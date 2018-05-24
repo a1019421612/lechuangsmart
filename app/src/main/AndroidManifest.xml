@@ -53,7 +53,14 @@
         <activity android:name=".activity.VersionActivity" />
         <activity android:name=".activity.WiFiActivity" />
         <activity android:name=".activity.FamilyManagerActivity" />
-        <activity android:name=".activity.EditPswActivity"></activity>
+        <activity android:name=".activity.EditPswActivity" />
+        <activity android:name=".activity.AnFangActivity" />
+        <activity android:name=".activity.ZhaoMingActivity" />
+        <activity android:name=".activity.ChuangLianActivity" />
+        <activity android:name=".activity.ChuanganqiActivity" />
+        <activity android:name=".activity.FangjianActivity" />
+        <activity android:name=".activity.KaiguanActivity" />
+        <activity android:name=".activity.YaokongqiActivity"></activity>
     </application>
 
 </manifest>
