@@ -20,6 +20,7 @@ import com.hbdiye.lechuangsmart.activity.FangjianActivity;
 import com.hbdiye.lechuangsmart.activity.KaiguanActivity;
 import com.hbdiye.lechuangsmart.activity.YaokongqiActivity;
 import com.hbdiye.lechuangsmart.activity.ZhaoMingActivity;
+import com.hbdiye.lechuangsmart.util.SPUtils;
 
 import org.java_websocket.client.WebSocketClient;
 
@@ -53,15 +54,18 @@ public class HomeFragment extends Fragment {
     private WebSocketConnection mConnection;
     WebSocketOptions mOptions = new WebSocketOptions();
     private Unbinder unbinder;
-
+    private String mobilephone;
+    private String password;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         unbinder = ButterKnife.bind(this, view);
         mConnection = new WebSocketConnection();
+        mobilephone= (String) SPUtils.get(getActivity(),"mobilephone","");
+        password= (String) SPUtils.get(getActivity(),"password","");
         try {
-            mConnection.connect("ws://39.104.105.10:18888/mobilephone=15944444444&password=123", new MyWebSocketHandler());
+            mConnection.connect("ws://39.104.105.10:18888/mobilephone="+mobilephone+"&password="+password, new MyWebSocketHandler());
 
         } catch (WebSocketException e) {
             e.printStackTrace();
@@ -114,6 +118,7 @@ public class HomeFragment extends Fragment {
         @Override
         public void onOpen() {
             Log.e("TAG", "open");
+            mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
         }
 
         @Override
