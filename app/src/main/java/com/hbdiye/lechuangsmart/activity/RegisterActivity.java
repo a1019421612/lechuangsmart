@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -13,12 +14,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.coder.zzq.smartshow.toast.SmartToast;
+import com.hbdiye.lechuangsmart.Global.InterfaceManager;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.utils.RegexUtils;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.Call;
 
 public class RegisterActivity extends BaseActivity {
 
@@ -77,10 +83,10 @@ public class RegisterActivity extends BaseActivity {
         switch (view.getId()) {
             case R.id.sendCodeButton:
                 if (checkPhone()) {
-                    Toast.makeText(this, "验证码", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, "验证码", Toast.LENGTH_SHORT).show();
                     timeCount=new TimeCount(10000,1000);
                     timeCount.start();
-
+                    getVailCode(mPhone);
                 }
                 break;
             case R.id.saveButton:
@@ -92,6 +98,26 @@ public class RegisterActivity extends BaseActivity {
                 finish();
                 break;
         }
+    }
+
+    private void getVailCode(String mPhone) {
+        OkHttpUtils
+                .post()
+                .url(InterfaceManager.getInstance().getURL(InterfaceManager.GETVAILCODE))
+                .addParams("mobilephone",mPhone)
+                .addParams("type","reg")
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        SmartToast.show("网络连接错误");
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        Log.e("TAG",response);
+                    }
+                });
     }
 
     class TimeCount extends CountDownTimer {

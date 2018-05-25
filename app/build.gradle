@@ -71,4 +71,5 @@ dependencies {
     compile 'com.zhy:okhttputils:2.6.2'
     compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.30'
     implementation files('libs/autobahn-0.5.0.jar')
+    implementation files('libs/gson-2.3.1.jar')
 }

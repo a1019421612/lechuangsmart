@@ -17,6 +17,7 @@
             android:textSize="@dimen/size_20" />
 
         <ImageView
+            android:id="@+id/iv_scene_edit"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
@@ -38,12 +39,13 @@
             android:scaleType="fitXY"
             android:src="@drawable/changjing" />
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_list"
+            android:id="@+id/rv_scene"
             android:layout_width="match_parent"
             android:background="#fff"
             android:layout_weight="1"
             android:layout_height="0dp"></android.support.v7.widget.RecyclerView>
         <LinearLayout
+            android:id="@+id/ll_add_scene"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"

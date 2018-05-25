@@ -60,7 +60,8 @@
         <activity android:name=".activity.ChuanganqiActivity" />
         <activity android:name=".activity.FangjianActivity" />
         <activity android:name=".activity.KaiguanActivity" />
-        <activity android:name=".activity.YaokongqiActivity"></activity>
+        <activity android:name=".activity.YaokongqiActivity" />
+        <activity android:name=".activity.SceneSettingActivity"></activity>
     </application>
 
 </manifest>

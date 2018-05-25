@@ -49,11 +49,10 @@ public class HomeFragment extends Fragment {
     LinearLayout llKaiguan;
     @BindView(R.id.ll_yaokong)
     LinearLayout llYaokong;
-    private WebSocketClient webSocketClient;
+
+    private Unbinder unbinder;
 
     private WebSocketConnection mConnection;
-    WebSocketOptions mOptions = new WebSocketOptions();
-    private Unbinder unbinder;
     private String mobilephone;
     private String password;
     @Nullable
