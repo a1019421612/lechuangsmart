@@ -14,6 +14,7 @@ public class AboutUsActivity extends BaseActivity {
 
     @Override
     protected String getTitleName() {
+
         return "关于我们";
     }
 
