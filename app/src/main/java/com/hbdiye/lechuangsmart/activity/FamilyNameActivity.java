@@ -1,16 +1,22 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.google.zxing.WriterException;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.bean.FamilyNameBean;
+import com.hbdiye.lechuangsmart.google.zxing.encoding.EncodingHandler;
+import com.hbdiye.lechuangsmart.util.DensityUtils;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 
 import butterknife.BindView;
@@ -32,6 +38,8 @@ public class FamilyNameActivity extends BaseActivity {
     TextView tvName;
     @BindView(R.id.tv_family_phone)
     TextView tvFamilyPhone;
+    @BindView(R.id.iv_qrcode)
+    ImageView ivQrcode;
     private WebSocketConnection mConnection;
     private String mobilephone;
     private String password;
@@ -77,11 +85,16 @@ public class FamilyNameActivity extends BaseActivity {
                 startActivity(new Intent(this, FamilyMemberActivity.class));
                 break;
             case R.id.tv_qrcode:
-                SmartToast.show("扫描二维码");
+                try {
+                    Bitmap qrCode = EncodingHandler.createQRCode("123", DensityUtils.dp2px(this,150));
+                    Glide.with(FamilyNameActivity.this).load(qrCode).into(ivQrcode);
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
+//                startActivity(new Intent(this, CaptureActivity.class));
                 break;
         }
     }
-
 
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
@@ -95,7 +108,8 @@ public class FamilyNameActivity extends BaseActivity {
             Log.e("TAG", "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
-            }if (payload.contains("\"pn\":\"UITP\"")){
+            }
+            if (payload.contains("\"pn\":\"UITP\"")) {
                 parseData(payload);
             }
         }

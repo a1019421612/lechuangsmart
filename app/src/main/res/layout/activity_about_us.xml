@@ -1,26 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/shezhibg"
-    android:orientation="vertical"
-    tools:context=".activity.AboutUsActivity">
-<ImageView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:src="@mipmap/xinxi"
-    android:layout_marginTop="40dp"
-    />
-    <TextView
+    >
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:textSize="@dimen/sp_16"
-        android:textColor="#fff"
-        android:text="河北棣烨信息有限公司成立于2018年1月18日.公司以经营物联网硬件设备、软件开发等业务。"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+    <TextView
+        android:id="@+id/tv_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fff"
+        android:layout_gravity="end"
+        android:text="123"
         />
-</LinearLayout>
+</android.support.v4.widget.DrawerLayout>
+<!--<LinearLayout -->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:background="@drawable/shezhibg"-->
+    <!--android:orientation="vertical"-->
+    <!--tools:context=".activity.AboutUsActivity">-->
+<!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:src="@mipmap/xinxi"-->
+    <!--android:layout_marginTop="40dp"-->
+    <!--/>-->
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="50dp"-->
+        <!--android:layout_marginLeft="20dp"-->
+        <!--android:layout_marginRight="20dp"-->
+        <!--android:textSize="@dimen/sp_16"-->
+        <!--android:textColor="#fff"-->
+        <!--android:text="河北棣烨信息有限公司成立于2018年1月18日.公司以经营物联网硬件设备、软件开发等业务。"-->
+        <!--/>-->
+<!--</LinearLayout>-->

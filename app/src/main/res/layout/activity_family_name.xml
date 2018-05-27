@@ -91,11 +91,13 @@
             android:drawableRight="@mipmap/right"
             />
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:id="@+id/iv_qrcode"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal"
-            android:src="@mipmap/ic_launcher_round"/>
+            android:src="@mipmap/ic_launcher"
+            />
         <TextView
             android:id="@+id/tv_qrcode"
             android:layout_width="match_parent"
