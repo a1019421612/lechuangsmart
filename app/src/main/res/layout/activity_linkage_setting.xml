@@ -31,7 +31,7 @@
                     android:id="@+id/tv_base_title"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="---"
+                    android:text="联动设置"
                     android:layout_centerInParent="true"
                     android:gravity="center_vertical"
                     android:textSize="@dimen/size_20"
@@ -66,29 +66,29 @@
             android:textSize="30sp"
             android:gravity="center_vertical"
             />
-</LinearLayout>
+    </LinearLayout>
 
 </android.support.v4.widget.DrawerLayout>
-<!--<LinearLayout -->
+    <!--<LinearLayout -->
     <!--android:layout_width="match_parent"-->
     <!--android:layout_height="match_parent"-->
     <!--android:background="@drawable/shezhibg"-->
     <!--android:orientation="vertical"-->
     <!--tools:context=".activity.AboutUsActivity">-->
-<!--<ImageView-->
+    <!--<ImageView-->
     <!--android:layout_width="match_parent"-->
     <!--android:layout_height="wrap_content"-->
     <!--android:src="@mipmap/xinxi"-->
     <!--android:layout_marginTop="40dp"-->
     <!--/>-->
     <!--<TextView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="50dp"-->
-        <!--android:layout_marginLeft="20dp"-->
-        <!--android:layout_marginRight="20dp"-->
-        <!--android:textSize="@dimen/sp_16"-->
-        <!--android:textColor="#fff"-->
-        <!--android:text="河北棣烨信息有限公司成立于2018年1月18日.公司以经营物联网硬件设备、软件开发等业务。"-->
-        <!--/>-->
-<!--</LinearLayout>-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginTop="50dp"-->
+    <!--android:layout_marginLeft="20dp"-->
+    <!--android:layout_marginRight="20dp"-->
+    <!--android:textSize="@dimen/sp_16"-->
+    <!--android:textColor="#fff"-->
+    <!--android:text="河北棣烨信息有限公司成立于2018年1月18日.公司以经营物联网硬件设备、软件开发等业务。"-->
+    <!--/>-->
+    <!--</LinearLayout>-->

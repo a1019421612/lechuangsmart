@@ -34,7 +34,7 @@ import de.tavendo.autobahn.WebSocketHandler;
 import de.tavendo.autobahn.WebSocketOptions;
 
 public class HomeFragment extends Fragment {
-    private static final String TAG = HomeFragment.class.getName();
+    private   String TAG = HomeFragment.class.getName();
     @BindView(R.id.ll_anfang)
     LinearLayout llAnfang;
     @BindView(R.id.ll_zhaoming)
@@ -116,13 +116,13 @@ public class HomeFragment extends Fragment {
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
-            Log.e("TAG", "open");
+            Log.e(TAG, "open");
             mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
         }
 
         @Override
         public void onTextMessage(String payload) {
-            Log.e("TAG", "onTextMessage" + payload);
+            Log.e(TAG, "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
@@ -130,7 +130,7 @@ public class HomeFragment extends Fragment {
 
         @Override
         public void onClose(int code, String reason) {
-            Log.e("TAG", "onClose");
+            Log.e(TAG, "onClose");
         }
     }
 
@@ -138,15 +138,15 @@ public class HomeFragment extends Fragment {
     public void onHiddenChanged(boolean hidden) {
         if (hidden) {
             // 隐藏
-            Log.e("TAG", "home" + "隐藏");
+            Log.e(TAG, "home" + "隐藏");
             mConnection.disconnect();
 
         } else {
             // 可视
-            Log.e("TAG", "home" + "显示");
+            Log.e(TAG, "home" + "显示");
             if (mConnection != null) {
                 try {
-                    mConnection.connect("ws://39.104.105.10:18888/mobilephone=15944444444&password=123", new MyWebSocketHandler());
+                    mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
 
                 } catch (WebSocketException e) {
                     e.printStackTrace();

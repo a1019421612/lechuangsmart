@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/ll_scene_item"
+        android:id="@+id/ll_linkage_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -13,7 +13,7 @@
         android:padding="10dp">
 
         <LinearLayout
-            android:id="@+id/ll_scene_item_del"
+            android:id="@+id/ll_linkage_item_del"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:visibility="gone">
@@ -27,18 +27,24 @@
         <ImageView
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:src="@mipmap/changjing1" />
+            android:padding="3dp"
+            android:src="@mipmap/iconliandongoff" />
 
         <TextView
-            android:id="@+id/tv_scene_name"
+            android:id="@+id/tv_linkage_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_weight="1"
             android:text="123" />
-
+        <CheckBox
+            android:id="@+id/checkbox_switch"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:button="@drawable/switch_selector"
+            />
         <LinearLayout
-            android:id="@+id/ll_scene_item_edt"
+            android:id="@+id/ll_linkage_item_edt"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:visibility="gone">

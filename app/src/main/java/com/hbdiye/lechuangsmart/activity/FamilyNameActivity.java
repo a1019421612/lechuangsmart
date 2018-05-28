@@ -153,7 +153,7 @@ public class FamilyNameActivity extends BaseActivity {
         Log.e("TAG", "onrestart");
         if (mConnection != null) {
             try {
-                mConnection.connect("ws://39.104.105.10:18888/mobilephone=15944444444&password=123", new MyWebSocketHandler());
+                mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
 
             } catch (WebSocketException e) {
                 e.printStackTrace();

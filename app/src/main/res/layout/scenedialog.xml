@@ -12,6 +12,7 @@
         android:layout_centerInParent="true"
         >
         <TextView
+            android:id="@+id/tv_dialog_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="修改场景名称"
@@ -25,7 +26,7 @@
             android:id="@+id/applayloandailog_code_edt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="请输入场景名称"
+            android:hint=""
             android:padding="10dp"
             android:layout_marginBottom="30dp"
             android:layout_marginLeft="30dp"
