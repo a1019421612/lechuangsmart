@@ -105,7 +105,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                         break;
                     case R.id.ll_scene_item:
                         if (editStatus) {
-                            startActivity(new Intent(getActivity(), SceneSettingActivity.class));
+                            startActivity(new Intent(getActivity(), SceneSettingActivity.class).putExtra("sceneID",mList.get(position).id));
                         } else {
                             String sceneId = mList.get(position).id;
                             sceneName = mList.get(position).name;
@@ -172,7 +172,9 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    SmartToast.show("场景：" + sceneName + "已启用！");
+                    if (status){
+                        SmartToast.show("场景：" + sceneName + "已启用！");
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -182,9 +184,11 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 try {
                     JSONObject jsonObject=new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    sceneDialog.dismiss();
-                    SmartToast.show("修改成功");
-                    mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                    if (status){
+                        sceneDialog.dismiss();
+                        SmartToast.show("修改成功");
+                        mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -204,9 +208,11 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 try {
                     JSONObject jsonObject=new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    sceneDialog.dismiss();
-                    SmartToast.show("添加场景成功");
-                    mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                    if (status){
+                        sceneDialog.dismiss();
+                        SmartToast.show("添加场景成功");
+                        mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
