@@ -49,7 +49,7 @@
         </activity>
         <activity android:name=".activity.FamilyNameActivity" />
         <activity android:name=".activity.FamilyMemberActivity" />
-        <activity android:name=".activity.AboutUsActivity"></activity>
+        <activity android:name=".activity.AboutUsActivity" />
         <activity android:name=".activity.VersionActivity" />
         <activity android:name=".activity.WiFiActivity" />
         <activity android:name=".activity.FamilyManagerActivity" />
@@ -63,7 +63,8 @@
         <activity android:name=".activity.YaokongqiActivity" />
         <activity android:name=".activity.SceneSettingActivity" />
         <activity android:name=".google.zxing.activity.CaptureActivity" />
-        <activity android:name=".activity.LinkageSettingActivity"></activity>
+        <activity android:name=".activity.LinkageSettingActivity" />
+        <activity android:name=".activity.TimeTriggeredActivity"></activity>
     </application>
 
 </manifest>

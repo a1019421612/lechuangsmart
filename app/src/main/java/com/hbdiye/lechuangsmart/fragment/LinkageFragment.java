@@ -92,7 +92,7 @@ public class LinkageFragment extends Fragment {
                 switch (view.getId()) {
                     case R.id.ll_linkage_item:
                         if (editStatus){
-                            startActivity(new Intent(getActivity(), LinkageSettingActivity.class));
+                            startActivity(new Intent(getActivity(), LinkageSettingActivity.class).putExtra("linkageID",mList.get(position).id));
                         }
                         break;
                     case R.id.ll_linkage_item_del:

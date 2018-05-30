@@ -94,6 +94,8 @@ public class SceneSettingActivity extends AppCompatActivity {
     private SceneDialog sceneDialog;
     private SceneDeviceBean sceneDeviceBean;
 
+    private int dialogflag;//开关列表标志
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,11 +146,12 @@ public class SceneSettingActivity extends AppCompatActivity {
                         builder.show();
                         break;
                     case R.id.tv_scene_setting_switch:
+                        dialogflag=-1;
                         final List<SceneDeviceBean.SceneTasks.ProActs> proActs = mList.get(position).proActs;
 //                        String[] proActs_id = new String[proActs.size()];
                         String proActID = mList.get(position).proActID;
                         String[] proActs_name = new String[proActs.size()];
-                        int dialogflag=-1;
+
                         for (int i = 0; i < proActs.size(); i++) {
                             proActs_name[i]=proActs.get(i).name;
                             if (proActID.equals(proActs.get(i).id)){
@@ -160,7 +163,10 @@ public class SceneSettingActivity extends AppCompatActivity {
                         proActs_list.setSingleChoiceItems(proActs_name, dialogflag, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                SmartToast.show(proActs.get(which).name);
+//                                SmartToast.show(proActs.get(which).name);
+                              if (which!=dialogflag){
+                                  mConnection.sendTextMessage("{\"pn\":\"STUTP\",\"stID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + mList.get(position).proActs.get(which).id + "\",\"delaytime\":\"" + mList.get(position).delaytime + "\"}");
+                              }
                                 dialog.dismiss();
                             }
                         });

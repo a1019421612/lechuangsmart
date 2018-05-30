@@ -7,9 +7,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
         <LinearLayout
             android:id="@+id/toolbar_ll"
             android:layout_width="match_parent"
@@ -48,11 +49,79 @@
                     />
             </RelativeLayout>
         </LinearLayout>
-    </FrameLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bgindex"
+        android:orientation="vertical"
+        android:padding="20dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            android:padding="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@mipmap/changjing1"
+                />
+            <TextView
+                android:id="@+id/tv_linkage_name"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="---"
+                android:layout_marginLeft="10dp"
+                android:background="#fff"
+                />
+            <ImageView
+                android:id="@+id/iv_linkage_edit"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:padding="3dp"
+                android:scaleType="fitXY"
+                android:src="@mipmap/bianji" />
+        </LinearLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_linkage_setting"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="@dimen/dp_10"
+            >
+
+        </android.support.v7.widget.RecyclerView>
+        <LinearLayout
+            android:layout_marginTop="@dimen/dp_10"
+            android:id="@+id/ll_add_device"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/tianjia"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="添加新设备"
+                android:gravity="center_horizontal"
+                android:textColor="#fff"
+                android:padding="10dp"
+                />
+        </LinearLayout>
+    </LinearLayout>
+    </LinearLayout>
     <LinearLayout
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:background="#fff"
+        android:orientation="vertical"
         android:layout_gravity="end"
         >
         <TextView
@@ -66,6 +135,10 @@
             android:textSize="30sp"
             android:gravity="center_vertical"
             />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_linkage_device"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
 </android.support.v4.widget.DrawerLayout>
