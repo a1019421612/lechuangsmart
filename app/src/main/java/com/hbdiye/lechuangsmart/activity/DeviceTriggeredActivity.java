@@ -1,10 +1,12 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -73,6 +76,11 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
 
     private LinkageSettingBean.Linkage linkage;
 
+    String[] items_fanwei={"大于","小于","等于"};
+    int[] items_value={-1,0,1};
+    private int type=-2;
+    private int flag_type=-2;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +99,16 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
 
         String name = linkage.device.name;
         tvDeviceTrigName.setText(name);
-
+        int value = linkage.value;
+        type = linkage.type;
+        if (type ==-1){
+            tvDeviceTrigCondition.setText("大于");
+        }else if (type ==0){
+            tvDeviceTrigCondition.setText("小于");
+        }else if (type ==1){
+            tvDeviceTrigCondition.setText("等于");
+        }
+        etDeviceTrigValue.setText(value+"");
     }
 
     private void initView() {
@@ -126,6 +143,13 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
         rvDeviceTrig.setLayoutManager(manager);
         adapter=new DeviceTriggeredAdapter(mList);
         rvDeviceTrig.setAdapter(adapter);
+
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter baseQuickAdapter, View view, int i) {
+
+            }
+        });
     }
 
 
@@ -149,8 +173,39 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.tv_device_trig_attr:
+                List<LinkageSettingBean.Linkage.Device.DeviceAttributes> deviceAttributes = linkage.device.deviceAttributes;
+                String[] items_attr=new String[deviceAttributes.size()];
+                for (int i = 0; i < deviceAttributes.size(); i++) {
+                    String attName = deviceAttributes.get(i).proAtt.name;
+                    items_attr[i]=attName;
+                }
+                AlertDialog.Builder builder=new AlertDialog.Builder(this);
+                builder.setSingleChoiceItems(items_attr, -1, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                builder.show();
                 break;
             case R.id.tv_device_trig_condition:
+                //选择大于小于等于
+                for (int i = 0; i < items_value.length; i++) {
+                    if (items_value[i]==type){
+                        flag_type=i;
+                    }
+                }
+                AlertDialog.Builder builder1=new AlertDialog.Builder(this);
+                builder1.setSingleChoiceItems(items_fanwei, flag_type, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                            type=items_value[i];
+                            SmartToast.show(type+"");
+                            tvDeviceTrigCondition.setText(items_fanwei[i]);
+                        dialogInterface.dismiss();
+                    }
+                });
+                builder1.show();
                 break;
         }
     }
