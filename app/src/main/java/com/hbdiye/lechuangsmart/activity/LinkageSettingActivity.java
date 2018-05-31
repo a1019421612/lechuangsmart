@@ -85,8 +85,12 @@ public class LinkageSettingActivity extends AppCompatActivity {
     private LinkageSettingAdapter adapter;
 
 
-    //头布局
+    //头布局 时间联动
     private TextView tv_time_mode, tv_time_timing;
+    private LinearLayout ll_dingshi;
+    //头布局 设备联动
+    private TextView tv_device_name,tv_device_cfgn,tv_device_cftj;
+    private LinearLayout ll_device;
 
     private SceneDialog sceneDialog;
 
@@ -94,14 +98,15 @@ public class LinkageSettingActivity extends AppCompatActivity {
     private int timeFlag = -1;//position
 
     private int dialogflag;//开关列表标志
-    private LinearLayout ll_dingshi;
     private LinkageSettingBean.Linkage linkage;
+    private String timingId="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_linkage_setting);
         ButterKnife.bind(this);
+        timingId = getIntent().getStringExtra("timingId");
         initView();
         initCustomTimePicker();
         initData();
@@ -175,6 +180,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
     }
     private void initData() {
         linkageID = getIntent().getStringExtra("linkageID");
+
         mobilephone = (String) SPUtils.get(this, "mobilephone", "");
         password = (String) SPUtils.get(this, "password", "");
         mConnection = new WebSocketConnection();
@@ -221,6 +227,31 @@ public class LinkageSettingActivity extends AppCompatActivity {
         adapter = new LinkageSettingAdapter(mList);
         rvLinkageSetting.setAdapter(adapter);
 
+        if (timingId.equals("null")){
+            //设备联动
+            addDeviceHeader();
+        }else {
+            //时间联动
+            addTimeHeader();
+        }
+    }
+
+    private void addDeviceHeader() {
+        View view=getLayoutInflater().inflate(R.layout.device_linkage_head, (ViewGroup) rvLinkageSetting.getParent(),false);
+        adapter.addHeaderView(view);
+        tv_device_name = view.findViewById(R.id.tv_device_linkage_name);
+        tv_device_cfgn=view.findViewById(R.id.tv_chufagn);
+        tv_device_cftj=view.findViewById(R.id.tv_chufatj);
+        ll_device=view.findViewById(R.id.ll_device);
+        ll_device.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LinkageSettingActivity.this,DeviceTriggeredActivity.class).putExtra("LinkageData",linkage));
+            }
+        });
+    }
+
+    private void addTimeHeader() {
         View view = getLayoutInflater().inflate(R.layout.time_linkage_head, (ViewGroup) rvLinkageSetting.getParent(), false);
         adapter.addHeaderView(view);
         tv_time_mode = view.findViewById(R.id.tv_linkage_time_mode);
@@ -293,6 +324,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
             Log.e("TAG", "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+
             }
             if (payload.contains("\"pn\":\"LCTP\"")) {
                 parseData(payload);
@@ -387,15 +419,42 @@ public class LinkageSettingActivity extends AppCompatActivity {
             LinkageSettingBean linkageSettingBean = new Gson().fromJson(payload, LinkageSettingBean.class);
             linkage = linkageSettingBean.linkage;
             String name = linkageSettingBean.linkage.name;
-            String cronExpression = linkageSettingBean.linkage.timingRecord.cronExpression;
-            String timing = linkageSettingBean.linkage.timingRecord.timing;
             tvLinkageName.setText(name);
-            if (TextUtils.isEmpty(cronExpression)){
-                tv_time_mode.setText("仅一次");
+            if (timingId.equals("null")){
+                //设备联动
+                String name1 = linkageSettingBean.linkage.device.name;
+                String name2 = linkageSettingBean.linkage.proAtt.name;
+                tv_device_name.setText(name1);
+                tv_device_cfgn.setText(name2);
+                int value = linkageSettingBean.linkage.value;
+                if (name2.equals("开关")){
+                    if (value==0){
+                        tv_device_cftj.setText("关闭");
+                    }else {
+                        tv_device_cftj.setText("开启");
+                    }
+                }else {
+                    int type = linkageSettingBean.linkage.type;
+                    if (type==-1){
+                        tv_device_cftj.setText("(>)"+value);
+                    }else if (type==0){
+                        tv_device_cftj.setText("(<)"+value);
+                    }else if (type==1){
+                        tv_device_cftj.setText("(=)"+value);
+                    }
+                }
             }else {
-                tv_time_mode.setText(cronExpression);
+                //时间联动
+                String cronExpression = linkageSettingBean.linkage.timingRecord.cronExpression;
+                String timing = linkageSettingBean.linkage.timingRecord.timing;
+                if (TextUtils.isEmpty(cronExpression)){
+                    tv_time_mode.setText("仅一次");
+                }else {
+                    tv_time_mode.setText(cronExpression);
+                }
+                tv_time_timing.setText(timing);
             }
-            tv_time_timing.setText(timing);
+
             List<LinkageSettingBean.Lts> lts = linkageSettingBean.lts;
             if (mList.size() > 0) {
                 mList.clear();

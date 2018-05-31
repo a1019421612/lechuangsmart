@@ -92,7 +92,8 @@ public class LinkageFragment extends Fragment {
                 switch (view.getId()) {
                     case R.id.ll_linkage_item:
                         if (editStatus){
-                            startActivity(new Intent(getActivity(), LinkageSettingActivity.class).putExtra("linkageID",mList.get(position).id));
+                            String timingID = mList.get(position).timingID+"";
+                            startActivity(new Intent(getActivity(), LinkageSettingActivity.class).putExtra("linkageID",mList.get(position).id).putExtra("timingId",timingID));
                         }
                         break;
                     case R.id.ll_linkage_item_del:
@@ -242,7 +243,9 @@ public class LinkageFragment extends Fragment {
             if (mList.size() > 0) {
                 mList.clear();
             }
+
             List<LinkageBean.Linkages> linkages = linkageBean.linkages;
+
             mList.addAll(linkages);
             adapter.notifyDataSetChanged();
         } catch (JsonSyntaxException e) {

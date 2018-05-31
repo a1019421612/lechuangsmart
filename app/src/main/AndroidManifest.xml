@@ -64,7 +64,8 @@
         <activity android:name=".activity.SceneSettingActivity" />
         <activity android:name=".google.zxing.activity.CaptureActivity" />
         <activity android:name=".activity.LinkageSettingActivity" />
-        <activity android:name=".activity.TimeTriggeredActivity"></activity>
+        <activity android:name=".activity.TimeTriggeredActivity" />
+        <activity android:name=".activity.DeviceTriggeredActivity"></activity>
     </application>
 
 </manifest>
