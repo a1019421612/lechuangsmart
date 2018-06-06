@@ -65,7 +65,7 @@
             <ImageView
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:src="@mipmap/changjing1"
+                android:src="@drawable/tab_found_hover"
                 />
             <TextView
                 android:id="@+id/tv_linkage_name"

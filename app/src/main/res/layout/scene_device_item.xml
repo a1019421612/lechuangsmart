@@ -12,8 +12,9 @@
         android:padding="@dimen/dp_10">
 
         <ImageView
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:id="@+id/iv_device_icon_item"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:src="@drawable/fangjianicon" />
 
         <TextView

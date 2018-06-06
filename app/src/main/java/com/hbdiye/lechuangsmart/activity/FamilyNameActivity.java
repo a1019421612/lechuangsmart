@@ -44,6 +44,8 @@ public class FamilyNameActivity extends BaseActivity {
     private String mobilephone;
     private String password;
 
+    private String TAG=FamilyNameActivity.class.getSimpleName();
+
     @Override
     protected void initData() {
         mobilephone = (String) SPUtils.get(this, "mobilephone", "");
@@ -99,13 +101,13 @@ public class FamilyNameActivity extends BaseActivity {
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
-            Log.e("TAG", "open");
+            Log.e(TAG, "open");
             mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
         }
 
         @Override
         public void onTextMessage(String payload) {
-            Log.e("TAG", "onTextMessage" + payload);
+            Log.e(TAG, "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
@@ -116,7 +118,7 @@ public class FamilyNameActivity extends BaseActivity {
 
         @Override
         public void onClose(int code, String reason) {
-            Log.e("TAG", "onClose");
+            Log.e(TAG, "onClose");
         }
     }
 
@@ -143,14 +145,14 @@ public class FamilyNameActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.e("TAG", "onstop");
+        Log.e(TAG, "onstop");
         mConnection.disconnect();
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.e("TAG", "onrestart");
+        Log.e(TAG, "onrestart");
         if (mConnection != null) {
             try {
                 mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
@@ -165,7 +167,7 @@ public class FamilyNameActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e("TAG", "onstop");
+        Log.e(TAG, "onstop");
         mConnection.disconnect();
     }
 }

@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
 import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
 import com.bigkoo.pickerview.view.OptionsPickerView;
+import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
@@ -100,6 +101,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
     private int dialogflag;//开关列表标志
     private LinkageSettingBean.Linkage linkage;
     private String timingId="";
+    private ImageView iv_header;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -243,10 +245,11 @@ public class LinkageSettingActivity extends AppCompatActivity {
         tv_device_cfgn=view.findViewById(R.id.tv_chufagn);
         tv_device_cftj=view.findViewById(R.id.tv_chufatj);
         ll_device=view.findViewById(R.id.ll_device);
+        iv_header = view.findViewById(R.id.iv_header);
         ll_device.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LinkageSettingActivity.this,DeviceTriggeredActivity.class).putExtra("LinkageData",linkage));
+                startActivity(new Intent(LinkageSettingActivity.this,DeviceTriggeredActivity.class).putExtra("LinkageData",linkage).putExtra("linkageID",linkageID));
             }
         });
     }
@@ -424,23 +427,26 @@ public class LinkageSettingActivity extends AppCompatActivity {
                 //设备联动
                 String name1 = linkageSettingBean.linkage.device.name;
                 String name2 = linkageSettingBean.linkage.proAtt.name;
+                String modelPath = linkageSettingBean.linkage.device.product.modelPath;
                 tv_device_name.setText(name1);
+                Glide.with(this).load(ContentConfig.drawableByIcon(linkageSettingBean.linkage.device.product.icon)).into(iv_header);
                 tv_device_cfgn.setText(name2);
                 int value = linkageSettingBean.linkage.value;
-                if (name2.equals("开关")){
+                if (modelPath.equals("pro_switch")){
                     if (value==0){
                         tv_device_cftj.setText("关闭");
                     }else {
                         tv_device_cftj.setText("开启");
                     }
                 }else {
+                    int value1 = linkageSettingBean.linkage.value;
                     int type = linkageSettingBean.linkage.type;
                     if (type==-1){
-                        tv_device_cftj.setText("(>)"+value);
+                        tv_device_cftj.setText("(>)"+value1);
                     }else if (type==0){
-                        tv_device_cftj.setText("(<)"+value);
+                        tv_device_cftj.setText("(=)"+value1);
                     }else if (type==1){
-                        tv_device_cftj.setText("(=)"+value);
+                        tv_device_cftj.setText("(<)"+value1);
                     }
                 }
             }else {

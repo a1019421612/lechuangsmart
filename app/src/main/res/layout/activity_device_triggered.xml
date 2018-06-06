@@ -71,8 +71,9 @@
                     android:textColor="#000"
                     />
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/iv_triggered_icon"
+                    android:layout_width="50dp"
+                    android:layout_height="40dp"
                     android:src="@mipmap/shebei1"
                     />
                 <TextView
@@ -104,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:background="#fff"
                 android:padding="@dimen/dp_10"
-                android:text="---"
+                android:hint="---"
                 android:drawableRight="@mipmap/down"
                 />
             <TextView
@@ -125,7 +126,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/dp_10"
-                android:text="---"
+                android:hint="---"
                 android:background="#fff"
                 android:drawableRight="@mipmap/down"
                 />

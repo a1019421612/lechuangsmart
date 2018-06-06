@@ -12,8 +12,8 @@
         android:orientation="horizontal">
         <ImageView
             android:id="@+id/iv_device_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="40dp"
             android:src="@mipmap/shebei1"
             />
         <TextView
@@ -28,6 +28,7 @@
             android:id="@+id/tv_device_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             android:text="设备离线"
             />
     </LinearLayout>

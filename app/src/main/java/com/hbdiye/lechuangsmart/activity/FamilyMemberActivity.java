@@ -32,6 +32,8 @@ public class FamilyMemberActivity extends BaseActivity {
     private List<FamilyNameBean.FamilyUsers> mList=new ArrayList<>();
     private FamilyMemberAdapter adapter;
 
+    private String TAG=FamilyMemberActivity.class.getSimpleName();
+
     @Override
     protected void initData() {
         mobilephone = (String) SPUtils.get(this, "mobilephone", "");
@@ -73,13 +75,13 @@ public class FamilyMemberActivity extends BaseActivity {
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
-            Log.e("TAG", "open");
+            Log.e(TAG, "open");
             mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
         }
 
         @Override
         public void onTextMessage(String payload) {
-            Log.e("TAG", "onTextMessage" + payload);
+            Log.e(TAG, "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
@@ -90,7 +92,7 @@ public class FamilyMemberActivity extends BaseActivity {
 
         @Override
         public void onClose(int code, String reason) {
-            Log.e("TAG", "onClose");
+            Log.e(TAG, "onClose");
         }
     }
     private void parseData(String payload) {
@@ -110,14 +112,14 @@ public class FamilyMemberActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.e("TAG", "onstop");
+        Log.e(TAG, "onstop");
         mConnection.disconnect();
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.e("TAG", "onrestart");
+        Log.e(TAG, "onrestart");
         if (mConnection != null) {
             socketConnect();
         }
@@ -126,7 +128,7 @@ public class FamilyMemberActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e("TAG", "onstop");
+        Log.e(TAG, "onstop");
         mConnection.disconnect();
     }
 }

@@ -63,13 +63,13 @@ public class HomeFragment extends Fragment {
         mConnection = new WebSocketConnection();
         mobilephone= (String) SPUtils.get(getActivity(),"mobilephone","");
         password= (String) SPUtils.get(getActivity(),"password","");
-        try {
-            mConnection.connect("ws://39.104.105.10:18888/mobilephone="+mobilephone+"&password="+password, new MyWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
+//        try {
+//            mConnection.connect("ws://39.104.105.10:18888/mobilephone="+mobilephone+"&password="+password, new MyWebSocketHandler());
+//
+//        } catch (WebSocketException e) {
+//            e.printStackTrace();
+//            SmartToast.show("网络连接错误");
+//        }
         return view;
     }
 
@@ -134,25 +134,25 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        if (hidden) {
-            // 隐藏
-            Log.e(TAG, "home" + "隐藏");
-            mConnection.disconnect();
-
-        } else {
-            // 可视
-            Log.e(TAG, "home" + "显示");
-            if (mConnection != null) {
-                try {
-                    mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-                } catch (WebSocketException e) {
-                    e.printStackTrace();
-                    SmartToast.show("网络连接错误");
-                }
-            }
-        }
-    }
+//    @Override
+//    public void onHiddenChanged(boolean hidden) {
+//        if (hidden) {
+//            // 隐藏
+//            Log.e(TAG, "home" + "隐藏");
+//            mConnection.disconnect();
+//
+//        } else {
+//            // 可视
+//            Log.e(TAG, "home" + "显示");
+//            if (mConnection != null) {
+//                try {
+//                    mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+//
+//                } catch (WebSocketException e) {
+//                    e.printStackTrace();
+//                    SmartToast.show("网络连接错误");
+//                }
+//            }
+//        }
+//    }
 }

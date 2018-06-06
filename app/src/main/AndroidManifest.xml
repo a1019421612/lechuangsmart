@@ -66,6 +66,9 @@
         <activity android:name=".activity.LinkageSettingActivity" />
         <activity android:name=".activity.TimeTriggeredActivity" />
         <activity android:name=".activity.DeviceTriggeredActivity"></activity>
+        <service android:name=".service.WebSocketService"
+            android:enabled="true"
+            android:exported="true"/>
     </application>
 
 </manifest>

@@ -1,37 +1,41 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.content.DialogInterface;
-import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
-import com.bigkoo.pickerview.builder.TimePickerBuilder;
-import com.bigkoo.pickerview.listener.CustomListener;
 import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
-import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.OptionsPickerView;
 import com.bigkoo.pickerview.view.TimePickerView;
+import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.hbdiye.lechuangsmart.Global.ContentConfig;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.adapter.ImageAdapter;
 import com.hbdiye.lechuangsmart.adapter.SceneSettingAdapter;
 import com.hbdiye.lechuangsmart.adapter.SceneSettingDeviceAdapter;
+import com.hbdiye.lechuangsmart.bean.ImageBean;
 import com.hbdiye.lechuangsmart.bean.SceneDeviceBean;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.hbdiye.lechuangsmart.views.SceneDialog;
@@ -40,8 +44,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -50,8 +52,6 @@ import butterknife.OnClick;
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
-
-import static com.hbdiye.lechuangsmart.util.DateUtil.getTime;
 
 public class SceneSettingActivity extends AppCompatActivity {
     @BindView(R.id.iv_base_back)
@@ -74,6 +74,8 @@ public class SceneSettingActivity extends AppCompatActivity {
     RecyclerView rvSceneSetting;
     @BindView(R.id.rv_scene_device)
     RecyclerView rvSceneDevice;
+    @BindView(R.id.iv_scene_setting_icon)
+    ImageView ivSceneSettingIcon;
     private boolean isOpen = false;//默认侧边栏关闭
     private String sceneID = "";
 
@@ -95,6 +97,12 @@ public class SceneSettingActivity extends AppCompatActivity {
     private SceneDeviceBean sceneDeviceBean;
 
     private int dialogflag;//开关列表标志
+
+    //pupupwindows
+    private PopupWindow popupWindow;
+    private RecyclerView rv_image_list;
+
+    private List<ImageBean> mList_image=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,27 +154,27 @@ public class SceneSettingActivity extends AppCompatActivity {
                         builder.show();
                         break;
                     case R.id.tv_scene_setting_switch:
-                        dialogflag=-1;
+                        dialogflag = -1;
                         final List<SceneDeviceBean.SceneTasks.ProActs> proActs = mList.get(position).proActs;
 //                        String[] proActs_id = new String[proActs.size()];
                         String proActID = mList.get(position).proActID;
                         String[] proActs_name = new String[proActs.size()];
 
                         for (int i = 0; i < proActs.size(); i++) {
-                            proActs_name[i]=proActs.get(i).name;
-                            if (proActID.equals(proActs.get(i).id)){
-                                dialogflag=i;
+                            proActs_name[i] = proActs.get(i).name;
+                            if (proActID.equals(proActs.get(i).id)) {
+                                dialogflag = i;
                             }
                         }
 
-                        AlertDialog.Builder proActs_list=new AlertDialog.Builder(SceneSettingActivity.this);
+                        AlertDialog.Builder proActs_list = new AlertDialog.Builder(SceneSettingActivity.this);
                         proActs_list.setSingleChoiceItems(proActs_name, dialogflag, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 //                                SmartToast.show(proActs.get(which).name);
-                              if (which!=dialogflag){
-                                  mConnection.sendTextMessage("{\"pn\":\"STUTP\",\"stID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + mList.get(position).proActs.get(which).id + "\",\"delaytime\":\"" + mList.get(position).delaytime + "\"}");
-                              }
+                                if (which != dialogflag) {
+                                    mConnection.sendTextMessage("{\"pn\":\"STUTP\",\"stID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + mList.get(position).proActs.get(which).id + "\",\"delaytime\":\"" + mList.get(position).delaytime + "\"}");
+                                }
                                 dialog.dismiss();
                             }
                         });
@@ -189,6 +197,25 @@ public class SceneSettingActivity extends AppCompatActivity {
         password = (String) SPUtils.get(this, "password", "");
         mConnection = new WebSocketConnection();
         socketConnection();
+
+        initImageData();
+    }
+
+    private void initImageData() {
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.changjing1);setIconName("changjing1");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.huijia);setIconName("changjing2");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.youxi);setIconName("changjing3");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.ipod);setIconName("changjing4");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.zixingche);setIconName("changjing5");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.chuang);setIconName("changjing6");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.jita);setIconName("changjing7");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.dianhua);setIconName("changjing8");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.dangao);setIconName("changjing9");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.guangdie);setIconName("changjing10");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.erji);setIconName("changjing11");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.suo);setIconName("changjing12");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.kaisuo);setIconName("changjing13");}});
+        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.mojing);setIconName("changjing14");}});
     }
 
     private void initView() {
@@ -232,7 +259,7 @@ public class SceneSettingActivity extends AppCompatActivity {
         rvSceneDevice.setAdapter(mAdapter);
     }
 
-    @OnClick({R.id.iv_base_back, R.id.iv_base_right, R.id.iv_scene_edit, R.id.ll_add_device})
+    @OnClick({R.id.iv_base_back, R.id.iv_base_right, R.id.iv_scene_edit, R.id.ll_add_device, R.id.iv_scene_setting_icon})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_scene_edit:
@@ -254,7 +281,52 @@ public class SceneSettingActivity extends AppCompatActivity {
                     finish();
                 }
                 break;
+            case R.id.iv_scene_setting_icon:
+                showPopWindow(getView());
+                break;
         }
+    }
+
+    private void showPopWindow(View view) {
+        popupWindow=new PopupWindow(view, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow.setFocusable(true);
+        popupWindow.setOutsideTouchable(true);
+        ColorDrawable cd = new ColorDrawable(0x00ffffff);// 背景颜色全透明
+        popupWindow.setBackgroundDrawable(cd);
+        int[] location = new int[2];
+        ivSceneSettingIcon.getLocationOnScreen(location);
+        backgroundAlpha(0.5f);// 设置背景半透明
+        popupWindow.showAsDropDown(ivSceneSettingIcon);
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+
+            @Override
+            public void onDismiss() {
+                popupWindow = null;// 当点击屏幕时，使popupWindow消失
+                backgroundAlpha(1.0f);// 当点击屏幕时，使半透明效果取消
+            }
+        });
+    }
+    // 设置popupWindow背景半透明
+    public void backgroundAlpha(float bgAlpha) {
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.alpha = bgAlpha;// 0.0-1.0
+        getWindow().setAttributes(lp);
+    }
+    private View getView() {
+        View view= LayoutInflater.from(this).inflate(R.layout.popup_image_list,null);
+        rv_image_list = view.findViewById(R.id.rv_image_list);
+        rv_image_list.setLayoutManager(new GridLayoutManager(this,9));
+        ImageAdapter imageAdapter=new ImageAdapter(mList_image);
+        rv_image_list.setAdapter(imageAdapter);
+        imageAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                String s = tvSceneName.getText().toString();
+                mConnection.sendTextMessage("{\"pn\":\"SUTP\",\"sceneID\":\"" + sceneID + "\",\"icon\":\""+mList_image.get(position).getIconName()+"\",\"name\":\"" + s + "\"}");
+                popupWindow.dismiss();
+            }
+        });
+        return view;
     }
 
     public View.OnClickListener dailogClicer = new View.OnClickListener() {
@@ -270,7 +342,7 @@ public class SceneSettingActivity extends AppCompatActivity {
                     if (TextUtils.isEmpty(sceneName)) {
                         SmartToast.show("场景名称不能为空");
                     } else {
-                        mConnection.sendTextMessage("{\"pn\":\"SUTP\",\"sceneID\":\"" + sceneID + "\",\"icon\":\"changjing1.png\",\"name\":\"" + sceneName + "\"}");
+                        mConnection.sendTextMessage("{\"pn\":\"SUTP\",\"sceneID\":\"" + sceneID + "\",\"name\":\"" + sceneName + "\"}");
                     }
                     break;
             }
@@ -309,7 +381,9 @@ public class SceneSettingActivity extends AppCompatActivity {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     if (status) {
-                        sceneDialog.dismiss();
+                        if (sceneDialog!=null){
+                            sceneDialog.dismiss();
+                        }
                         SmartToast.show("修改成功");
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
                     }
@@ -366,6 +440,7 @@ public class SceneSettingActivity extends AppCompatActivity {
         try {
             sceneDeviceBean = new Gson().fromJson(payload, SceneDeviceBean.class);
             tvSceneName.setText(sceneDeviceBean.scene.name);
+            Glide.with(this).load(ContentConfig.sceneIcon(sceneDeviceBean.scene.icon)).into(ivSceneSettingIcon);
             List<SceneDeviceBean.SceneTasks> sceneTasks = sceneDeviceBean.sceneTasks;
             List<SceneDeviceBean.Devices> devices = sceneDeviceBean.devices;
             if (mList.size() > 0) {

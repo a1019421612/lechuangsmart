@@ -1,23 +1,20 @@
 package com.hbdiye.lechuangsmart;
 
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
@@ -59,12 +56,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SceneFragment sceneFragment;
     private LinkageFragment linkageFragment;
     private SettingFragment settingFragment;
+    private Intent serviceIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         irDeviceId = AndroidUniqueId.getUniqueId(this);
         initView();
+        initData();
         fragmentManager = getSupportFragmentManager();
         changeTextViewColor();
         changeSelectedTabState(0);
@@ -112,6 +112,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                .ready()
 //                .go(getUrl());
 //        mAgentWeb.getJsInterfaceHolder().addJavaObject("android", new AndroidInterface());
+    }
+
+    private void initData() {
+//        serviceIntent = new Intent(MainActivity.this, WebSocketService.class);
+//        startService(serviceIntent);
     }
 
     private void initView() {
@@ -240,6 +245,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 showFragment(3);
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        stopService(serviceIntent);
     }
     /**
      * ====================================Android与HTML通信接口===========开始===========================================

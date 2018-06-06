@@ -12,6 +12,9 @@ import com.hbdiye.lechuangsmart.adapter.AnFangAdapter;
 import com.hbdiye.lechuangsmart.bean.AnFangBean;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +33,7 @@ public class AnFangActivity extends BaseActivity {
 
     private List<AnFangBean.Devices> mList=new ArrayList<>();
     private AnFangAdapter adapter;
+    private List<Boolean> mList_status=new ArrayList<>();
 
     @Override
     protected void initData() {
@@ -49,7 +53,7 @@ public class AnFangActivity extends BaseActivity {
         LinearLayoutManager manager=new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvAnfang.setLayoutManager(manager);
-        adapter=new AnFangAdapter(mList);
+        adapter=new AnFangAdapter(mList,mList_status);
         rvAnfang.setAdapter(adapter);
     }
 
@@ -79,6 +83,22 @@ public class AnFangActivity extends BaseActivity {
             if (payload.contains("\"pn\":\"DGLTP\"")) {
                 parseData(payload);
             }
+            if(payload.contains("\"pn\":\"SDOSTP\"")){
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    String sdMAC = jsonObject.getString("sdMAC");
+                        //子设备在线
+                        for (int i = 0; i < mList.size(); i++) {
+                            if (mList.get(i).mac.equals(sdMAC)){
+                                mList_status.set(i,status);
+                            }
+                        }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                adapter.notifyDataSetChanged();
+            }
         }
 
         @Override
@@ -94,7 +114,11 @@ public class AnFangActivity extends BaseActivity {
         }
         List<AnFangBean.Devices> devices = anFangBean.devices;
         mList.addAll(devices);
-        adapter.notifyDataSetChanged();
+        for (int i = 0; i < devices.size(); i++) {
+            mList_status.add(false);
+        }
+//        adapter.notifyDataSetChanged();
+        mConnection.sendTextMessage("{\"pn\":\"SDOSTP\"}");
     }
 
     @Override

@@ -22,6 +22,7 @@ public class LinkageAdapter extends BaseQuickAdapter<LinkageBean.Linkages,BaseVi
             helper.setGone(R.id.ll_linkage_item_del,false);
             helper.setGone(R.id.ll_linkage_item_edt,false);
             helper.setGone(R.id.checkbox_switch,true);
+            helper.setChecked(R.id.checkbox_switch,false);
             if (item.active==1){
                 helper.setChecked(R.id.checkbox_switch,true);
             }

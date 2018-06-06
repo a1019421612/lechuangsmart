@@ -23,7 +23,9 @@ import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.activity.DeviceTriggeredActivity;
 import com.hbdiye.lechuangsmart.activity.LinkageSettingActivity;
+import com.hbdiye.lechuangsmart.activity.TimeTriggeredActivity;
 import com.hbdiye.lechuangsmart.adapter.LinkageAdapter;
 import com.hbdiye.lechuangsmart.bean.LinkageBean;
 import com.hbdiye.lechuangsmart.util.SPUtils;
@@ -80,6 +82,7 @@ public class LinkageFragment extends Fragment {
         rvLinkage.setAdapter(adapter);
 
         socketConnect();
+
         handleClick();
         return view;
     }
@@ -161,7 +164,8 @@ public class LinkageFragment extends Fragment {
                 builder.setNegativeButton("设备联动", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        startActivity(new Intent(getActivity(), DeviceTriggeredActivity.class));
+                        dialog.dismiss();
                     }
                 });
                 builder.setPositiveButton("取消",null);
@@ -169,6 +173,9 @@ public class LinkageFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
+                        mConnection.sendTextMessage("{\"pn\":\"LATP\",\"timing\":\"00:00\",\"timingType\":2,\"cronExpression\":\"仅一次\",\"name\":\"新联动\"}");
+//                        startActivity(new Intent(getActivity(), TimeTriggeredActivity.class));
+                        dialog.dismiss();
                     }
                 });
                 builder.show();
@@ -178,7 +185,7 @@ public class LinkageFragment extends Fragment {
 
     private void socketConnect() {
         try {
-            mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+            mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyLinkageWebSocketHandler());
 
         } catch (WebSocketException e) {
             e.printStackTrace();
@@ -186,7 +193,7 @@ public class LinkageFragment extends Fragment {
         }
     }
 
-    class MyWebSocketHandler extends WebSocketHandler {
+    class MyLinkageWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
             Log.e(TAG, "open");
@@ -211,8 +218,8 @@ public class LinkageFragment extends Fragment {
                     if (sceneDialog!=null){
                         sceneDialog.dismiss();
                     }
+                        mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
 //                    SmartToast.show("修改成功");
-                    mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -223,6 +230,23 @@ public class LinkageFragment extends Fragment {
                     JSONObject jsonObject=new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (payload.contains("\"pn\":\"LATP\"")){
+                //LATP
+                JSONObject jsonObject = null;
+                try {
+                    jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status) {
+                        JSONObject linkage = jsonObject.getJSONObject("linkage");
+                        String linkageID = linkage.getString("id");
+                        String timingID = linkage.getString("timingID");
+                        startActivity(new Intent(getActivity(),LinkageSettingActivity.class).putExtra("linkageID",linkageID).putExtra("timingId",timingID));
+
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -253,12 +277,28 @@ public class LinkageFragment extends Fragment {
         }
     }
 
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        Log.e("TAG", "onstop");
+//        mConnection.disconnect();
+//    }
+//
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        Log.e(TAG, "onResume");
+//        socketConnect();
+//    }
+
     @Override
     public void onHiddenChanged(boolean hidden) {
         if (hidden) {
             // 隐藏
             Log.e(TAG, "linkage" + "隐藏");
             mConnection.disconnect();
+            boolean connected = mConnection.isConnected();
+            Log.e(TAG, "是否断开连接" + connected);
         } else {
             // 可视
             Log.e(TAG, "linkage" + "显示");
