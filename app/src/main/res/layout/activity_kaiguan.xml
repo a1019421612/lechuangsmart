@@ -12,7 +12,7 @@
         android:scaleType="fitXY"
         android:src="@drawable/changjing" />
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_list"
+        android:id="@+id/rv_kaiguan"
         android:layout_width="match_parent"
         android:background="#fff"
         android:layout_weight="1"
