@@ -82,7 +82,24 @@ public class RoomDeviceBean implements Serializable {
             public List<Actions> actions;
 
             public class Actions {
+                public Object product;
+                public String productID;
+                public int port;
+                public String name;
+                public String actionID;
+                public int index;
+                public String id;
+                public Action action;
 
+                public class Action implements Serializable {
+
+                    public int clusterNo;
+                    public int commandNo;
+                    public String name;
+                    public int index;
+                    public String id;
+                    public int directionNo;
+                }
             }
         }
     }

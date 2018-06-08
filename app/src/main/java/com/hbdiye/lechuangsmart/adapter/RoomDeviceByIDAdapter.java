@@ -1,6 +1,7 @@
 package com.hbdiye.lechuangsmart.adapter;
 
 import android.support.annotation.Nullable;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -8,18 +9,17 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.hbdiye.lechuangsmart.Global.ContentConfig;
 import com.hbdiye.lechuangsmart.R;
-import com.hbdiye.lechuangsmart.bean.ChuanGanQiBean;
 import com.hbdiye.lechuangsmart.bean.RoomDeviceBean;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoomDeviceAdapter extends BaseQuickAdapter<RoomDeviceBean.Devices,BaseViewHolder>{
-
+public class RoomDeviceByIDAdapter extends BaseQuickAdapter<RoomDeviceBean.Devices,BaseViewHolder>{
+    private boolean isShow=true;
     private List<Boolean> mList;
     private List<Integer> checkboxUserIdList ;
-    public RoomDeviceAdapter(@Nullable List<RoomDeviceBean.Devices> data,List<Boolean> mList) {
-        super(R.layout.room_device_item, data);
+    public RoomDeviceByIDAdapter(@Nullable List<RoomDeviceBean.Devices> data, List<Boolean> mList) {
+        super(R.layout.room_device_byid_item, data);
         this.mList=mList;
         checkboxUserIdList=new ArrayList<>();
     }
@@ -141,8 +141,29 @@ public class RoomDeviceAdapter extends BaseQuickAdapter<RoomDeviceBean.Devices,B
             helper.setGone(R.id.checkbox_middle,false);
             helper.setGone(R.id.checkbox_left,false);
         }
+        if (isShow){
+            helper.setGone(R.id.ll_scene_item_del,false);
+            helper.setGone(R.id.ll_scene_item_edt,false);
+        }else {
+            helper.setGone(R.id.ll_scene_item_del,true);
+            helper.setGone(R.id.ll_scene_item_edt,true);
+
+            helper.setGone(R.id.tv_device_status,false);
+            helper.setGone(R.id.ll_checkbox,false);
+            helper.setGone(R.id.checkbox_left,false);
+            helper.setGone(R.id.checkbox_middle,false);
+            helper.setGone(R.id.checkbox_right,false);
+            helper.setGone(R.id.ll_device_attr,false);
+        }
         helper.addOnClickListener(R.id.checkbox_left);
         helper.addOnClickListener(R.id.checkbox_middle);
         helper.addOnClickListener(R.id.checkbox_right);
+        helper.addOnClickListener(R.id.ll_scene_device);
+        helper.addOnClickListener(R.id.ll_scene_item_del);
+        helper.addOnClickListener(R.id.ll_scene_item_edt);
+    }
+    public void sceneStatusChange(boolean status){
+        isShow=status;
+        notifyDataSetChanged();
     }
 }

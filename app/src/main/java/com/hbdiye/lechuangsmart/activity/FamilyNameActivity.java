@@ -15,9 +15,13 @@ import com.google.gson.JsonSyntaxException;
 import com.google.zxing.WriterException;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.bean.FamilyNameBean;
+import com.hbdiye.lechuangsmart.google.zxing.activity.CaptureActivity;
 import com.hbdiye.lechuangsmart.google.zxing.encoding.EncodingHandler;
 import com.hbdiye.lechuangsmart.util.DensityUtils;
 import com.hbdiye.lechuangsmart.util.SPUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,6 +49,9 @@ public class FamilyNameActivity extends BaseActivity {
     private String password;
 
     private String TAG=FamilyNameActivity.class.getSimpleName();
+    private String erCode="";
+
+    private boolean flag=false;
 
     @Override
     protected void initData() {
@@ -58,6 +65,7 @@ public class FamilyNameActivity extends BaseActivity {
             e.printStackTrace();
             SmartToast.show("网络连接错误");
         }
+
     }
 
     @Override
@@ -87,14 +95,21 @@ public class FamilyNameActivity extends BaseActivity {
                 startActivity(new Intent(this, FamilyMemberActivity.class));
                 break;
             case R.id.tv_qrcode:
-                try {
-                    Bitmap qrCode = EncodingHandler.createQRCode("123", DensityUtils.dp2px(this,150));
-                    Glide.with(FamilyNameActivity.this).load(qrCode).into(ivQrcode);
-                } catch (WriterException e) {
-                    e.printStackTrace();
-                }
-//                startActivity(new Intent(this, CaptureActivity.class));
+
+                startActivityForResult(new Intent(this, CaptureActivity.class),111);
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 111 && resultCode == 4) {
+            flag=true;
+            erCode = data.getStringExtra("erCode");
+
+//            textview.setText(s);
+//            SmartToast.show(erCode);
         }
     }
 
@@ -103,6 +118,9 @@ public class FamilyNameActivity extends BaseActivity {
         public void onOpen() {
             Log.e(TAG, "open");
             mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
+            if (flag){
+                mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\""+ erCode +"\"} ");
+            }
         }
 
         @Override
@@ -113,6 +131,22 @@ public class FamilyNameActivity extends BaseActivity {
             }
             if (payload.contains("\"pn\":\"UITP\"")) {
                 parseData(payload);
+            }
+            if (payload.contains("\"pn\":\"UJFTP\"")){
+                //扫描加入家庭
+                flag=false;
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status){
+                        SmartToast.show("成功加入家庭");
+                    }else {
+                        SmartToast.show("加入家庭失败");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+//                SmartToast.showLong(payload);
             }
         }
 
@@ -129,6 +163,13 @@ public class FamilyNameActivity extends BaseActivity {
             String name = familyNameBean.user.name;
             String mobilephone = familyNameBean.user.mobilephone;
             String familyname = familyNameBean.user.family.name;
+            String familyID = familyNameBean.user.familyID;
+            try {
+                Bitmap qrCode = EncodingHandler.createQRCode(familyID, DensityUtils.dp2px(this, 150));
+                Glide.with(FamilyNameActivity.this).load(qrCode).into(ivQrcode);
+            } catch (WriterException e) {
+                e.printStackTrace();
+            }
             tvFamilyName.setText(familyname);
             tvFamilyPhone.setText(mobilephone);
             tvName.setText(name);

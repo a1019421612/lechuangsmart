@@ -12,12 +12,13 @@
         android:scaleType="fitXY"
         android:src="@drawable/changjing" />
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_list"
+        android:id="@+id/rv_rooms_manager"
         android:layout_width="match_parent"
         android:background="#fff"
         android:layout_weight="1"
         android:layout_height="0dp"></android.support.v7.widget.RecyclerView>
     <LinearLayout
+        android:id="@+id/tv_addroom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

@@ -64,8 +64,8 @@ public class FangjianActivity extends AppCompatActivity {
     private List<RoomBean.Rooms> list_room = new ArrayList<>();
 
     private RoomDeviceAdapter adapter;
-    private List<RoomDeviceBean.Devices> mList=new ArrayList<>();
-    private List<Boolean> mList_status=new ArrayList<>();
+    private List<RoomDeviceBean.Devices> mList = new ArrayList<>();
+    private List<Boolean> mList_status = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,8 +82,48 @@ public class FangjianActivity extends AppCompatActivity {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 tvFangjianName.setText(list_room.get(position).name);
-                mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+list_room.get(position).id+"\"}");
+                mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + list_room.get(position).id + "\"}");
                 drawerLayout.closeDrawers();
+            }
+        });
+        adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                RoomDeviceBean.Devices devices = mList.get(position);
+                switch (view.getId()) {
+                    case R.id.checkbox_left:
+                        int value_left = devices.deviceAttributes.get(0).value;
+                        if (value_left==0){
+                            //value=0 关
+                            String onId = devices.deviceAttributes.get(0).actions.get(0).id;//开id
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
+                        }else {
+                            //开
+                            String offId = devices.deviceAttributes.get(0).actions.get(1).id;//关id
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+                        }
+                        break;
+                    case R.id.checkbox_middle:
+                        int value_middle = devices.deviceAttributes.get(1).value;
+                        if (value_middle==0){
+                            String onId = devices.deviceAttributes.get(1).actions.get(0).id;//开id
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
+                        }else {
+                            String offId = devices.deviceAttributes.get(1).actions.get(1).id;//关id
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+                        }
+                        break;
+                    case R.id.checkbox_right:
+                        int value_right = devices.deviceAttributes.get(2).value;
+                        if (value_right==0){
+                            String onId = devices.deviceAttributes.get(2).actions.get(0).id;//开id
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
+                        }else {
+                            String offId = devices.deviceAttributes.get(2).actions.get(1).id;//关id
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+                        }
+                        break;
+                }
             }
         });
     }
@@ -131,13 +171,13 @@ public class FangjianActivity extends AppCompatActivity {
             }
             if (payload.contains("\"pn\":\"SDOSTP\"")) {
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     String sdMAC = jsonObject.getString("sdMAC");
                     //子设备在线
                     for (int i = 0; i < mList.size(); i++) {
-                        if (mList.get(i).mac.equals(sdMAC)){
-                            mList_status.set(i,status);
+                        if (mList.get(i).mac.equals(sdMAC)) {
+                            mList_status.set(i, status);
                         }
                     }
                 } catch (JSONException e) {
@@ -161,20 +201,20 @@ public class FangjianActivity extends AppCompatActivity {
         }
         list_room.addAll(rooms);
         roomAdapter.notifyDataSetChanged();
-        if (list_room.size()>0){
+        if (list_room.size() > 0) {
             tvFangjianName.setText(list_room.get(0).name);
-            mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+list_room.get(0).id+"\"}");
+            mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + list_room.get(0).id + "\"}");
         }
     }
 
     private void parseData(String payload) {
         RoomDeviceBean roomDeviceBean = new Gson().fromJson(payload, RoomDeviceBean.class);
         List<RoomDeviceBean.Devices> devices = roomDeviceBean.devices;
-        if (mList.size()>0){
+        if (mList.size() > 0) {
             mList.clear();
         }
         mList.addAll(devices);
-        if (mList_status.size()>0){
+        if (mList_status.size() > 0) {
             mList_status.clear();
         }
         for (int i = 0; i < devices.size(); i++) {
@@ -211,10 +251,10 @@ public class FangjianActivity extends AppCompatActivity {
             }
         });
 
-        LinearLayoutManager manager1=new LinearLayoutManager(this);
+        LinearLayoutManager manager1 = new LinearLayoutManager(this);
         manager1.setOrientation(LinearLayoutManager.VERTICAL);
         rvDeviceRoom.setLayoutManager(manager1);
-        adapter=new RoomDeviceAdapter(mList,mList_status);
+        adapter = new RoomDeviceAdapter(mList, mList_status);
         rvDeviceRoom.setAdapter(adapter);
 
         LinearLayoutManager manager = new LinearLayoutManager(this);

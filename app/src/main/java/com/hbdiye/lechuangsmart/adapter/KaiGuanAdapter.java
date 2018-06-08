@@ -75,5 +75,8 @@ public class KaiGuanAdapter extends BaseQuickAdapter<KaiGuanBean.Devices,BaseVie
             helper.setGone(R.id.checkbox_middle,false);
             helper.setGone(R.id.checkbox_right,false);
         }
+        helper.addOnClickListener(R.id.checkbox_left);
+        helper.addOnClickListener(R.id.checkbox_middle);
+        helper.addOnClickListener(R.id.checkbox_right);
     }
 }

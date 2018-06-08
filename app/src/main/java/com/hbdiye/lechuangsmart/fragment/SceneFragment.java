@@ -285,7 +285,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                         if (TextUtils.isEmpty(sceneName)){
                             SmartToast.show("场景名称不能为空");
                         }else {
-                            mSceneConnection.sendTextMessage("{\"pn\":\"SATP\",\"icon\":\"changjing1.png\",\"name\":\""+sceneName+"\"}");
+                            mSceneConnection.sendTextMessage("{\"pn\":\"SATP\",\"icon\":\"changjing1\",\"name\":\""+sceneName+"\"}");
                         }
                     }else {
                         //修改场景

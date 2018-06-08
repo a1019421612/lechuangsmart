@@ -277,12 +277,17 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
         //FIXME
         if (TextUtils.isEmpty(resultString)) {
             Toast.makeText(CaptureActivity.this, "扫码失败!", Toast.LENGTH_SHORT).show();
+            CaptureActivity.this.finish();
         } else {
             Intent resultIntent = new Intent();
             Bundle bundle = new Bundle();
             bundle.putString(INTENT_EXTRA_KEY_QR_SCAN, resultString);
             System.out.println("sssssssssssssssss scan 0 = " + resultString);
-            SmartToast.show(resultString);
+//            SmartToast.show(resultString);
+            Intent intent=new Intent();
+            intent.putExtra("erCode",resultString);
+            setResult(4,intent);
+            finish();
 //            startActivity(new Intent(this, ScanCodeResultActivity.class).putExtra("result",resultString));
 
 //            ToastUtils.showShort(this,resultString);
@@ -292,7 +297,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
 //            resultIntent.putExtras(bundle);
 //            this.setResult(RESULT_CODE_QR_SCAN, resultIntent);
         }
-        CaptureActivity.this.finish();
+
     }
 
     private void initCamera(SurfaceHolder surfaceHolder) {

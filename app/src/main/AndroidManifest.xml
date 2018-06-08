@@ -65,10 +65,14 @@
         <activity android:name=".google.zxing.activity.CaptureActivity" />
         <activity android:name=".activity.LinkageSettingActivity" />
         <activity android:name=".activity.TimeTriggeredActivity" />
-        <activity android:name=".activity.DeviceTriggeredActivity"></activity>
-        <service android:name=".service.WebSocketService"
+        <activity android:name=".activity.DeviceTriggeredActivity" />
+
+        <service
+            android:name=".service.WebSocketService"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true" />
+
+        <activity android:name=".activity.RoomActivity"></activity>
     </application>
 
 </manifest>

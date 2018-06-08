@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.hbdiye.lechuangsmart.R;
@@ -63,7 +65,46 @@ public class KaiguanActivity extends BaseActivity {
     }
 
     private void handlerClick() {
-
+        adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                KaiGuanBean.Devices devices = mList.get(position);
+                switch (view.getId()) {
+                    case R.id.checkbox_left:
+                        int value_left = devices.deviceAttributes.get(0).value;
+                        if (value_left==0){
+                            //value=0 关
+                            String onId = devices.deviceAttributes.get(0).actions.get(0).id;//开id
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
+                        }else {
+                            //开
+                            String offId = devices.deviceAttributes.get(0).actions.get(1).id;//关id
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+                        }
+                        break;
+                    case R.id.checkbox_middle:
+                        int value_middle = devices.deviceAttributes.get(1).value;
+                        if (value_middle==0){
+                            String onId = devices.deviceAttributes.get(1).actions.get(0).id;//开id
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
+                        }else {
+                            String offId = devices.deviceAttributes.get(1).actions.get(1).id;//关id
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+                        }
+                        break;
+                    case R.id.checkbox_right:
+                        int value_right = devices.deviceAttributes.get(2).value;
+                        if (value_right==0){
+                            String onId = devices.deviceAttributes.get(2).actions.get(0).id;//开id
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
+                        }else {
+                            String offId = devices.deviceAttributes.get(2).actions.get(1).id;//关id
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+                        }
+                        break;
+                }
+            }
+        });
     }
 
     @Override
