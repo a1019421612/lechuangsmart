@@ -720,7 +720,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             district = location.getDistrict();
             String street = location.getStreet();    //获取街道信息
             Log.e("TAG", province + "      " + city + "    " + district);
-            SmartToast.show(province + "      " + city + "    " + district);
+            SmartToast.show(province + "      " + city + "    " + district );
         }
     }
 
