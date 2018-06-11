@@ -13,14 +13,11 @@ import android.widget.TextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.hbdiye.lechuangsmart.R;
-import com.hbdiye.lechuangsmart.adapter.RoomDeviceAdapter;
-import com.hbdiye.lechuangsmart.adapter.RoomDeviceByIDAdapter;
-import com.hbdiye.lechuangsmart.bean.RoomBean;
-import com.hbdiye.lechuangsmart.bean.RoomDeviceBean;
-import com.hbdiye.lechuangsmart.google.zxing.activity.CaptureActivity;
+import com.hbdiye.lechuangsmart.adapter.YaoKongQiListAdapter;
+import com.hbdiye.lechuangsmart.bean.YaoKongListBean;
 import com.hbdiye.lechuangsmart.util.SPUtils;
+import com.hbdiye.lechuangsmart.views.PicYaoKongPopwindow;
 import com.hbdiye.lechuangsmart.views.SceneDialog;
 
 import org.json.JSONException;
@@ -36,46 +33,48 @@ import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
 
-public class RoomActivity extends BaseActivity {
+public class YaoKongListActivity extends BaseActivity {
 
-    @BindView(R.id.tv_room_name)
-    TextView tvRoomName;
-    @BindView(R.id.rv_room_device)
-    RecyclerView rvRoomDevice;
-    @BindView(R.id.ll_add_roomdevice)
-    LinearLayout llAddRoomdevice;
+    @BindView(R.id.tv_yaokong_name)
+    TextView tvYaokongName;
+    @BindView(R.id.rv_yaokong)
+    RecyclerView rvYaokong;
+    @BindView(R.id.ll_add_device)
+    LinearLayout llAddDevice;
+    @BindView(R.id.ll_root)
+    LinearLayout llRoot;
 
-    private String TAG = RoomActivity.class.getSimpleName();
     private WebSocketConnection mConnection;
     private String mobilephone;
     private String password;
-    private String roomId="";
+    private String deviceID = "";
+    private String deviceName = "";
 
-    private RoomDeviceByIDAdapter adapter;
-    private List<RoomDeviceBean.Devices> mList = new ArrayList<>();
-    private List<Boolean> mList_status = new ArrayList<>();
+    private YaoKongQiListAdapter adapter;
+    private List<YaoKongListBean.Irremotes> mList = new ArrayList<>();
 
     private boolean editStatus = false;//编辑状态标志，默认false
+    private int flag = -1;
 
     private SceneDialog sceneDialog;
-    private int flag=-1;
 
-    private String erCode="";
-
-    private boolean flag_code=false;
+    private PicYaoKongPopwindow popwindow;
 
     @Override
     protected void initData() {
+        deviceID = getIntent().getStringExtra("deviceID");
+        deviceName = getIntent().getStringExtra("deviceName");
         mobilephone = (String) SPUtils.get(this, "mobilephone", "");
         password = (String) SPUtils.get(this, "password", "");
-        roomId = getIntent().getStringExtra("roomId");
         mConnection = new WebSocketConnection();
         socketConnect();
+
+        tvYaokongName.setText(deviceName);
     }
 
     @Override
     protected String getTitleName() {
-        return "房间";
+        return "遥控器列表";
     }
 
     @Override
@@ -83,11 +82,12 @@ public class RoomActivity extends BaseActivity {
         ivBaseEdit.setVisibility(View.VISIBLE);
         ivBaseEdit.setImageResource(R.drawable.bianji2);
 
-        LinearLayoutManager manager1 = new LinearLayoutManager(this);
-        manager1.setOrientation(LinearLayoutManager.VERTICAL);
-        rvRoomDevice.setLayoutManager(manager1);
-        adapter = new RoomDeviceByIDAdapter(mList, mList_status);
-        rvRoomDevice.setAdapter(adapter);
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager.setOrientation(LinearLayoutManager.VERTICAL);
+        rvYaokong.setLayoutManager(manager);
+        adapter = new YaoKongQiListAdapter(mList);
+        rvYaokong.setAdapter(adapter);
+
         handlerClick();
     }
 
@@ -106,30 +106,32 @@ public class RoomActivity extends BaseActivity {
                 }
             }
         });
+
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 flag = position;
                 switch (view.getId()) {
                     case R.id.ll_scene_item_del:
-//                        mConnection.sendTextMessage("{\"pn\":\"RDTP\",\"roomID\":\""+mList.get(position).id+"\"}");
+                        mConnection.sendTextMessage("{\"pn\":\"IRDTP\",\"id\":\""+mList.get(position).id+"\"}");
                         break;
                     case R.id.ll_scene_item_edt:
-                        sceneDialog = new SceneDialog(RoomActivity.this, R.style.MyDialogStyle, dailogClicer, "修改设备名称");
+                        sceneDialog = new SceneDialog(YaoKongListActivity.this, R.style.MyDialogStyle, dailogClicer, "修改设备名称");
                         sceneDialog.setCanceledOnTouchOutside(true);
                         sceneDialog.show();
                         break;
-//                    case R.id.ll_scene_device:
-//                        if (!editStatus) {
-//                            startActivity(new Intent(FamilyManagerActivity.this, RoomActivity.class).putExtra("roomId", mList.get(position).id));
-//                        }
-//                        break;
+                    case R.id.ll_scene_device:
+                        if (!editStatus) {
+                            startActivity(new Intent(YaoKongListActivity.this, DianShiActivity.class));
+                        }
+                        break;
                 }
             }
         });
     }
 
-    private View.OnClickListener dailogClicer=new View.OnClickListener() {
+    public View.OnClickListener dailogClicer = new View.OnClickListener() {
+
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
@@ -141,8 +143,7 @@ public class RoomActivity extends BaseActivity {
                     if (TextUtils.isEmpty(sceneName)) {
                         SmartToast.show("设备名称不能为空");
                     } else {
-                        String devicemac = mList.get(flag).mac;
-                        mConnection.sendTextMessage("{\"pn\":\"DUTP\",\"deviceMAC\":\""+devicemac+"\",\"newName\": \""+sceneName+"\"}");
+                        mConnection.sendTextMessage("{\"pn\":\"IRUTP\",\"id\":\"" + mList.get(flag).id + "\",\"name\":\"" + sceneName + "\"}");
                     }
                     break;
             }
@@ -151,113 +152,118 @@ public class RoomActivity extends BaseActivity {
 
     @Override
     protected int getLayoutID() {
-        return R.layout.activity_room;
+        return R.layout.activity_yao_kong_list;
     }
 
-    @OnClick(R.id.ll_add_roomdevice)
+    @OnClick(R.id.ll_add_device)
     public void onViewClicked() {
-        startActivityForResult(new Intent(this, CaptureActivity.class),123);
+        popwindow = new PicYaoKongPopwindow(this, popupClicker);
+        popwindow.showPopupWindowBottom(llRoot);
     }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 111 && resultCode == 4) {
-            flag_code=true;
-            erCode = data.getStringExtra("erCode");
 
-//            textview.setText(s);
-//            SmartToast.show(erCode);
+    public View.OnClickListener popupClicker = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.tv_ds:
+                    break;
+                case R.id.tv_jdh:
+                    break;
+                case R.id.tv_kt:
+                    break;
+                case R.id.tv_fs:
+                    break;
+                case R.id.tv_znhz:
+                    break;
+                case R.id.tv_gf:
+                    break;
+                case R.id.tv_dvd:
+                    break;
+                case R.id.tv_tyy:
+                    break;
+                case R.id.tv_xj:
+                    break;
+                case R.id.tv_kqjhq:
+                    break;
+                case R.id.tv_rsq:
+                    break;
+            }
         }
-    }
+    };
+
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
-            Log.e(TAG, "open");
-            mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
-            if (flag_code){
-                mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\""+ erCode +"\"} ");
-            }
+            Log.e("TAG", "open");
+            mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + deviceID + "\"}");
         }
 
         @Override
         public void onTextMessage(String payload) {
 
-            Log.e(TAG, "onTextMessage" + payload);
+            Log.e("TAG", "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
-            if (payload.contains("\"pn\":\"DGLTP\"")) {
+            if (payload.contains("\"pn\":\"DOSTP\"")) {
+
+            }
+            if (payload.contains("\"pn\":\"IRLTP\"")) {
                 parseData(payload);
             }
-            if (payload.contains("\"pn\":\"SDOSTP\"")) {
+            if (payload.contains("\"pn\":\"IRUTP\"")) {
+//                修改设备名称 IRUTP
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    String sdMAC = jsonObject.getString("sdMAC");
-                    //子设备在线
-                    for (int i = 0; i < mList.size(); i++) {
-                        if (mList.get(i).mac.equals(sdMAC)) {
-                            mList_status.set(i, status);
-                        }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                adapter.notifyDataSetChanged();
-            }
-            if (payload.contains("\"pn\":\"DUTP\"")){
-                //修改设备名称 DUTP
-                try {
-                    JSONObject jsonObject=new JSONObject(payload);
-                    boolean status = jsonObject.getBoolean("status");
-                    if (status){
+                    if (status) {
                         sceneDialog.dismiss();
-                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
+                        SmartToast.show("修改成功");
+                        mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + deviceID + "\"}");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            if (payload.contains("\"pn\":\"UJFTP\"")){
-                //扫描加入家庭
-                flag_code=false;
+            if (payload.contains("\"pn\":\"IRDTP\"")){
+                //删除 IRDTP
                 try {
                     JSONObject jsonObject=new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     if (status){
-                        SmartToast.show("成功加入家庭");
-                    }else {
-                        SmartToast.show("加入家庭失败");
+                        mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + deviceID + "\"}");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-//                SmartToast.showLong(payload);
             }
 
         }
 
         @Override
         public void onClose(int code, String reason) {
-            Log.e(TAG, "onClose");
+            Log.e("TAG", "onClose");
         }
     }
 
     private void parseData(String payload) {
-        RoomDeviceBean roomDeviceBean = new Gson().fromJson(payload, RoomDeviceBean.class);
-        tvRoomName.setText(roomDeviceBean.room.name);
-        List<RoomDeviceBean.Devices> devices = roomDeviceBean.devices;
+        YaoKongListBean yaoKongListBean = new Gson().fromJson(payload, YaoKongListBean.class);
+        List<YaoKongListBean.Irremotes> irremotes = yaoKongListBean.irremotes;
         if (mList.size() > 0) {
             mList.clear();
         }
-        mList.addAll(devices);
-        if (mList_status.size() > 0) {
-            mList_status.clear();
-        }
-        for (int i = 0; i < devices.size(); i++) {
-            mList_status.add(false);
-        }
-        mConnection.sendTextMessage("{\"pn\":\"SDOSTP\"}");
+        mList.addAll(irremotes);
+        adapter.notifyDataSetChanged();
+//        YaoKongBean anFangBean = new Gson().fromJson(payload, YaoKongBean.class);
+//        if (mList.size() > 0) {
+//            mList.clear();
+//        }
+//        List<YaoKongBean.Devices> devices = anFangBean.devices;
+//        mList.addAll(devices);
+//        for (int i = 0; i < devices.size(); i++) {
+//            mList_status.add(false);
+//        }
+//        mConnection.sendTextMessage("{\"pn\":\"SDOSTP\"}");
     }
 
     @Override

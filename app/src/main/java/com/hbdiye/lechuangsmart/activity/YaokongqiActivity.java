@@ -1,10 +1,13 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.hbdiye.lechuangsmart.R;
@@ -61,7 +64,12 @@ public class YaokongqiActivity extends BaseActivity {
     }
 
     private void handlerClick() {
-
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                startActivity(new Intent(YaokongqiActivity.this,YaoKongListActivity.class).putExtra("deviceID",mList.get(position).id).putExtra("deviceName",mList.get(position).name));
+            }
+        });
     }
 
     @Override

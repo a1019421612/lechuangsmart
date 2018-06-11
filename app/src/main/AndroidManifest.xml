@@ -72,7 +72,10 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".activity.RoomActivity"></activity>
+        <activity android:name=".activity.RoomActivity" />
+        <activity android:name=".activity.YaoKongListActivity" />
+        <activity android:name=".activity.KongTiaoActivity" />
+        <activity android:name=".activity.DianShiActivity"></activity>
     </application>
 
 </manifest>

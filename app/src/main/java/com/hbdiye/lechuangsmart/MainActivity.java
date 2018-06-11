@@ -20,14 +20,20 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 
+import com.coder.zzq.smartshow.toast.SmartToast;
 import com.hbdiye.lechuangsmart.fragment.HomeFragment;
 import com.hbdiye.lechuangsmart.fragment.LinkageFragment;
 import com.hbdiye.lechuangsmart.fragment.SceneFragment;
 import com.hbdiye.lechuangsmart.fragment.SettingFragment;
 import com.hbdiye.lechuangsmart.util.AndroidUniqueId;
 
+import com.hbdiye.lechuangsmart.util.Logger;
 import com.hbdiye.lechuangsmart.util.TipsUtil;
 import com.hzy.tvmao.KookongSDK;
+import com.hzy.tvmao.interf.IRequestResult;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -98,7 +104,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            TipsUtil.toast(this, "IrDevice初始化失败");//手机端解压的初始化
 //        }
         KookongSDK.setDebugMode(true);
+        KookongSDK.getAreaId("北京市", "北京市", "海淀区", new IRequestResult<Integer>() {
 
+            @Override
+            public void onSuccess(String msg, Integer result) {
+                Logger.d("AreaId is : " + result);
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("areaId", result);
+                    SmartToast.show(result+"");
+                    //
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFail(Integer errorCode, String msg) {
+                SmartToast.show(msg);
+
+            }
+        });
 //        mAgentWeb = AgentWeb.with(this)
 //                .setAgentWebParent(mLinearLayout, new LinearLayout.LayoutParams(-1, -1))
 //                .closeIndicator()
