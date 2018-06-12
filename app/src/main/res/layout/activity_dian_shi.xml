@@ -187,56 +187,59 @@
                 android:textSize="30sp" />
         </LinearLayout>
     </LinearLayout>
+    <com.hbdiye.lechuangsmart.views.RoundMenuView
+        android:id="@+id/roundMenuView"
+        android:layout_width="150dp"
+        android:layout_height="150dp" />
+    <!--<TextView-->
+        <!--android:layout_width="80dp"-->
+        <!--android:layout_height="80dp"-->
+        <!--android:gravity="center"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!--android:padding="@dimen/dp_20"-->
+        <!--android:textColor="#000"-->
+        <!--android:textSize="30sp"-->
+        <!--android:text="↑" />-->
 
-    <TextView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:padding="@dimen/dp_20"
-        android:textColor="#000"
-        android:textSize="30sp"
-        android:text="↑" />
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center_horizontal"-->
+        <!--android:orientation="horizontal">-->
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal">
+        <!--<TextView-->
+            <!--android:layout_width="100dp"-->
+            <!--android:gravity="center_horizontal"-->
+            <!--android:layout_height="80dp"-->
+            <!--android:padding="@dimen/dp_20"-->
+            <!--android:textColor="#000"-->
+            <!--android:textSize="30sp"-->
+            <!--android:text="←" />-->
 
-        <TextView
-            android:layout_width="100dp"
-            android:gravity="center_horizontal"
-            android:layout_height="80dp"
-            android:padding="@dimen/dp_20"
-            android:textColor="#000"
-            android:textSize="30sp"
-            android:text="←" />
-
-        <TextView
-            android:layout_width="80dp"
-            android:gravity="center_horizontal"
-            android:layout_height="80dp"
-            android:padding="@dimen/dp_20"
-            android:textColor="#000"
-            android:textSize="20sp"
-            android:text="OK" />
-        <TextView
-            android:layout_width="100dp"
-            android:gravity="center_horizontal"
-            android:layout_height="80dp"
-            android:padding="@dimen/dp_20"
-            android:textColor="#000"
-            android:textSize="30sp"
-            android:text="→" />
-    </LinearLayout>
-    <TextView
-        android:layout_width="80dp"
-        android:gravity="center_horizontal"
-        android:layout_height="80dp"
-        android:padding="@dimen/dp_20"
-        android:layout_gravity="center_horizontal"
-        android:textColor="#000"
-        android:textSize="30sp"
-        android:text="↓" />
+        <!--<TextView-->
+            <!--android:layout_width="80dp"-->
+            <!--android:gravity="center_horizontal"-->
+            <!--android:layout_height="80dp"-->
+            <!--android:padding="@dimen/dp_20"-->
+            <!--android:textColor="#000"-->
+            <!--android:textSize="20sp"-->
+            <!--android:text="OK" />-->
+        <!--<TextView-->
+            <!--android:layout_width="100dp"-->
+            <!--android:gravity="center_horizontal"-->
+            <!--android:layout_height="80dp"-->
+            <!--android:padding="@dimen/dp_20"-->
+            <!--android:textColor="#000"-->
+            <!--android:textSize="30sp"-->
+            <!--android:text="→" />-->
+    <!--</LinearLayout>-->
+    <!--<TextView-->
+        <!--android:layout_width="80dp"-->
+        <!--android:gravity="center_horizontal"-->
+        <!--android:layout_height="80dp"-->
+        <!--android:padding="@dimen/dp_20"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!--android:textColor="#000"-->
+        <!--android:textSize="30sp"-->
+        <!--android:text="↓" />-->
 </LinearLayout>

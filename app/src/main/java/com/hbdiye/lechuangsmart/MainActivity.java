@@ -28,6 +28,7 @@ import com.hbdiye.lechuangsmart.fragment.SettingFragment;
 import com.hbdiye.lechuangsmart.util.AndroidUniqueId;
 
 import com.hbdiye.lechuangsmart.util.Logger;
+import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.hbdiye.lechuangsmart.util.TipsUtil;
 import com.hzy.tvmao.KookongSDK;
 import com.hzy.tvmao.interf.IRequestResult;
@@ -97,34 +98,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //按红外设备授权收费的客户，需要传递自己设备唯一的标识，使用KookongSDK.init(Context context, String key, String irDeviceId);
         //其他客户使用KookongSDK.init(Context context, String key);
         if (!KookongSDK.init(this, APP_KEY, irDeviceId)) {
-            TipsUtil.toast(this, "KookongSDK初始化失败");
+            SmartToast.show("KookongSDK初始化失败");
         }
 
 //        if (!IrDevice.init(this, APP_KEY)) {
 //            TipsUtil.toast(this, "IrDevice初始化失败");//手机端解压的初始化
 //        }
         KookongSDK.setDebugMode(true);
-        KookongSDK.getAreaId("北京市", "北京市", "海淀区", new IRequestResult<Integer>() {
-
-            @Override
-            public void onSuccess(String msg, Integer result) {
-                Logger.d("AreaId is : " + result);
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("areaId", result);
-                    SmartToast.show(result+"");
-                    //
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFail(Integer errorCode, String msg) {
-                SmartToast.show(msg);
-
-            }
-        });
 //        mAgentWeb = AgentWeb.with(this)
 //                .setAgentWebParent(mLinearLayout, new LinearLayout.LayoutParams(-1, -1))
 //                .closeIndicator()
@@ -720,7 +700,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             district = location.getDistrict();
             String street = location.getStreet();    //获取街道信息
             Log.e("TAG", province + "      " + city + "    " + district);
-            SmartToast.show(province + "      " + city + "    " + district );
+            if (province.equals("")||city.equals("")||district.equals("")){
+            }else {
+                SPUtils.put(MainActivity.this,"province",province);
+                SPUtils.put(MainActivity.this,"city",city);
+                SPUtils.put(MainActivity.this,"district",district);
+            }
         }
     }
 

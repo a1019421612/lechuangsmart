@@ -16,9 +16,12 @@ import com.google.gson.Gson;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.adapter.YaoKongQiListAdapter;
 import com.hbdiye.lechuangsmart.bean.YaoKongListBean;
+import com.hbdiye.lechuangsmart.util.Logger;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.hbdiye.lechuangsmart.views.PicYaoKongPopwindow;
 import com.hbdiye.lechuangsmart.views.SceneDialog;
+import com.hzy.tvmao.KookongSDK;
+import com.hzy.tvmao.interf.IRequestResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +36,9 @@ import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
 
+/**
+ * 遥控设备列表
+ */
 public class YaoKongListActivity extends BaseActivity {
 
     @BindView(R.id.tv_yaokong_name)
@@ -60,16 +66,53 @@ public class YaoKongListActivity extends BaseActivity {
 
     private PicYaoKongPopwindow popwindow;
 
+    private String province;
+    private String city;
+    private String district;
+    private String mac;
+
     @Override
     protected void initData() {
         deviceID = getIntent().getStringExtra("deviceID");
         deviceName = getIntent().getStringExtra("deviceName");
+        mac = getIntent().getStringExtra("mac");
         mobilephone = (String) SPUtils.get(this, "mobilephone", "");
         password = (String) SPUtils.get(this, "password", "");
         mConnection = new WebSocketConnection();
         socketConnect();
 
         tvYaokongName.setText(deviceName);
+
+        province = (String) SPUtils.get(this,"province","");
+        city = (String) SPUtils.get(this,"city","");
+        district = (String) SPUtils.get(this,"district","");
+        getAreaId();
+
+    }
+
+    private void getAreaId() {
+        if (!TextUtils.isEmpty(province)&&!TextUtils.isEmpty(city)&&!TextUtils.isEmpty(district)){
+            KookongSDK.getAreaId(province, city, district, new IRequestResult<Integer>() {
+
+                @Override
+                public void onSuccess(String msg, Integer result) {
+                    Logger.d("AreaId is : " + result);
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("areaId", result);
+
+                        //
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFail(Integer errorCode, String msg) {
+                    SmartToast.show(msg);
+                }
+            });
+        }
     }
 
     @Override
@@ -161,31 +204,59 @@ public class YaoKongListActivity extends BaseActivity {
         popwindow.showPopupWindowBottom(llRoot);
     }
 
+    /**
+     * 获取某设备的品牌列表
+     * public int STB = 1; //机顶盒
+     * public int TV  = 2; //电视
+     * public int BOX = 3; //网络盒子
+     * public int DVD = 4; //DVD
+     * public int AC  = 5; //空调
+     * public int PRO = 6; //投影仪
+     * public int PA  = 7; //功放
+     * public int FAN = 8; //风扇
+     * public int SLR = 9; //单反相机
+     * public int Light = 10; //开关灯泡
+     * public int AIR_CLEANER = 11;// 空气净化器
+     * public int WATER_HEATER = 12;// 热水器
+     */
     public View.OnClickListener popupClicker = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.tv_ds:
+                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class)
+                            .putExtra("type",2)
+                            .putExtra("mac",mac));
                     break;
                 case R.id.tv_jdh:
+                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",1));
                     break;
                 case R.id.tv_kt:
+                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",5));
                     break;
                 case R.id.tv_fs:
+                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",8));
                     break;
                 case R.id.tv_znhz:
+                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",3));
                     break;
                 case R.id.tv_gf:
+                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",7));
                     break;
                 case R.id.tv_dvd:
+                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",4));
                     break;
                 case R.id.tv_tyy:
+                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",6));
                     break;
                 case R.id.tv_xj:
+                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",9));
                     break;
                 case R.id.tv_kqjhq:
+                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",11));
                     break;
                 case R.id.tv_rsq:
+                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",12));
                     break;
             }
         }

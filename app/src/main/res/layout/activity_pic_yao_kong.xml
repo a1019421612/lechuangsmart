@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.PicYaoKongActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:gravity="center_horizontal"
+        android:layout_marginTop="@dimen/dp_20"
+        android:textSize="@dimen/sp_16"
+        android:text="设备需要时间来响应您的操作，\n还请您操作后适当等待一下"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="@dimen/dp_20"
+        android:text="对准设备按住按钮\n设备响应时请立刻松手"
+        android:textColor="#000"
+        android:textSize="@dimen/sp_16"
+        />
+    <TextView
+        android:id="@+id/tv_yaokong_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:textSize="@dimen/sp_16"
+        android:text="测试按键"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="@dimen/dp_30"
+        />
+    <TextView
+        android:id="@+id/tv_power"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:text="电源"
+        android:textColor="#fff"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/dp_20"
+        android:background="@drawable/shap_circle"
+        />
+</LinearLayout>

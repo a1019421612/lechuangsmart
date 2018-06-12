@@ -29,6 +29,9 @@ import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
 
+/**
+ * 红外设备列表
+ */
 public class YaokongqiActivity extends BaseActivity {
     @BindView(R.id.rv_yaokong)
     RecyclerView rvYaokong;
@@ -39,6 +42,7 @@ public class YaokongqiActivity extends BaseActivity {
     private List<YaoKongBean.Devices> mList = new ArrayList<>();
     private YaoKongAdapter adapter;
     private List<Boolean> mList_status = new ArrayList<>();
+
     @Override
     protected void initData() {
         mobilephone = (String) SPUtils.get(this, "mobilephone", "");
@@ -67,7 +71,10 @@ public class YaokongqiActivity extends BaseActivity {
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                startActivity(new Intent(YaokongqiActivity.this,YaoKongListActivity.class).putExtra("deviceID",mList.get(position).id).putExtra("deviceName",mList.get(position).name));
+                startActivity(new Intent(YaokongqiActivity.this, YaoKongListActivity.class)
+                        .putExtra("deviceID", mList.get(position).id)
+                        .putExtra("deviceName", mList.get(position).name)
+                        .putExtra("mac", mList.get(position).mac));
             }
         });
     }
