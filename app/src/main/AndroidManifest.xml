@@ -36,15 +36,20 @@
             android:enabled="true"
             android:process=":remote" />
 
-        <activity android:name=".MainActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.LoginActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.RegisterActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.ForgetPasswordActivityActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.WelcomeActivity"
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.RegisterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ForgetPasswordActivityActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.WelcomeActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,62 +57,87 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.FamilyNameActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.FamilyMemberActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.AboutUsActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.VersionActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.WiFiActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.FamilyManagerActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.EditPswActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.AnFangActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.ZhaoMingActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.ChuangLianActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.ChuanganqiActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.FangjianActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.KaiguanActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.YaokongqiActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.SceneSettingActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.FamilyNameActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.FamilyMemberActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.AboutUsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.VersionActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.WiFiActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.FamilyManagerActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.EditPswActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.AnFangActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ZhaoMingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ChuangLianActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ChuanganqiActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.FangjianActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.KaiguanActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.YaokongqiActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.SceneSettingActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".google.zxing.activity.CaptureActivity" />
-        <activity android:name=".activity.LinkageSettingActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.TimeTriggeredActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.DeviceTriggeredActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.LinkageSettingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.TimeTriggeredActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.DeviceTriggeredActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".service.WebSocketService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".activity.RoomActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.YaoKongListActivity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask"/>
-        <activity android:name=".activity.KongTiaoActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.DianShiActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.HWDeviceListActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.PicYaoKongActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.RoomActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.YaoKongListActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.KongTiaoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.DianShiActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.HWDeviceListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.PicYaoKongActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".activity.SmartBoxActivity"></activity>
     </application>
 
 </manifest>

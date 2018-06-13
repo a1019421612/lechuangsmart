@@ -6,6 +6,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.WindowManager;
 
 import com.hbdiye.lechuangsmart.MainActivity;
 import com.hbdiye.lechuangsmart.R;
@@ -33,6 +34,8 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_welcome);
         userName= (String) SPUtils.get(this,"mobilephone","");
         if (TextUtils.isEmpty(userName)){

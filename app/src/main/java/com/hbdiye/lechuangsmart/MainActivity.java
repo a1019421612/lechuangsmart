@@ -1,12 +1,14 @@
 package com.hbdiye.lechuangsmart;
 
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 import android.view.View;
@@ -32,9 +34,15 @@ import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.hbdiye.lechuangsmart.util.TipsUtil;
 import com.hzy.tvmao.KookongSDK;
 import com.hzy.tvmao.interf.IRequestResult;
+import com.yanzhenjie.permission.Action;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.Permission;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -72,6 +80,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         irDeviceId = AndroidUniqueId.getUniqueId(this);
         initView();
         initData();
+        String[] perm={Permission.CAMERA,Permission.WRITE_EXTERNAL_STORAGE,Permission.ACCESS_COARSE_LOCATION};
+        AndPermission.with(this)
+                .runtime()
+                .permission(perm)
+                .onGranted(new Action<List<String>>() {
+                    @Override
+                    public void onAction(List<String> data) {
+                    }
+                })
+                .onDenied(new Action<List<String>>() {
+                    @Override
+                    public void onAction(List<String> data) {
+                    }
+                })
+                .start();
         fragmentManager = getSupportFragmentManager();
         changeTextViewColor();
         changeSelectedTabState(0);
@@ -700,8 +723,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             district = location.getDistrict();
             String street = location.getStreet();    //获取街道信息
             Log.e("TAG", province + "      " + city + "    " + district);
-            if (province.equals("")||city.equals("")||district.equals("")){
-            }else {
+            if (!TextUtils.isEmpty(province)&&!TextUtils.isEmpty(city)&&!TextUtils.isEmpty(district)){
                 SPUtils.put(MainActivity.this,"province",province);
                 SPUtils.put(MainActivity.this,"city",city);
                 SPUtils.put(MainActivity.this,"district",district);

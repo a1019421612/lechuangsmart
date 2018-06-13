@@ -93,7 +93,7 @@ public class PicYaoKongActivity extends BaseActivity {
     public void onViewClicked() {
         if (remoteids!=null){
             if (flag==remoteids_size){
-                SmartToast.show("越界了");
+
                 return;
             }
             getIRDataById(remoteids.get(flag));
@@ -116,7 +116,8 @@ public class PicYaoKongActivity extends BaseActivity {
                             if (irDatas.get(0).keys.get(i).fkey.equals("power")){
                                 String pulse = irDatas.get(0).keys.get(i).pulse;
                                 String replace = pulse.replace(" ", "").replace(",", "");
-                                mConnection.sendTextMessage("{\"pn\":\"IRTP\", \"sdMAC\":\""+mac+"\", \"rcode\":\""+rid+"\",\"fpulse\":\""+replace+"\"}}");
+                                String data="{\"pn\":\"IRTP\", \"sdMAC\":\""+mac+"\", \"rcode\":\""+rid+"\",\"fpulse\":\""+replace+"\"}}";
+                                mConnection.sendTextMessage(data);
                             }
                         }
 
@@ -197,7 +198,7 @@ public class PicYaoKongActivity extends BaseActivity {
                     e.printStackTrace();
                 }
             }
-            if (payload.contains("\"pn\":\"IRTP\"")){
+            if (payload.contains("\"pn\":\"IRATP\"")){
                 //添加红外遥控 IRATP
                 try {
                     JSONObject jsonObject=new JSONObject(payload);
