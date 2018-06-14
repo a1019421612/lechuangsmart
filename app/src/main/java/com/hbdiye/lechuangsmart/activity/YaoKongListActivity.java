@@ -232,7 +232,9 @@ public class YaoKongListActivity extends BaseActivity {
                     startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",1));
                     break;
                 case R.id.tv_kt:
-                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",5));
+                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class)
+                            .putExtra("type",5)
+                            .putExtra("mac",mac));
                     break;
                 case R.id.tv_fs:
                     startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",8));

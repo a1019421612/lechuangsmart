@@ -135,9 +135,10 @@
             android:name=".activity.HWDeviceListActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.PicYaoKongActivity"
+            android:name=".activity.PicTVYaoKongActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.SmartBoxActivity"></activity>
+        <activity android:name=".activity.SmartBoxActivity" />
+        <activity android:name=".activity.PicKTYaoKongActivity"></activity>
     </application>
 
 </manifest>

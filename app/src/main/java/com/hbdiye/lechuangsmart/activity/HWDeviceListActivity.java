@@ -23,6 +23,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.hzy.tvmao.ir.Device.AC;
+import static com.hzy.tvmao.ir.Device.TV;
+
 public class HWDeviceListActivity extends BaseActivity {
     /**
      * 获取某设备的品牌列表
@@ -115,10 +118,19 @@ public class HWDeviceListActivity extends BaseActivity {
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                startActivity(new Intent(HWDeviceListActivity.this, PicYaoKongActivity.class)
-                        .putExtra("type", type)
-                        .putExtra("mac",mac)
-                        .putExtra("brandId", mList.get(position).brandId));
+                if (type==AC){
+                    //空调
+                    startActivity(new Intent(HWDeviceListActivity.this, PicKTYaoKongActivity.class)
+                            .putExtra("type", type)
+                            .putExtra("mac",mac)
+                            .putExtra("brandId", mList.get(position).brandId));
+                } else if (type==TV) {
+                    //电视
+                    startActivity(new Intent(HWDeviceListActivity.this, PicTVYaoKongActivity.class)
+                            .putExtra("type", type)
+                            .putExtra("mac",mac)
+                            .putExtra("brandId", mList.get(position).brandId));
+                }
             }
         });
     }

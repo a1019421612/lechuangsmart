@@ -2,21 +2,18 @@ package com.hbdiye.lechuangsmart.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.coder.zzq.smartshow.toast.SmartToast;
-import com.google.gson.Gson;
-import com.hbdiye.lechuangsmart.MainActivity;
 import com.hbdiye.lechuangsmart.R;
-import com.hbdiye.lechuangsmart.bean.AnFangBean;
 import com.hbdiye.lechuangsmart.util.Logger;
 import com.hbdiye.lechuangsmart.util.SPUtils;
-import com.hbdiye.lechuangsmart.util.TipsUtil;
 import com.hbdiye.lechuangsmart.views.SceneDialog;
 import com.hzy.tvmao.KookongSDK;
 import com.hzy.tvmao.interf.IRequestResult;
@@ -26,23 +23,23 @@ import com.kookong.app.data.IrData;
 import com.kookong.app.data.IrDataList;
 import com.kookong.app.data.RemoteList;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
 
-/**
- * 遥控选择界面
- */
-public class PicYaoKongActivity extends BaseActivity {
+public class PicKTYaoKongActivity extends BaseActivity {
 
     @BindView(R.id.tv_power)
     TextView tvPower;
@@ -71,7 +68,7 @@ public class PicYaoKongActivity extends BaseActivity {
         type = getIntent().getIntExtra("type", -1);
         brandId = getIntent().getIntExtra("brandId", -1);
         mac = getIntent().getStringExtra("mac");
-        getAllRemoteIds();
+        getAllRemoteIds(type);
     }
 
     @Override
@@ -86,7 +83,7 @@ public class PicYaoKongActivity extends BaseActivity {
 
     @Override
     protected int getLayoutID() {
-        return R.layout.activity_pic_yao_kong;
+        return R.layout.activity_pic_ktyao_kong;
     }
 
     @OnClick(R.id.tv_power)
@@ -105,43 +102,74 @@ public class PicYaoKongActivity extends BaseActivity {
 
     private void getIRDataById(Integer rid) {
         //获取获取rid = 4162的 红外码, 批量获取红外码的方式是逗号隔开
-        KookongSDK.getIRDataById(rid+"", type, true, new IRequestResult<IrDataList>() {
+        KookongSDK.getNoStateIRDataById(rid+"", Device.AC, true, new IRequestResult<IrDataList>() {
 
-                    @Override
-                    public void onSuccess(String msg, IrDataList result) {
-                        List<IrData> irDatas = result.getIrDataList();
-                        String rid = irDatas.get(0).exts.get(99999);
-                        for (int i = 0; i < irDatas.size(); i++) {
-                            Logger.d("The rid is " + irDatas.get(i).rid);
-                            if (irDatas.get(0).keys.get(i).fkey.equals("power")){
-                                String pulse = irDatas.get(0).keys.get(i).pulse;
-                                String replace = pulse.replace(" ", "").replace(",", "");
-                                String data="{\"pn\":\"IRTP\", \"sdMAC\":\""+mac+"\", \"rcode\":\""+rid+"\",\"fpulse\":\""+replace+"\"}}";
-                                mConnection.sendTextMessage(data);
-                            }
-                        }
+            @Override
+            public void onSuccess(String msg, IrDataList result) {
+                List<IrData> irDatas = result.getIrDataList();
+                for (int i = 0; i < irDatas.size(); i++) {
+                    IrData irData = irDatas.get(i);
+                    Logger.d("空调：" + irData.rid);
+                    //空调支持的模式、温度、风速
+                    HashMap<Integer, String> exts = irData.exts;
+                    //遥控器参数
+                    String remoteParam = exts.get(99999);
+                    Logger.d("遥控器参数99999：" + remoteParam);
+                    try {
+                        JSONArray ja = new JSONArray(exts.get(0));
+                        //遍历模式，模式顺序：制冷、制热、自动、送风、除湿
 
+                        //制冷模式
+                        acMode(ja.getJSONObject(0), "制冷模式");
+                        //制热模式
+                        acMode(ja.getJSONObject(1), "制热模式");
+                        //自动模式
+                        acMode(ja.getJSONObject(2), "自动模式");
+                        //送风模式
+                        acMode(ja.getJSONObject(3), "送风模式");
+                        //除湿模式
+                        acMode(ja.getJSONObject(4), "除湿模式");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
 
-                    @Override
-                    public void onFail(Integer errorCode, String msg) {
-                        //按红外设备授权的客户，才会用到这两个值
-                        if (errorCode == AppConst.CUSTOMER_DEVICE_REMOTE_NUM_LIMIT) {//同一个设备下载遥控器超过了50套限制
-                            msg = "下载的遥控器超过了套数限制";
-                        } else if (errorCode == AppConst.CUSTOMER_DEVICE_NUM_LIMIT) {//设备总数超过了授权的额度
-                            msg = "设备总数超过了授权的额度";
-                        }
-                       SmartToast.show(msg);
-
+                    //空调的组合按键
+                    ArrayList<IrData.IrKey> keyList = irData.keys;
+                    String keySize = irData.rid + "的组合按键个数：" + (keyList == null ? "0" : keyList.size()) + "\n";
+                    Logger.d(keySize);
+                    if (keyList != null) {
+                        IrData.IrKey irKey = keyList.get(0);
+                        Logger.d("按键参数：" + irKey.fkey + "=" + irKey.pulse);
+                        IrData.IrKey irKey1 = keyList.get(1);
+                        Logger.d("按键参数：" + irKey1.fkey + "=" + irKey1.pulse);
+                        IrData.IrKey irKey2 = keyList.get(keyList.size() - 1);
+                        Logger.d("按键参数：" + irKey2.fkey + "=" + irKey2.pulse);
+                        String replace = irKey.pulse.replace(" ", "").replace(",", "");
+                        String data="{\"pn\":\"IRTP\", \"sdMAC\":\""+mac+"\", \"rcode\":\""+remoteParam+"\",\"fpulse\":\""+replace+"\"}}";
+                        mConnection.sendTextMessage(data);
                     }
-                });
+                }
+            }
+
+            @Override
+            public void onFail(Integer errorCode, String msg) {
+                //按红外设备授权的客户，才会用到这两个值
+                if (errorCode == AppConst.CUSTOMER_DEVICE_REMOTE_NUM_LIMIT) {//同一个设备下载遥控器超过了50套限制
+                    msg = "下载的遥控器超过了套数限制";
+                } else if (errorCode == AppConst.CUSTOMER_DEVICE_NUM_LIMIT) {//设备总数超过了授权的额度
+                    msg = "设备总数超过了授权的额度";
+                }
+                SmartToast.show( msg);
+            }
+
+        });
     }
 
-    private void getAllRemoteIds() {
+    private void getAllRemoteIds(int type) {
         //指定brand下的电视机所有的红外码的id spid和areaid都传0
 //                //获取指定设备类型(机顶盒是spId和areaid,所以这里不是机顶盒的获取方
 //                //式，机顶盒的红外码都是按区域划分和品牌关系不大),指定品牌下的红外码
-        KookongSDK.getAllRemoteIds(Device.TV, brandId, 0, 0, new IRequestResult<RemoteList>() {
+        KookongSDK.getAllRemoteIds(type, brandId, 0, 0, new IRequestResult<RemoteList>() {
 
             @Override
             public void onSuccess(String msg, RemoteList result) {
@@ -179,12 +207,12 @@ public class PicYaoKongActivity extends BaseActivity {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
             if (payload.contains("\"pn\":\"IRTP\"")){
-                AlertDialog.Builder builder=new AlertDialog.Builder(PicYaoKongActivity.this);
+                AlertDialog.Builder builder=new AlertDialog.Builder(PicKTYaoKongActivity.this);
                 builder.setMessage("设备有响应吗？");
                 builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        sceneDialog = new SceneDialog(PicYaoKongActivity.this, R.style.MyDialogStyle, dailogClicer, "修改设备名称");
+                        sceneDialog = new SceneDialog(PicKTYaoKongActivity.this, R.style.MyDialogStyle, dailogClicer, "修改设备名称");
                         sceneDialog.show();
                     }
                 });
@@ -205,7 +233,7 @@ public class PicYaoKongActivity extends BaseActivity {
                     boolean status = jsonObject.getBoolean("status");
                     if (status){
                         sceneDialog.dismiss();
-                        startActivity(new Intent(PicYaoKongActivity.this,YaoKongListActivity.class));
+                        startActivity(new Intent(PicKTYaoKongActivity.this,YaoKongListActivity.class));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -279,5 +307,19 @@ public class PicYaoKongActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         mConnection.disconnect();
+    }
+    private void acMode(JSONObject jo, String mode) throws JSONException {
+        String speed = jo.optString("speed");
+
+        String temperature = jo.optString("temperature");
+        Map<String,String> mod_s_t=new HashMap<>();
+        mod_s_t.put("speed",speed);
+        mod_s_t.put("temperature",temperature);
+        if (TextUtils.isEmpty(speed) && TextUtils.isEmpty(temperature)) {
+            Logger.d("不具备" + mode);
+        } else {
+            Logger.d(mode + "支持的可调风速：" + speed + "，支持的可调温度：" + temperature);
+        }
+
     }
 }

@@ -9,7 +9,7 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
+        android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:layout_marginTop="@dimen/dp_20"
         android:textSize="@dimen/sp_16"
@@ -27,7 +27,7 @@
     <TextView
         android:id="@+id/tv_yaokong_test"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
+        android:layout_height="wrap_content"
         android:textSize="@dimen/sp_16"
         android:text="测试按键"
         android:gravity="center_horizontal"
