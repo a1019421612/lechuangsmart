@@ -120,8 +120,8 @@ public class PicTVYaoKongActivity extends BaseActivity {
                             if (irDatas.get(0).keys.get(i).fkey.equals("power")){
                                 String pulse = irDatas.get(0).keys.get(i).pulse;
                                 String replace = pulse.replace(" ", "").replace(",", "");
-                                String data="{\"pn\":\"IRTP\", \"sdMAC\":\""+mac+"\", \"rcode\":\""+rid+"\",\"fpulse\":\""+replace+"\"}}";
-                                mConnection.sendTextMessage(data);
+                                String data="{\"pn\":\"IRTP\", \"sdMAC\":\""+mac+"\", \"rcode\":\""+rid+"\",\"fpulse\":\""+49+"\"}}";
+                                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"AF471518004B1200\",\"rcode\":\"010C0ED8060004811C04801700150480170021048017002D0480170038048026001502801700\",\"fpulse\":\"00420120030025\"}");
                             }
                         }
 

@@ -175,7 +175,8 @@ public class RoomActivity extends BaseActivity {
             Log.e(TAG, "open");
             mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
             if (flag_code){
-                mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\""+ erCode +"\"} ");
+//                mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\""+ erCode +"\"} ");
+                mConnection.sendTextMessage("{{\"pn\":\"SDBTP\",\"roomID\":\""+roomId+"\",\"serialnumber\":\""+erCode+"\"}}");
             }
         }
 
@@ -218,16 +219,17 @@ public class RoomActivity extends BaseActivity {
                     e.printStackTrace();
                 }
             }
-            if (payload.contains("\"pn\":\"UJFTP\"")){
+            if (payload.contains("\"pn\":\"SDBTP\"")){
                 //扫描加入家庭
                 flag_code=false;
                 try {
                     JSONObject jsonObject=new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     if (status){
-                        SmartToast.show("成功加入家庭");
+                        SmartToast.show("成功加入");
+                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
                     }else {
-                        SmartToast.show("加入家庭失败");
+                        SmartToast.show("加入失败");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

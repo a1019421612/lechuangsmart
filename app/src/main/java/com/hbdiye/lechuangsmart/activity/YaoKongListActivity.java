@@ -36,6 +36,10 @@ import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
 
+import static com.hzy.tvmao.ir.Device.AC;
+import static com.hzy.tvmao.ir.Device.BOX;
+import static com.hzy.tvmao.ir.Device.TV;
+
 /**
  * 遥控设备列表
  */
@@ -83,15 +87,15 @@ public class YaoKongListActivity extends BaseActivity {
 
         tvYaokongName.setText(deviceName);
 
-        province = (String) SPUtils.get(this,"province","");
-        city = (String) SPUtils.get(this,"city","");
-        district = (String) SPUtils.get(this,"district","");
+        province = (String) SPUtils.get(this, "province", "");
+        city = (String) SPUtils.get(this, "city", "");
+        district = (String) SPUtils.get(this, "district", "");
         getAreaId();
 
     }
 
     private void getAreaId() {
-        if (!TextUtils.isEmpty(province)&&!TextUtils.isEmpty(city)&&!TextUtils.isEmpty(district)){
+        if (!TextUtils.isEmpty(province) && !TextUtils.isEmpty(city) && !TextUtils.isEmpty(district)) {
             KookongSDK.getAreaId(province, city, district, new IRequestResult<Integer>() {
 
                 @Override
@@ -149,14 +153,13 @@ public class YaoKongListActivity extends BaseActivity {
                 }
             }
         });
-
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 flag = position;
                 switch (view.getId()) {
                     case R.id.ll_scene_item_del:
-                        mConnection.sendTextMessage("{\"pn\":\"IRDTP\",\"id\":\""+mList.get(position).id+"\"}");
+                        mConnection.sendTextMessage("{\"pn\":\"IRDTP\",\"id\":\"" + mList.get(position).id + "\"}");
                         break;
                     case R.id.ll_scene_item_edt:
                         sceneDialog = new SceneDialog(YaoKongListActivity.this, R.style.MyDialogStyle, dailogClicer, "修改设备名称");
@@ -165,7 +168,54 @@ public class YaoKongListActivity extends BaseActivity {
                         break;
                     case R.id.ll_scene_device:
                         if (!editStatus) {
-                            startActivity(new Intent(YaoKongListActivity.this, DianShiActivity.class));
+                            String rtype = mList.get(position).rtype;
+                            String rid = mList.get(position).rid;
+                            if (rtype.equals("TV")) {
+                                //电视
+                                startActivity(new Intent(YaoKongListActivity.this, DianShiActivity.class)
+                                        .putExtra("rid", rid)
+                                        .putExtra("type", TV)
+                                        .putExtra("mac",mac ));
+                            } else if (rtype.equals("BOX")) {
+                                //盒子
+                                startActivity(new Intent(YaoKongListActivity.this, SmartBoxActivity.class)
+                                        .putExtra("rid", rid)
+                                        .putExtra("type", BOX)
+                                        .putExtra("mac",mac ));
+                            } else if (rtype.equals("STB")) {
+                                //机顶盒
+                                SmartToast.show("STB");
+                            } else if (rtype.equals("DVD")) {
+                                //DVD
+                                SmartToast.show("DVD");
+                            } else if (rtype.equals("AC")) {
+                                //空调
+                                startActivity(new Intent(YaoKongListActivity.this, KongTiaoActivity.class)
+                                        .putExtra("rid", rid)
+                                        .putExtra("type", AC)
+                                        .putExtra("mac",mac ));
+                            } else if (rtype.equals("PRO")) {
+                                //投影仪
+                                SmartToast.show("PRO");
+                            } else if (rtype.equals("PA")) {
+                                //功放
+                                SmartToast.show("PA");
+                            } else if (rtype.equals("FAN")) {
+                                //风扇
+                                SmartToast.show("FAN");
+                            } else if (rtype.equals("SLR")) {
+                                //单反
+                                SmartToast.show("SLR");
+                            } else if (rtype.equals("Light")) {
+                                //开关灯泡
+                                SmartToast.show("Light");
+                            } else if (rtype.equals("AIR_CLEANER")) {
+                                //空气净化器
+                                SmartToast.show("AIR_CLEANER");
+                            } else if (rtype.equals("WATER_HEATER")) {
+                                //热水器
+                                SmartToast.show("WATER_HEATER");
+                            }
                         }
                         break;
                 }
@@ -224,41 +274,41 @@ public class YaoKongListActivity extends BaseActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.tv_ds:
-                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class)
-                            .putExtra("type",2)
-                            .putExtra("mac",mac));
+                    startActivity(new Intent(YaoKongListActivity.this, HWDeviceListActivity.class)
+                            .putExtra("type", 2)
+                            .putExtra("mac", mac));
                     break;
                 case R.id.tv_jdh:
-                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",1));
+                    startActivity(new Intent(YaoKongListActivity.this, HWDeviceListActivity.class).putExtra("type", 1));
                     break;
                 case R.id.tv_kt:
-                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class)
-                            .putExtra("type",5)
-                            .putExtra("mac",mac));
+                    startActivity(new Intent(YaoKongListActivity.this, HWDeviceListActivity.class)
+                            .putExtra("type", 5)
+                            .putExtra("mac", mac));
                     break;
                 case R.id.tv_fs:
-                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",8));
+                    startActivity(new Intent(YaoKongListActivity.this, HWDeviceListActivity.class).putExtra("type", 8));
                     break;
                 case R.id.tv_znhz:
-                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",3));
+                    startActivity(new Intent(YaoKongListActivity.this, HWDeviceListActivity.class).putExtra("type", 3));
                     break;
                 case R.id.tv_gf:
-                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",7));
+                    startActivity(new Intent(YaoKongListActivity.this, HWDeviceListActivity.class).putExtra("type", 7));
                     break;
                 case R.id.tv_dvd:
-                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",4));
+                    startActivity(new Intent(YaoKongListActivity.this, HWDeviceListActivity.class).putExtra("type", 4));
                     break;
                 case R.id.tv_tyy:
-                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",6));
+                    startActivity(new Intent(YaoKongListActivity.this, HWDeviceListActivity.class).putExtra("type", 6));
                     break;
                 case R.id.tv_xj:
-                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",9));
+                    startActivity(new Intent(YaoKongListActivity.this, HWDeviceListActivity.class).putExtra("type", 9));
                     break;
                 case R.id.tv_kqjhq:
-                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",11));
+                    startActivity(new Intent(YaoKongListActivity.this, HWDeviceListActivity.class).putExtra("type", 11));
                     break;
                 case R.id.tv_rsq:
-                    startActivity(new Intent(YaoKongListActivity.this,HWDeviceListActivity.class).putExtra("type",12));
+                    startActivity(new Intent(YaoKongListActivity.this, HWDeviceListActivity.class).putExtra("type", 12));
                     break;
             }
         }
@@ -298,12 +348,12 @@ public class YaoKongListActivity extends BaseActivity {
                     e.printStackTrace();
                 }
             }
-            if (payload.contains("\"pn\":\"IRDTP\"")){
+            if (payload.contains("\"pn\":\"IRDTP\"")) {
                 //删除 IRDTP
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status){
+                    if (status) {
                         mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + deviceID + "\"}");
                     }
                 } catch (JSONException e) {
