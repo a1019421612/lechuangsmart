@@ -300,4 +300,9 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
             }
         }
     };
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mSceneConnection.disconnect();
+    }
 }

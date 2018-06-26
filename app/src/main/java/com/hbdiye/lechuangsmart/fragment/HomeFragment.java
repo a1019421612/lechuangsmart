@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.coder.zzq.smartshow.toast.SmartToast;
+import com.hbdiye.lechuangsmart.Global.CWebSocketHandler;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.activity.AnFangActivity;
 import com.hbdiye.lechuangsmart.activity.ChuangLianActivity;
@@ -63,13 +64,13 @@ public class HomeFragment extends Fragment {
         mConnection = new WebSocketConnection();
         mobilephone= (String) SPUtils.get(getActivity(),"mobilephone","");
         password= (String) SPUtils.get(getActivity(),"password","");
-//        try {
-//            mConnection.connect("ws://39.104.105.10:18888/mobilephone="+mobilephone+"&password="+password, new MyWebSocketHandler());
-//
-//        } catch (WebSocketException e) {
-//            e.printStackTrace();
-//            SmartToast.show("网络连接错误");
-//        }
+        try {
+            mConnection.connect("ws://39.104.105.10:18888/mobilephone="+mobilephone+"&password="+password, new MyWebSocketHandler());
+
+        } catch (WebSocketException e) {
+            e.printStackTrace();
+            SmartToast.show("网络连接错误");
+        }
         return view;
     }
 
@@ -113,7 +114,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    class MyWebSocketHandler extends WebSocketHandler {
+    class MyWebSocketHandler extends CWebSocketHandler{
         @Override
         public void onOpen() {
             Log.e(TAG, "open");
@@ -122,7 +123,7 @@ public class HomeFragment extends Fragment {
 
         @Override
         public void onTextMessage(String payload) {
-            Log.e(TAG, "onTextMessage" + payload);
+            super.onTextMessage(payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
@@ -133,26 +134,52 @@ public class HomeFragment extends Fragment {
             Log.e(TAG, "onClose");
         }
     }
-
-//    @Override
-//    public void onHiddenChanged(boolean hidden) {
-//        if (hidden) {
-//            // 隐藏
-//            Log.e(TAG, "home" + "隐藏");
-//            mConnection.disconnect();
+//    class MyWebSocketHandler extends WebSocketHandler {
+//        @Override
+//        public void onOpen() {
+//            Log.e(TAG, "open");
+//            mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
+//        }
 //
-//        } else {
-//            // 可视
-//            Log.e(TAG, "home" + "显示");
-//            if (mConnection != null) {
-//                try {
-//                    mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-//
-//                } catch (WebSocketException e) {
-//                    e.printStackTrace();
-//                    SmartToast.show("网络连接错误");
-//                }
+//        @Override
+//        public void onTextMessage(String payload) {
+//            Log.e(TAG, "onTextMessage" + payload);
+//            if (payload.contains("{\"pn\":\"HRQP\"}")) {
+//                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
 //            }
 //        }
+//
+//        @Override
+//        public void onClose(int code, String reason) {
+//            Log.e(TAG, "onClose");
+//        }
 //    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        if (hidden) {
+            // 隐藏
+            Log.e(TAG, "home" + "隐藏");
+            mConnection.disconnect();
+
+        } else {
+            // 可视
+            Log.e(TAG, "home" + "显示");
+            if (mConnection != null) {
+                try {
+                    mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+
+                } catch (WebSocketException e) {
+                    e.printStackTrace();
+                    SmartToast.show("网络连接错误");
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mConnection.disconnect();
+    }
 }

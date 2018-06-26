@@ -305,4 +305,10 @@ public class LinkageFragment extends Fragment {
             socketConnect();
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mConnection.disconnect();
+    }
 }
