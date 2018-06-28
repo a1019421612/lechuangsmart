@@ -13,26 +13,32 @@
     android:src="@mipmap/forgotbanner"
     />
     <EditText
+        android:id="@+id/et_old_psw"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="旧密码"
         android:background="@drawable/shape_edit"
         android:padding="10dp"
+        android:inputType="textPassword"
         android:layout_margin="10dp"
         />
     <EditText
+        android:id="@+id/et_new_psw"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="新密码"
         android:background="@drawable/shape_edit"
+        android:inputType="textPassword"
         android:padding="10dp"
         android:layout_margin="10dp"
         />
     <EditText
+        android:id="@+id/et_enter_psw"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="确认密码"
         android:background="@drawable/shape_edit"
+        android:inputType="textPassword"
         android:padding="10dp"
         android:layout_margin="10dp"
         />

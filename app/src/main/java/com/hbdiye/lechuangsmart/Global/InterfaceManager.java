@@ -4,14 +4,18 @@ import java.util.HashMap;
 
 public class InterfaceManager {
     public static final String LOGIN = "LOGIN";//登录
+    public static final String REGISTER="REGISTER";//注册
     public static final String GETVAILCODE="GETVAILCODE";//获取验证码
+    public static final String FORGETPSW="FORGETPSW";//忘记密码
     private static HashMap<String, String> urlManager = new HashMap<String, String>();
     private static InterfaceManager manager;
     public static InterfaceManager getInstance(){
         if (manager==null){
             manager=new InterfaceManager();
             urlManager.put(InterfaceManager.LOGIN,"http://39.104.105.10:8888/SmarthomeHTTPServer/Login.php");
-            urlManager.put(InterfaceManager.GETVAILCODE,"http://39.104.105.10:8888/SmarthomeHTTPServer/GetVailCode.php");
+            urlManager.put(InterfaceManager.REGISTER,"http://39.104.105.10:8088/SmartHome-java-user/user/register");
+            urlManager.put(InterfaceManager.GETVAILCODE,"http://39.104.105.10:8088/SmartHome-java-user/user/getValidateCode");
+            urlManager.put(InterfaceManager.FORGETPSW,"http://39.104.105.10:8088/SmartHome-java-user/user/resetPassword");
         }
         return manager;
     }

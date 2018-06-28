@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -16,10 +17,15 @@ import android.widget.Toast;
 
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.hbdiye.lechuangsmart.Global.InterfaceManager;
+import com.hbdiye.lechuangsmart.MainActivity;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.hbdiye.lechuangsmart.utils.RegexUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -84,14 +90,14 @@ public class RegisterActivity extends BaseActivity {
             case R.id.sendCodeButton:
                 if (checkPhone()) {
 //                    Toast.makeText(this, "验证码", Toast.LENGTH_SHORT).show();
-                    timeCount=new TimeCount(10000,1000);
+                    timeCount=new TimeCount(60000,1000);
                     timeCount.start();
                     getVailCode(mPhone);
                 }
                 break;
             case R.id.saveButton:
                 if (check()) {
-                    Toast.makeText(this, "注册", Toast.LENGTH_SHORT).show();
+                   registerUser(mPhone,mPassword,mCode);
                 }
                 break;
             case R.id.iv_register_back:
@@ -99,13 +105,47 @@ public class RegisterActivity extends BaseActivity {
                 break;
         }
     }
+    private void registerUser(String mPhone, String mPassword, String mCode) {
+        OkHttpUtils.post()
+                .url(InterfaceManager.getInstance().getURL(InterfaceManager.REGISTER))
+                .addParams("mobilephone",mPhone)
+                .addParams("password",mPassword)
+                .addParams("confirmPassword",mPassword)
+                .addParams("code",mCode)
+                .addParams("name",mPhone)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        SmartToast.show("注册失败");
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        Log.e("sss",response);
+                        try {
+                            JSONObject jsonObject=new JSONObject(response);
+                            int result = jsonObject.getInt("errcode");
+                            if (result==0){
+                                SmartToast.show("注册成功");
+                                finish();
+                            }else {
+                                String data = jsonObject.getString("errmsg");
+                                SmartToast.show(data);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
 
     private void getVailCode(String mPhone) {
         OkHttpUtils
                 .post()
                 .url(InterfaceManager.getInstance().getURL(InterfaceManager.GETVAILCODE))
                 .addParams("mobilephone",mPhone)
-                .addParams("type","reg")
+                .addParams("type","1")
                 .build()
                 .execute(new StringCallback() {
                     @Override
@@ -135,16 +175,26 @@ public class RegisterActivity extends BaseActivity {
 
         @Override
         public void onTick(long millisUntilFinished) {
-            sendCodeButton.setEnabled(false);
-            sendCodeButton.setBackgroundColor(Color.TRANSPARENT);
-            sendCodeButton.setText(millisUntilFinished / 1000 + "秒");
+
+            try {
+                sendCodeButton.setEnabled(false);
+                sendCodeButton.setBackgroundColor(Color.TRANSPARENT);
+                sendCodeButton.setText(millisUntilFinished / 1000 + "秒");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void onFinish() {
-            sendCodeButton.setEnabled(true);
-            sendCodeButton.setText("");
-            sendCodeButton.setBackgroundResource(R.mipmap.ic_code);
+            try {
+                sendCodeButton.setEnabled(true);
+                sendCodeButton.setText("");
+                sendCodeButton.setBackgroundResource(R.mipmap.ic_code);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
@@ -180,5 +230,11 @@ public class RegisterActivity extends BaseActivity {
         }
         return true;
     }
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (timeCount!=null){
+            timeCount.cancel();
+        }
+    }
 }

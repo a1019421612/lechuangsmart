@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,12 +13,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.coder.zzq.smartshow.toast.SmartToast;
+import com.hbdiye.lechuangsmart.Global.InterfaceManager;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.utils.RegexUtils;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.Call;
 
 public class ForgetPasswordActivityActivity extends BaseActivity {
 
@@ -74,18 +83,55 @@ public class ForgetPasswordActivityActivity extends BaseActivity {
                 break;
             case R.id.sendCodeButton:
                 if (checkPhone()){
-                    Toast.makeText(this,"验证码",Toast.LENGTH_SHORT).show();
-                    timeCount = new TimeCount(10000,1000);
+                    timeCount = new TimeCount(60000,1000);
                     timeCount.start();
+                    getVailCode(mPhone);
                 }
                 break;
             case R.id.saveButton:
                 if (check()){
-                    Toast.makeText(this, "注册", Toast.LENGTH_SHORT).show();
+                    forgetPsw(mPhone,mCode,mPassword);
                 }
                 break;
         }
     }
+
+    private void forgetPsw(String phone, String code, String psw) {
+        OkHttpUtils
+                .post()
+                .url(InterfaceManager.getInstance().getURL(InterfaceManager.FORGETPSW))
+                .addParams("mobilephone",phone)
+                .addParams("code",code)
+                .addParams("password",psw)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        SmartToast.show("修改失败");
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        Log.e("SSS",response);
+                        try {
+                            JSONObject jsonObject=new JSONObject(response);
+                            int result = jsonObject.getInt("errcode");
+                            if (result==0){
+                                SmartToast.show("修改成功");
+
+                                finish();
+                            }else {
+                                String data = jsonObject.getString("errmsg");
+                                SmartToast.show(data);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+    }
+
     private boolean check() {
         codeTextInputLayout.setErrorEnabled(false);
 
@@ -104,6 +150,25 @@ public class ForgetPasswordActivityActivity extends BaseActivity {
         }
         return true;
     }
+    private void getVailCode(String mPhone) {
+        OkHttpUtils
+                .post()
+                .url(InterfaceManager.getInstance().getURL(InterfaceManager.GETVAILCODE))
+                .addParams("mobilephone",mPhone)
+                .addParams("type","2")
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        SmartToast.show("网络连接错误");
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        Log.e("TAG",response);
+                    }
+                });
+    }
     class TimeCount extends CountDownTimer {
 
         /**
@@ -119,16 +184,25 @@ public class ForgetPasswordActivityActivity extends BaseActivity {
 
         @Override
         public void onTick(long millisUntilFinished) {
-            sendCodeButton.setEnabled(false);
-            sendCodeButton.setBackgroundColor(Color.TRANSPARENT);
-            sendCodeButton.setText(millisUntilFinished / 1000 + "秒");
+            try {
+                sendCodeButton.setEnabled(false);
+                sendCodeButton.setBackgroundColor(Color.TRANSPARENT);
+                sendCodeButton.setText(millisUntilFinished / 1000 + "秒");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void onFinish() {
-            sendCodeButton.setEnabled(true);
-            sendCodeButton.setText("");
-            sendCodeButton.setBackgroundResource(R.mipmap.ic_code);
+            try {
+                sendCodeButton.setEnabled(true);
+                sendCodeButton.setText("");
+                sendCodeButton.setBackgroundResource(R.mipmap.ic_code);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
     }
     private boolean checkPhone() {
@@ -143,5 +217,13 @@ public class ForgetPasswordActivityActivity extends BaseActivity {
             return false;
         }
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (timeCount!=null){
+            timeCount.cancel();
+        }
     }
 }
