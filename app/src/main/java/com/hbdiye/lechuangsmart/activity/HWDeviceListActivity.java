@@ -49,11 +49,13 @@ public class HWDeviceListActivity extends BaseActivity {
     private List<BrandList.Brand> mList = new ArrayList<>();
     private HWDeviceAdapter adapter;
     private String mac;
+    private String deviceID;
 
     @Override
     protected void initData() {
         type = getIntent().getIntExtra("type", -1);
         mac = getIntent().getStringExtra("mac");
+        deviceID=getIntent().getStringExtra("deviceID");
         if (type == 1) {
             tvBaseTitle.setText("机顶盒");
         } else if (type == 2) {
@@ -123,13 +125,13 @@ public class HWDeviceListActivity extends BaseActivity {
                     startActivity(new Intent(HWDeviceListActivity.this, PicKTYaoKongActivity.class)
                             .putExtra("type", type)
                             .putExtra("mac",mac)
-                            .putExtra("brandId", mList.get(position).brandId));
-                } else if (type==TV) {
-                    //电视
+                            .putExtra("brandId", mList.get(position).brandId).putExtra("deviceID",deviceID));
+                } else{
+
                     startActivity(new Intent(HWDeviceListActivity.this, PicTVYaoKongActivity.class)
                             .putExtra("type", type)
                             .putExtra("mac",mac)
-                            .putExtra("brandId", mList.get(position).brandId));
+                            .putExtra("brandId", mList.get(position).brandId).putExtra("deviceID",deviceID));
                 }
             }
         });

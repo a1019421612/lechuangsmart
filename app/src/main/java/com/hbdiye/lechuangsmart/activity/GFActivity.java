@@ -11,6 +11,7 @@ import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.util.ImageUtil;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.hbdiye.lechuangsmart.views.RoundMenuView;
+import com.hbdiye.lechuangsmart.views.TVNumDialog;
 import com.hzy.tvmao.KookongSDK;
 import com.hzy.tvmao.interf.IRequestResult;
 import com.kookong.app.data.AppConst;
@@ -27,53 +28,40 @@ import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
 
-/**
- * 智能盒子遥控
- */
-public class SmartBoxActivity extends BaseActivity {
+public class GFActivity extends BaseActivity {
 
-    @BindView(R.id.tv_box_power)
-    TextView tvBoxPower;
-    @BindView(R.id.tv_box_setting)
-    TextView tvBoxSetting;
-    @BindView(R.id.tv_box_home)
-    TextView tvBoxHome;
-    @BindView(R.id.tv_box_menu)
-    TextView tvBoxMenu;
-    @BindView(R.id.tv_box_back)
-    TextView tvBoxBack;
-    @BindView(R.id.tv_box_ex)
-    TextView tvBoxEx;
-    @BindView(R.id.tv_box_voice_up)
-    TextView tvBoxVoiceUp;
-    @BindView(R.id.tv_box_voice_down)
-    TextView tvBoxVoiceDown;
+    @BindView(R.id.tv_gf_power)
+    TextView tvGfPower;
+    @BindView(R.id.tv_gf_menu)
+    TextView tvGfMenu;
+    @BindView(R.id.tv_gf_novoice)
+    TextView tvGfNovoice;
+    @BindView(R.id.tv_gf_voice_down)
+    TextView tvGfVoiceDown;
+    @BindView(R.id.tv_gf_voice_up)
+    TextView tvGfVoiceUp;
+    @BindView(R.id.roundMenuView)
+    RoundMenuView roundMenuView;
+
+    private String TAG = GFActivity.class.getSimpleName();
+
     private String rid = "";
     private int type;
-    private String rcode;
-
     private WebSocketConnection mConnection;
     private String mobilephone;
     private String password;
     private String mac;
+    private String power;
     private String ok;
-    private String channel_up;
-    private String channel_down;
     private String navigate_up;
     private String navigate_down;
     private String navigate_left;
     private String navigate_right;
     private String volume_up;
     private String volume_down;
-    private String back;
-    private String homepage;
+    private String novoice;
     private String menu;
-    private String power;
-    private String TAG = SmartBoxActivity.class.getSimpleName();
-
-    @BindView(R.id.roundMenuView)
-    RoundMenuView roundMenuView;
-
+    private String rcode;
     @Override
     protected void initData() {
         mobilephone = (String) SPUtils.get(this, "mobilephone", "");
@@ -87,7 +75,6 @@ public class SmartBoxActivity extends BaseActivity {
             getIRDataById();
         }
     }
-
     private void getIRDataById() {
         KookongSDK.getIRDataById(rid, type, true, new IRequestResult<IrDataList>() {
 
@@ -103,13 +90,7 @@ public class SmartBoxActivity extends BaseActivity {
                     } else if (irDatas.get(0).keys.get(i).fid == 42) {
                         String pulse = irDatas.get(0).keys.get(i).pulse;
                         ok = pulse.replace(" ", "").replace(",", "");
-                    } else if (irDatas.get(0).keys.get(i).fid == 43) {
-                        String pulse = irDatas.get(0).keys.get(i).pulse;
-                        channel_up = pulse.replace(" ", "").replace(",", "");
-                    } else if (irDatas.get(0).keys.get(i).fid == 44) {
-                        String pulse = irDatas.get(0).keys.get(i).pulse;
-                        channel_down = pulse.replace(" ", "").replace(",", "");
-                    } else if (irDatas.get(0).keys.get(i).fid == 45) {
+                    }  else if (irDatas.get(0).keys.get(i).fid == 45) {
                         String pulse = irDatas.get(0).keys.get(i).pulse;
                         menu = pulse.replace(" ", "").replace(",", "");
                     } else if (irDatas.get(0).keys.get(i).fid == 46) {
@@ -130,14 +111,12 @@ public class SmartBoxActivity extends BaseActivity {
                     } else if (irDatas.get(0).keys.get(i).fid == 51) {
                         String pulse = irDatas.get(0).keys.get(i).pulse;
                         volume_down = pulse.replace(" ", "").replace(",", "");
-                    } else if (irDatas.get(0).keys.get(i).fid == 116) {
+                    } else if (irDatas.get(0).keys.get(i).fid == 106){
                         String pulse = irDatas.get(0).keys.get(i).pulse;
-                        back = pulse.replace(" ", "").replace(",", "");
-                    } else if (irDatas.get(0).keys.get(i).fid == 136) {
-                        String pulse = irDatas.get(0).keys.get(i).pulse;
-                        homepage = pulse.replace(" ", "").replace(",", "");
+                        novoice = pulse.replace(" ", "").replace(",", "");
                     }
                 }
+
             }
 
             @Override
@@ -153,22 +132,29 @@ public class SmartBoxActivity extends BaseActivity {
             }
         });
     }
-
     @Override
     protected String getTitleName() {
-        return "智能盒子";
+        return "功放";
     }
 
     @Override
     protected void initView() {
+        ivBaseBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        initRoundMenu();
+    }
+    private void initRoundMenu() {
         RoundMenuView.RoundMenu roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = getResources().getColor(R.color.gray_9999);
         roundMenu.strokeColor = getResources().getColor(R.color.gray_9999);
-        roundMenu.icon = ImageUtil.drawable2Bitmap(SmartBoxActivity.this, R.mipmap.right);
+        roundMenu.icon = ImageUtil.drawable2Bitmap(GFActivity.this, R.mipmap.right);
         roundMenu.onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //下
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + navigate_down + "\"}");
             }
         };
@@ -177,11 +163,10 @@ public class SmartBoxActivity extends BaseActivity {
         roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = getResources().getColor(R.color.gray_9999);
         roundMenu.strokeColor = getResources().getColor(R.color.gray_9999);
-        roundMenu.icon = ImageUtil.drawable2Bitmap(SmartBoxActivity.this, R.mipmap.right);
+        roundMenu.icon = ImageUtil.drawable2Bitmap(GFActivity.this, R.mipmap.right);
         roundMenu.onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //左
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + navigate_left + "\"}");
             }
         };
@@ -190,9 +175,8 @@ public class SmartBoxActivity extends BaseActivity {
         roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = getResources().getColor(R.color.gray_9999);
         roundMenu.strokeColor = getResources().getColor(R.color.gray_9999);
-        roundMenu.icon = ImageUtil.drawable2Bitmap(SmartBoxActivity.this, R.mipmap.right);
+        roundMenu.icon = ImageUtil.drawable2Bitmap(GFActivity.this, R.mipmap.right);
         roundMenu.onClickListener = new View.OnClickListener() {
-            //上
             @Override
             public void onClick(View view) {
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + navigate_up + "\"}");
@@ -203,9 +187,8 @@ public class SmartBoxActivity extends BaseActivity {
         roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = getResources().getColor(R.color.gray_9999);
         roundMenu.strokeColor = getResources().getColor(R.color.gray_9999);
-        roundMenu.icon = ImageUtil.drawable2Bitmap(SmartBoxActivity.this, R.mipmap.right);
+        roundMenu.icon = ImageUtil.drawable2Bitmap(GFActivity.this, R.mipmap.right);
         roundMenu.onClickListener = new View.OnClickListener() {
-            //右
             @Override
             public void onClick(View view) {
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + navigate_right + "\"}");
@@ -215,51 +198,45 @@ public class SmartBoxActivity extends BaseActivity {
 
         roundMenuView.setCoreMenu(getResources().getColor(R.color.gray_f2f2),
                 getResources().getColor(R.color.gray_9999), getResources().getColor(R.color.gray_9999)
-                , 1, 0.43, ImageUtil.drawable2Bitmap(SmartBoxActivity.this, R.drawable.ok), new View.OnClickListener() {
+                , 1, 0.43, ImageUtil.drawable2Bitmap(GFActivity.this, R.drawable.ok), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + ok + "\"}");
                     }
                 });
     }
-
     @Override
     protected int getLayoutID() {
-        return R.layout.activity_smart_box;
+        return R.layout.activity_gf;
     }
 
 
-    @OnClick({R.id.tv_box_power, R.id.tv_box_setting, R.id.tv_box_home, R.id.tv_box_menu, R.id.tv_box_back, R.id.tv_box_ex, R.id.tv_box_voice_up, R.id.tv_box_voice_down})
+    @OnClick({R.id.tv_gf_power, R.id.tv_gf_menu, R.id.tv_gf_novoice, R.id.tv_gf_voice_down, R.id.tv_gf_voice_up})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.tv_box_power:
+            case R.id.tv_gf_power:
                 //开关
-//                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"AF471518004B1200\",\"rcode\":\"010C0ED8060004811C04801700150480170021048017002D0480170038048026001502801700\",\"fpulse\":\"00403303030335\"}");
                 String data = "{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + power + "\"}";
                 mConnection.sendTextMessage(data);
                 break;
-            case R.id.tv_box_setting:
-                break;
-            case R.id.tv_box_home:
-                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + homepage + "\"}");
-                break;
-            case R.id.tv_box_menu:
+            case R.id.tv_gf_menu:
+                //菜单
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + menu + "\"}");
                 break;
-            case R.id.tv_box_back:
-                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + back + "\"}");
+            case R.id.tv_gf_novoice:
+                //   静音
+                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + novoice + "\"}");
                 break;
-            case R.id.tv_box_ex:
-                break;
-            case R.id.tv_box_voice_up:
-                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + volume_up + "\"}");
-                break;
-            case R.id.tv_box_voice_down:
+            case R.id.tv_gf_voice_down:
+                //                声音-
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + volume_down + "\"}");
+                break;
+            case R.id.tv_gf_voice_up:
+//                声音+
+                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + volume_up + "\"}");
                 break;
         }
     }
-
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {

@@ -13,5 +13,9 @@
     <color name="corner_color">#00FF00</color>
     <color name="gray_9999">#999999</color>
     <color name="gray_f2f2">#F2F2F2</color>
+    <color name="color_gray">#e8e8e8</color>
+    <color name="color_blue">#3F51B5</color>
+    <color name="color_red">#3F51B5</color>
+    <color name="color_green">#0f0</color>
     <!-- QRCode scanner color end -->
 </resources>

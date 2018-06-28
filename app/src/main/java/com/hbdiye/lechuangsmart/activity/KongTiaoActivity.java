@@ -1,6 +1,9 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +19,7 @@ import com.hzy.tvmao.ir.Device;
 import com.kookong.app.data.AppConst;
 import com.kookong.app.data.IrData;
 import com.kookong.app.data.IrDataList;
+import com.zhouyou.view.seekbar.SignSeekBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +28,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -75,6 +80,7 @@ public class KongTiaoActivity extends BaseActivity {
     private String speed;
     private String temp;
     private String fkey;
+    private SignSeekBar signSeekBar;
 
     @Override
     protected void initData() {
@@ -101,6 +107,34 @@ public class KongTiaoActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 finish();
+            }
+        });
+        signSeekBar = (SignSeekBar) findViewById(R.id.seek_bar);
+
+        signSeekBar.setOnProgressChangedListener(new SignSeekBar.OnProgressChangedListener() {
+            @Override
+            public void onProgressChanged(SignSeekBar signSeekBar, int progress, float progressFloat,boolean fromUser) {
+                //fromUser 表示是否是用户触发 是否是用户touch事件产生
+                String s = String.format(Locale.CHINA, "onChanged int:%d, float:%.1f", progress, progressFloat);
+//                progressText.setText(s);
+            }
+
+            @Override
+            public void getProgressOnActionUp(SignSeekBar signSeekBar, int progress, float progressFloat) {
+                String s = String.format(Locale.CHINA, "onActionUp int:%d, float:%.1f", progress, progressFloat);
+//                progressText.setText(s);
+            }
+
+            @Override
+            public void getProgressOnFinally(SignSeekBar signSeekBar, int progress, float progressFloat, boolean fromUser) {
+                String s = String.format(Locale.CHINA, "onFinally int:%d, float:%.1f", progress, progressFloat);
+                Log.e("sss",progress+"℃");
+                temp=progress+"";
+                tvKtCurTemp.setText(temp+"℃");
+                makeFkey(mode,temp,speed);
+                getFpulse();
+                mConnection.sendTextMessage("{\"pn\":\"IRTP\", \"sdMAC\":\"" + mac + "\", \"rcode\":\"" + rcode + "\",\"fpulse\":\"" + default_fpulse + "\"}}");
+//                progressText.setText(s + getContext().getResources().getStringArray(R.array.labels)[progress]);
             }
         });
     }
@@ -194,9 +228,11 @@ public class KongTiaoActivity extends BaseActivity {
         }
 
     }
-
+    private long startClickTime=0;
+    private int clickNum=0;
     @OnClick({R.id.tv_kt_power, R.id.tv_kt_mode, R.id.tv_kt_speed, R.id.tv_kt_director, R.id.tv_kt_saof, R.id.tv_kt_tem_down, R.id.tv_kt_tem_up})
     public void onViewClicked(View view) {
+        long nextClickTime = SystemClock.uptimeMillis();
         switch (view.getId()) {
             case R.id.tv_kt_power:
                 //电源
@@ -207,6 +243,24 @@ public class KongTiaoActivity extends BaseActivity {
                 tvKtCurMode.setText(mode_array[Integer.parseInt(mode)]);
                 tvKtCurSpeed.setText(speed);
                 tvKtCurTemp.setText(temp+"℃");
+                signSeekBar.getConfigBuilder()
+                        .min(Integer.parseInt(temp_array[0]))
+                        .max(Integer.parseInt(temp_array[temp_array.length-1]))
+                        .progress(2)
+                        .sectionCount(Integer.parseInt(temp_array[temp_array.length-1])-Integer.parseInt(temp_array[0]))
+                        .trackColor(ContextCompat.getColor(this, R.color.color_gray))
+                        .secondTrackColor(ContextCompat.getColor(this, R.color.color_blue))
+                        .thumbColor(ContextCompat.getColor(this, R.color.color_blue))
+                        .sectionTextColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                        .sectionTextSize(16)
+                        .thumbTextColor(ContextCompat.getColor(this, R.color.color_red))
+                        .thumbTextSize(18)
+                        .signColor(ContextCompat.getColor(this, R.color.color_green))
+                        .signTextSize(18)
+                        .autoAdjustSectionMark()
+                        .sectionTextPosition(SignSeekBar.TextPosition.BELOW_SECTION_MARK)
+                        .build();
+                signSeekBar.setVisibility(View.VISIBLE);
                 break;
             case R.id.tv_kt_mode:
                 int i = Integer.parseInt(mode);
@@ -254,6 +308,7 @@ public class KongTiaoActivity extends BaseActivity {
                 break;
             case R.id.tv_kt_tem_up:
 //                温度+
+
                 int cur_temp_up = Integer.parseInt(temp);
                 cur_temp_up=cur_temp_up+1;
                 int min_temp_up=Integer.parseInt(temp_array[0]) ;

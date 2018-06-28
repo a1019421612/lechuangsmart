@@ -130,7 +130,7 @@
                 android:id="@+id/tv_setting_version"
                 android:layout_width="match_parent"
                 android:layout_height="49dp"
-                android:text="版本号V2.0.0"
+                android:text="版本号"
                 android:gravity="center_vertical"
                 android:background="#fff"
                 android:padding="10dp"

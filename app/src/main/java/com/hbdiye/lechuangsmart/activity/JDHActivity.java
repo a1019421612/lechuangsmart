@@ -11,6 +11,7 @@ import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.util.ImageUtil;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.hbdiye.lechuangsmart.views.RoundMenuView;
+import com.hbdiye.lechuangsmart.views.TVNumDialog;
 import com.hzy.tvmao.KookongSDK;
 import com.hzy.tvmao.interf.IRequestResult;
 import com.kookong.app.data.AppConst;
@@ -27,35 +28,40 @@ import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
 
-/**
- * 智能盒子遥控
- */
-public class SmartBoxActivity extends BaseActivity {
+public class JDHActivity extends BaseActivity {
 
-    @BindView(R.id.tv_box_power)
-    TextView tvBoxPower;
-    @BindView(R.id.tv_box_setting)
-    TextView tvBoxSetting;
-    @BindView(R.id.tv_box_home)
-    TextView tvBoxHome;
-    @BindView(R.id.tv_box_menu)
-    TextView tvBoxMenu;
-    @BindView(R.id.tv_box_back)
-    TextView tvBoxBack;
-    @BindView(R.id.tv_box_ex)
-    TextView tvBoxEx;
-    @BindView(R.id.tv_box_voice_up)
-    TextView tvBoxVoiceUp;
-    @BindView(R.id.tv_box_voice_down)
-    TextView tvBoxVoiceDown;
+    @BindView(R.id.tv_jdh_power)
+    TextView tvJdhPower;
+    @BindView(R.id.tv_jdh_menu)
+    TextView tvJdhMenu;
+    @BindView(R.id.tv_jdh_number)
+    TextView tvJdhNumber;
+    @BindView(R.id.tv_jdh_novoice)
+    TextView tvJdhNovoice;
+    @BindView(R.id.tv_jdh_back)
+    TextView tvJdhBack;
+    @BindView(R.id.tv_jdh_channel_up)
+    TextView tvJdhChannelUp;
+    @BindView(R.id.tv_jdh_channel_down)
+    TextView tvJdhChannelDown;
+    @BindView(R.id.tv_jdh_voice_up)
+    TextView tvJdhVoiceUp;
+    @BindView(R.id.tv_jdh_voice_down)
+    TextView tvJdhVoiceDown;
+    @BindView(R.id.roundMenuView)
+    RoundMenuView roundMenuView;
+
+    private String TAG = JDHActivity.class.getSimpleName();
+
+    private TVNumDialog dialog;
     private String rid = "";
     private int type;
-    private String rcode;
 
     private WebSocketConnection mConnection;
     private String mobilephone;
     private String password;
     private String mac;
+    private String power;
     private String ok;
     private String channel_up;
     private String channel_down;
@@ -68,11 +74,18 @@ public class SmartBoxActivity extends BaseActivity {
     private String back;
     private String homepage;
     private String menu;
-    private String power;
-    private String TAG = SmartBoxActivity.class.getSimpleName();
-
-    @BindView(R.id.roundMenuView)
-    RoundMenuView roundMenuView;
+    private String zero;
+    private String nine;
+    private String eight;
+    private String seven;
+    private String six;
+    private String five;
+    private String four;
+    private String three;
+    private String two;
+    private String one;
+    private String rcode;
+    private String novoice;
 
     @Override
     protected void initData() {
@@ -136,8 +149,42 @@ public class SmartBoxActivity extends BaseActivity {
                     } else if (irDatas.get(0).keys.get(i).fid == 136) {
                         String pulse = irDatas.get(0).keys.get(i).pulse;
                         homepage = pulse.replace(" ", "").replace(",", "");
+                    } else if (irDatas.get(0).keys.get(i).fid == 61) {
+                        String pulse = irDatas.get(0).keys.get(i).pulse;
+                        one = pulse.replace(" ", "").replace(",", "");
+                    } else if (irDatas.get(0).keys.get(i).fid == 66) {
+                        String pulse = irDatas.get(0).keys.get(i).pulse;
+                        two = pulse.replace(" ", "").replace(",", "");
+                    } else if (irDatas.get(0).keys.get(i).fid == 71) {
+                        String pulse = irDatas.get(0).keys.get(i).pulse;
+                        three = pulse.replace(" ", "").replace(",", "");
+                    } else if (irDatas.get(0).keys.get(i).fid == 76) {
+                        String pulse = irDatas.get(0).keys.get(i).pulse;
+                        four = pulse.replace(" ", "").replace(",", "");
+                    } else if (irDatas.get(0).keys.get(i).fid == 81) {
+                        String pulse = irDatas.get(0).keys.get(i).pulse;
+                        five = pulse.replace(" ", "").replace(",", "");
+                    } else if (irDatas.get(0).keys.get(i).fid == 86) {
+                        String pulse = irDatas.get(0).keys.get(i).pulse;
+                        six = pulse.replace(" ", "").replace(",", "");
+                    } else if (irDatas.get(0).keys.get(i).fid == 91) {
+                        String pulse = irDatas.get(0).keys.get(i).pulse;
+                        seven = pulse.replace(" ", "").replace(",", "");
+                    } else if (irDatas.get(0).keys.get(i).fid == 96) {
+                        String pulse = irDatas.get(0).keys.get(i).pulse;
+                        eight = pulse.replace(" ", "").replace(",", "");
+                    } else if (irDatas.get(0).keys.get(i).fid == 101) {
+                        String pulse = irDatas.get(0).keys.get(i).pulse;
+                        nine = pulse.replace(" ", "").replace(",", "");
+                    } else if (irDatas.get(0).keys.get(i).fid == 56) {
+                        String pulse = irDatas.get(0).keys.get(i).pulse;
+                        zero = pulse.replace(" ", "").replace(",", "");
+                    }else if (irDatas.get(0).keys.get(i).fid == 106){
+                        String pulse = irDatas.get(0).keys.get(i).pulse;
+                        novoice = pulse.replace(" ", "").replace(",", "");
                     }
                 }
+
             }
 
             @Override
@@ -156,19 +203,33 @@ public class SmartBoxActivity extends BaseActivity {
 
     @Override
     protected String getTitleName() {
-        return "智能盒子";
+        return "机顶盒";
     }
 
     @Override
     protected void initView() {
+        ivBaseBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        initRoundMenu();
+    }
+
+    @Override
+    protected int getLayoutID() {
+        return R.layout.activity_jdh;
+    }
+
+    private void initRoundMenu() {
         RoundMenuView.RoundMenu roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = getResources().getColor(R.color.gray_9999);
         roundMenu.strokeColor = getResources().getColor(R.color.gray_9999);
-        roundMenu.icon = ImageUtil.drawable2Bitmap(SmartBoxActivity.this, R.mipmap.right);
+        roundMenu.icon = ImageUtil.drawable2Bitmap(JDHActivity.this, R.mipmap.right);
         roundMenu.onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //下
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + navigate_down + "\"}");
             }
         };
@@ -177,11 +238,10 @@ public class SmartBoxActivity extends BaseActivity {
         roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = getResources().getColor(R.color.gray_9999);
         roundMenu.strokeColor = getResources().getColor(R.color.gray_9999);
-        roundMenu.icon = ImageUtil.drawable2Bitmap(SmartBoxActivity.this, R.mipmap.right);
+        roundMenu.icon = ImageUtil.drawable2Bitmap(JDHActivity.this, R.mipmap.right);
         roundMenu.onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //左
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + navigate_left + "\"}");
             }
         };
@@ -190,9 +250,8 @@ public class SmartBoxActivity extends BaseActivity {
         roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = getResources().getColor(R.color.gray_9999);
         roundMenu.strokeColor = getResources().getColor(R.color.gray_9999);
-        roundMenu.icon = ImageUtil.drawable2Bitmap(SmartBoxActivity.this, R.mipmap.right);
+        roundMenu.icon = ImageUtil.drawable2Bitmap(JDHActivity.this, R.mipmap.right);
         roundMenu.onClickListener = new View.OnClickListener() {
-            //上
             @Override
             public void onClick(View view) {
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + navigate_up + "\"}");
@@ -203,9 +262,8 @@ public class SmartBoxActivity extends BaseActivity {
         roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = getResources().getColor(R.color.gray_9999);
         roundMenu.strokeColor = getResources().getColor(R.color.gray_9999);
-        roundMenu.icon = ImageUtil.drawable2Bitmap(SmartBoxActivity.this, R.mipmap.right);
+        roundMenu.icon = ImageUtil.drawable2Bitmap(JDHActivity.this, R.mipmap.right);
         roundMenu.onClickListener = new View.OnClickListener() {
-            //右
             @Override
             public void onClick(View view) {
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + navigate_right + "\"}");
@@ -215,7 +273,7 @@ public class SmartBoxActivity extends BaseActivity {
 
         roundMenuView.setCoreMenu(getResources().getColor(R.color.gray_f2f2),
                 getResources().getColor(R.color.gray_9999), getResources().getColor(R.color.gray_9999)
-                , 1, 0.43, ImageUtil.drawable2Bitmap(SmartBoxActivity.this, R.drawable.ok), new View.OnClickListener() {
+                , 1, 0.43, ImageUtil.drawable2Bitmap(JDHActivity.this, R.drawable.ok), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + ok + "\"}");
@@ -223,42 +281,90 @@ public class SmartBoxActivity extends BaseActivity {
                 });
     }
 
-    @Override
-    protected int getLayoutID() {
-        return R.layout.activity_smart_box;
-    }
-
-
-    @OnClick({R.id.tv_box_power, R.id.tv_box_setting, R.id.tv_box_home, R.id.tv_box_menu, R.id.tv_box_back, R.id.tv_box_ex, R.id.tv_box_voice_up, R.id.tv_box_voice_down})
+    @OnClick({R.id.tv_jdh_power, R.id.tv_jdh_menu, R.id.tv_jdh_number, R.id.tv_jdh_novoice, R.id.tv_jdh_back, R.id.tv_jdh_channel_up, R.id.tv_jdh_channel_down, R.id.tv_jdh_voice_up, R.id.tv_jdh_voice_down})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.tv_box_power:
+            case R.id.tv_jdh_power:
                 //开关
-//                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"AF471518004B1200\",\"rcode\":\"010C0ED8060004811C04801700150480170021048017002D0480170038048026001502801700\",\"fpulse\":\"00403303030335\"}");
                 String data = "{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + power + "\"}";
                 mConnection.sendTextMessage(data);
                 break;
-            case R.id.tv_box_setting:
-                break;
-            case R.id.tv_box_home:
-                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + homepage + "\"}");
-                break;
-            case R.id.tv_box_menu:
+            case R.id.tv_jdh_menu:
+                //菜单
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + menu + "\"}");
                 break;
-            case R.id.tv_box_back:
-                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + back + "\"}");
+            case R.id.tv_jdh_number:
+                //数字键盘
+                dialog = new TVNumDialog(this, R.style.MyDialogStyle, NumOnClick);
+                dialog.setCanceledOnTouchOutside(true);
+                dialog.show();
                 break;
-            case R.id.tv_box_ex:
+            case R.id.tv_jdh_novoice:
+                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + novoice + "\"}");
                 break;
-            case R.id.tv_box_voice_up:
+            case R.id.tv_jdh_back:
+                break;
+            case R.id.tv_jdh_channel_up:
+//                频道+
+                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + channel_up + "\"}");
+                break;
+            case R.id.tv_jdh_channel_down:
+                //                频道-
+                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + channel_down + "\"}");
+                break;
+            case R.id.tv_jdh_voice_up:
+                //                声音+
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + volume_up + "\"}");
                 break;
-            case R.id.tv_box_voice_down:
+            case R.id.tv_jdh_voice_down:
+                //                声音-
                 mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + volume_down + "\"}");
                 break;
         }
     }
+
+    public View.OnClickListener NumOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.tv_num_one:
+                    mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + one + "\"}");
+                    break;
+                case R.id.tv_num_two:
+                    mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + two + "\"}");
+                    break;
+                case R.id.tv_num_three:
+                    mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + three + "\"}");
+                    break;
+                case R.id.tv_num_four:
+                    mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + four + "\"}");
+                    break;
+                case R.id.tv_num_five:
+                    mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + five + "\"}");
+                    break;
+                case R.id.tv_num_six:
+                    mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + six + "\"}");
+                    break;
+                case R.id.tv_num_seven:
+                    mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + seven + "\"}");
+                    break;
+                case R.id.tv_num_eight:
+                    mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + eight + "\"}");
+                    break;
+                case R.id.tv_num_nine:
+                    mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + nine + "\"}");
+                    break;
+                case R.id.tv_num_back:
+                    break;
+                case R.id.tv_num_zero:
+                    mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + zero + "\"}");
+                    break;
+                case R.id.tv_num_pick:
+//                    -/--
+                    break;
+            }
+        }
+    };
 
     class MyWebSocketHandler extends WebSocketHandler {
         @Override

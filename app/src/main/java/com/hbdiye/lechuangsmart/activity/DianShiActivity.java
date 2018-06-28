@@ -349,50 +349,39 @@ public class DianShiActivity extends BaseActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.tv_num_one:
-                    SmartToast.show("1");
                     mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + one + "\"}");
                     break;
                 case R.id.tv_num_two:
-                    SmartToast.show("2");
                     mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + two + "\"}");
                     break;
                 case R.id.tv_num_three:
-                    SmartToast.show("3");
                     mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + three + "\"}");
                     break;
                 case R.id.tv_num_four:
-                    SmartToast.show("4");
                     mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + four + "\"}");
                     break;
                 case R.id.tv_num_five:
-                    SmartToast.show("5");
                     mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + five + "\"}");
                     break;
                 case R.id.tv_num_six:
-                    SmartToast.show("6");
                     mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + six + "\"}");
                     break;
                 case R.id.tv_num_seven:
-                    SmartToast.show("7");
                     mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + seven + "\"}");
                     break;
                 case R.id.tv_num_eight:
-                    SmartToast.show("8");
                     mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + eight + "\"}");
                     break;
                 case R.id.tv_num_nine:
-                    SmartToast.show("9");
                     mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + nine + "\"}");
                     break;
                 case R.id.tv_num_back:
                     SmartToast.show("back");
                     break;
                 case R.id.tv_num_zero:
-                    SmartToast.show("0");
                     mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + zero + "\"}");
                     break;
                 case R.id.tv_num_pick:
-                    SmartToast.show("-/--");
                     break;
             }
         }

@@ -14,6 +14,7 @@ import com.coder.zzq.smartshow.toast.SmartToast;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.util.Logger;
 import com.hbdiye.lechuangsmart.util.SPUtils;
+import com.hbdiye.lechuangsmart.util.TipsUtil;
 import com.hbdiye.lechuangsmart.views.SceneDialog;
 import com.hzy.tvmao.KookongSDK;
 import com.hzy.tvmao.interf.IRequestResult;
@@ -56,6 +57,8 @@ public class PicKTYaoKongActivity extends BaseActivity {
     private String mobilephone;
     private String password;
     private String mac;
+    private String deviceId;
+    private Integer rid;
 
     private SceneDialog sceneDialog;
 
@@ -68,6 +71,7 @@ public class PicKTYaoKongActivity extends BaseActivity {
         type = getIntent().getIntExtra("type", -1);
         brandId = getIntent().getIntExtra("brandId", -1);
         mac = getIntent().getStringExtra("mac");
+        deviceId=getIntent().getStringExtra("deviceID");
         getAllRemoteIds(type);
     }
 
@@ -93,6 +97,7 @@ public class PicKTYaoKongActivity extends BaseActivity {
 
                 return;
             }
+            rid = remoteids.get(flag);
             getIRDataById(remoteids.get(flag));
             flag++;
             tvYaokongTest.setText("测试按键（"+flag+"/"+ remoteids_size +"）");
@@ -147,6 +152,17 @@ public class PicKTYaoKongActivity extends BaseActivity {
                         String replace = irKey.pulse.replace(" ", "").replace(",", "");
                         String data="{\"pn\":\"IRTP\", \"sdMAC\":\""+mac+"\", \"rcode\":\""+remoteParam+"\",\"fpulse\":\""+replace+"\"}}";
                         mConnection.sendTextMessage(data);
+                        AlertDialog.Builder builder=new AlertDialog.Builder(PicKTYaoKongActivity.this);
+                        builder.setMessage("设备有响应吗？");
+                        builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                sceneDialog = new SceneDialog(PicKTYaoKongActivity.this, R.style.MyDialogStyle, dailogClicer, "修改设备名称");
+                                sceneDialog.show();
+                            }
+                        });
+                        builder.setNegativeButton("否",null);
+                        builder.show();
                     }
                 }
             }
@@ -207,17 +223,7 @@ public class PicKTYaoKongActivity extends BaseActivity {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
             if (payload.contains("\"pn\":\"IRTP\"")){
-                AlertDialog.Builder builder=new AlertDialog.Builder(PicKTYaoKongActivity.this);
-                builder.setMessage("设备有响应吗？");
-                builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        sceneDialog = new SceneDialog(PicKTYaoKongActivity.this, R.style.MyDialogStyle, dailogClicer, "修改设备名称");
-                        sceneDialog.show();
-                    }
-                });
-                builder.setNegativeButton("否",null);
-                builder.show();
+
                 SmartToast.show(payload);
                 try {
                     JSONObject jsonObject=new JSONObject(payload);
@@ -259,7 +265,9 @@ public class PicKTYaoKongActivity extends BaseActivity {
                     if (TextUtils.isEmpty(sceneName)) {
                         SmartToast.show("设备名称不能为空");
                     } else {
-                        mConnection.sendTextMessage("{\"pn\":\"IRATP\",\"deviceID\":\"11223344\",\"name\":\""+sceneName+"\",\"rid\":\"红外码remoteID\"}");
+                        String rtype = TipsUtil.RtypeNameByValue(type);
+                        String sss="{\"pn\":\"IRATP\",\"deviceID\":\""+deviceId+"\",\"name\":\""+sceneName+"\",\"rid\":\""+rid+"\",\"rtype\":\""+rtype+"\"}";
+                        mConnection.sendTextMessage(sss);
                     }
                     break;
             }

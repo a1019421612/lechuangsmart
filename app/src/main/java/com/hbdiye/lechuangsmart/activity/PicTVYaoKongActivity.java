@@ -63,8 +63,10 @@ public class PicTVYaoKongActivity extends BaseActivity {
     private String mobilephone;
     private String password;
     private String mac;
+    private String deviceId;
 
     private SceneDialog sceneDialog;
+    private Integer rid;
 
     @Override
     protected void initData() {
@@ -75,6 +77,7 @@ public class PicTVYaoKongActivity extends BaseActivity {
         type = getIntent().getIntExtra("type", -1);
         brandId = getIntent().getIntExtra("brandId", -1);
         mac = getIntent().getStringExtra("mac");
+        deviceId=getIntent().getStringExtra("deviceID");
         getAllRemoteIds(type);
     }
 
@@ -100,7 +103,8 @@ public class PicTVYaoKongActivity extends BaseActivity {
 
                 return;
             }
-            getIRDataById(remoteids.get(flag));
+            rid = remoteids.get(flag);
+            getIRDataById(rid);
             flag++;
             tvYaokongTest.setText("测试按键（"+flag+"/"+ remoteids_size +"）");
 
@@ -120,8 +124,19 @@ public class PicTVYaoKongActivity extends BaseActivity {
                             if (irDatas.get(0).keys.get(i).fkey.equals("power")){
                                 String pulse = irDatas.get(0).keys.get(i).pulse;
                                 String replace = pulse.replace(" ", "").replace(",", "");
-                                String data="{\"pn\":\"IRTP\", \"sdMAC\":\""+mac+"\", \"rcode\":\""+rid+"\",\"fpulse\":\""+49+"\"}}";
-                                mConnection.sendTextMessage("{\"pn\":\"IRTP\",\"sdMAC\":\"AF471518004B1200\",\"rcode\":\"010C0ED8060004811C04801700150480170021048017002D0480170038048026001502801700\",\"fpulse\":\"00420120030025\"}");
+                                String data="{\"pn\":\"IRTP\", \"sdMAC\":\""+mac+"\", \"rcode\":\""+rid+"\",\"fpulse\":\""+replace+"\"}}";
+                                mConnection.sendTextMessage(data);
+                                AlertDialog.Builder builder=new AlertDialog.Builder(PicTVYaoKongActivity.this);
+                                builder.setMessage("设备有响应吗？");
+                                builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        sceneDialog = new SceneDialog(PicTVYaoKongActivity.this, R.style.MyDialogStyle, dailogClicer, "设备名称");
+                                        sceneDialog.show();
+                                    }
+                                });
+                                builder.setNegativeButton("否",null);
+                                builder.show();
                             }
                         }
 
@@ -183,24 +198,24 @@ public class PicTVYaoKongActivity extends BaseActivity {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
             if (payload.contains("\"pn\":\"IRTP\"")){
-                AlertDialog.Builder builder=new AlertDialog.Builder(PicTVYaoKongActivity.this);
-                builder.setMessage("设备有响应吗？");
-                builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        sceneDialog = new SceneDialog(PicTVYaoKongActivity.this, R.style.MyDialogStyle, dailogClicer, "修改设备名称");
-                        sceneDialog.show();
-                    }
-                });
-                builder.setNegativeButton("否",null);
-                builder.show();
-                SmartToast.show(payload);
-                try {
-                    JSONObject jsonObject=new JSONObject(payload);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//                AlertDialog.Builder builder=new AlertDialog.Builder(PicTVYaoKongActivity.this);
+//                builder.setMessage("设备有响应吗？");
+//                builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        sceneDialog = new SceneDialog(PicTVYaoKongActivity.this, R.style.MyDialogStyle, dailogClicer, "修改设备名称");
+//                        sceneDialog.show();
+//                    }
+//                });
+//                builder.setNegativeButton("否",null);
+//                builder.show();
+//                SmartToast.show(payload);
+//                try {
+//                    JSONObject jsonObject=new JSONObject(payload);
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
             }
             if (payload.contains("\"pn\":\"IRATP\"")){
                 //添加红外遥控 IRATP
@@ -235,7 +250,9 @@ public class PicTVYaoKongActivity extends BaseActivity {
                     if (TextUtils.isEmpty(sceneName)) {
                         SmartToast.show("设备名称不能为空");
                     } else {
-                        mConnection.sendTextMessage("{\"pn\":\"IRATP\",\"deviceID\":\"11223344\",\"name\":\""+sceneName+"\",\"rid\":\"红外码remoteID\"}");
+                        String rtype = TipsUtil.RtypeNameByValue(type);
+                        String sss="{\"pn\":\"IRATP\",\"deviceID\":\""+deviceId+"\",\"name\":\""+sceneName+"\",\"rid\":\""+rid+"\",\"rtype\":\""+rtype+"\"}";
+                        mConnection.sendTextMessage(sss);
                     }
                     break;
             }

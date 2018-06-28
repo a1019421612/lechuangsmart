@@ -4,16 +4,21 @@ package com.hbdiye.lechuangsmart;
 import android.Manifest;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -77,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initStatusBar();
         irDeviceId = AndroidUniqueId.getUniqueId(this);
         initView();
         initData();
@@ -146,6 +152,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initData() {
 //        serviceIntent = new Intent(MainActivity.this, WebSocketService.class);
 //        startService(serviceIntent);
+    }
+    public void initStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+            // 获取状态栏高度
+            int statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+            View rectView = new View(this);
+            // 绘制一个和状态栏一样高的矩形，并添加到视图中
+            LinearLayout.LayoutParams params
+                    = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, statusBarHeight);
+            rectView.setLayoutParams(params);
+            //设置状态栏颜色（该颜色根据你的App主题自行更改）
+            rectView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+            // 添加矩形View到布局中
+            ViewGroup decorView = (ViewGroup) getWindow().getDecorView();
+            decorView.addView(rectView);
+            ViewGroup rootView = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
+            rootView.setFitsSystemWindows(true);
+            rootView.setClipToPadding(true);
+        }
     }
 
     private void initView() {

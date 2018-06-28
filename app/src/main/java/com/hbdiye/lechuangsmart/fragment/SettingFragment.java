@@ -1,6 +1,9 @@
 package com.hbdiye.lechuangsmart.fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -54,9 +57,21 @@ public class SettingFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_setting, container, false);
         unbinder = ButterKnife.bind(this, view);
+        tvSettingVersion.setText("版本号V"+getVersionName(getActivity()));
         return view;
     }
-
+    public String getVersionName(Context context){
+        PackageManager packageManager=context.getPackageManager();
+        PackageInfo packageInfo;
+        String versionName="";
+        try {
+            packageInfo=packageManager.getPackageInfo(context.getPackageName(),0);
+            versionName=packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return versionName;
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();

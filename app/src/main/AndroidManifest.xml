@@ -19,6 +19,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
 
     <application
         android:name=".MyApp"
@@ -35,6 +36,20 @@
             android:enabled="true"
             android:process=":remote" />
 
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+        <activity
+            android:name="com.tencent.bugly.beta.ui.BetaActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|locale"
+            android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
@@ -137,7 +152,14 @@
             android:name=".activity.PicTVYaoKongActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".activity.SmartBoxActivity" />
-        <activity android:name=".activity.PicKTYaoKongActivity"></activity>
+        <activity android:name=".activity.PicKTYaoKongActivity" />
+        <activity android:name=".activity.JDHActivity" />
+        <activity android:name=".activity.TYYActivity" />
+        <activity android:name=".activity.GFActivity" />
+        <activity android:name=".activity.FSActivity" />
+        <activity android:name=".activity.DFActivity" />
+        <activity android:name=".activity.DVDActivity" />
+        <activity android:name=".activity.KQjhqActivity"></activity>
     </application>
 
 </manifest>

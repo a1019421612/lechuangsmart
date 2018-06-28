@@ -91,6 +91,7 @@
         android:background="#e8e8e8" />
 
     <LinearLayout
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -132,7 +133,30 @@
             android:padding="@dimen/dp_30"
             android:text="+" />
     </LinearLayout>
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/dp_20"
+        android:text="温度"
+        />
+    <com.zhouyou.view.seekbar.SignSeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:visibility="invisible"
+        android:layout_height="16dp"
+        app:ssb_section_text_position="bottom_sides"
+        app:ssb_show_progress_in_float="false"
+        app:ssb_show_section_mark="false"
+        app:ssb_show_section_text="true"
+        app:ssb_show_sign="false"
+        app:ssb_show_thumb_text="false"
+        app:ssb_sign_arrow_height="5dp"
+        app:ssb_sign_arrow_width="10dp"
+        app:ssb_sign_border_color="@color/color_red"
+        app:ssb_sign_border_size="1dp"
+        app:ssb_sign_color="@color/color_gray"
+        app:ssb_sign_show_border="true"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -166,4 +190,5 @@
             android:gravity="center_horizontal"
             android:textSize="@dimen/dp_20" />
     </LinearLayout>
+
 </LinearLayout>
