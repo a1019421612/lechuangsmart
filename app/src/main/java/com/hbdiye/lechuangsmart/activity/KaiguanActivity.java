@@ -70,7 +70,7 @@ public class KaiguanActivity extends BaseActivity {
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 KaiGuanBean.Devices devices = mList.get(position);
                 switch (view.getId()) {
-                    case R.id.checkbox_left:
+                    case R.id.iv_kg_left:
                         int value_left = devices.deviceAttributes.get(0).value;
                         if (value_left==0){
                             //value=0 关
@@ -82,7 +82,7 @@ public class KaiguanActivity extends BaseActivity {
                             mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
                         }
                         break;
-                    case R.id.checkbox_middle:
+                    case R.id.iv_kg_middle:
                         int value_middle = devices.deviceAttributes.get(1).value;
                         if (value_middle==0){
                             String onId = devices.deviceAttributes.get(1).actions.get(0).id;//开id
@@ -92,7 +92,7 @@ public class KaiguanActivity extends BaseActivity {
                             mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
                         }
                         break;
-                    case R.id.checkbox_right:
+                    case R.id.iv_kg_right:
                         int value_right = devices.deviceAttributes.get(2).value;
                         if (value_right==0){
                             String onId = devices.deviceAttributes.get(2).actions.get(0).id;//开id
@@ -102,6 +102,38 @@ public class KaiguanActivity extends BaseActivity {
                             mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
                         }
                         break;
+//                    case R.id.checkbox_left:
+//                        int value_left = devices.deviceAttributes.get(0).value;
+//                        if (value_left==0){
+//                            //value=0 关
+//                            String onId = devices.deviceAttributes.get(0).actions.get(0).id;//开id
+//                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
+//                        }else {
+//                            //开
+//                            String offId = devices.deviceAttributes.get(0).actions.get(1).id;//关id
+//                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+//                        }
+//                        break;
+//                    case R.id.checkbox_middle:
+//                        int value_middle = devices.deviceAttributes.get(1).value;
+//                        if (value_middle==0){
+//                            String onId = devices.deviceAttributes.get(1).actions.get(0).id;//开id
+//                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
+//                        }else {
+//                            String offId = devices.deviceAttributes.get(1).actions.get(1).id;//关id
+//                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+//                        }
+//                        break;
+//                    case R.id.checkbox_right:
+//                        int value_right = devices.deviceAttributes.get(2).value;
+//                        if (value_right==0){
+//                            String onId = devices.deviceAttributes.get(2).actions.get(0).id;//开id
+//                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
+//                        }else {
+//                            String offId = devices.deviceAttributes.get(2).actions.get(1).id;//关id
+//                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+//                        }
+//                        break;
                 }
             }
         });
@@ -128,6 +160,9 @@ public class KaiguanActivity extends BaseActivity {
             }
             if (payload.contains("\"pn\":\"DOSTP\"")) {
 
+            }
+            if (payload.contains("\"pn\":\"ATP\"")){
+                mConnection.sendTextMessage("{\"pn\":\"DGLTP\", \"classify\":\"protype\", \"id\":\"PROTYPE04\"}");
             }
             if (payload.contains("\"pn\":\"DGLTP\"")) {
                 parseData(payload);

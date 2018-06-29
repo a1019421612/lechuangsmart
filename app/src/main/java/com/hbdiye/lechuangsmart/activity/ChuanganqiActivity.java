@@ -81,6 +81,9 @@ public class ChuanganqiActivity extends BaseActivity {
             if (payload.contains("\"pn\":\"DOSTP\"")) {
 
             }
+            if (payload.contains("\"pn\":\"ATP\"")){
+                mConnection.sendTextMessage("{\"pn\":\"DGLTP\", \"classify\":\"protype\", \"id\":\"PROTYPE07\"}");
+            }
             if (payload.contains("\"pn\":\"DGLTP\"")) {
                 parseData(payload);
             }

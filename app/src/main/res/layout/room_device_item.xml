@@ -72,23 +72,41 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             android:orientation="horizontal">
-            <CheckBox
-                android:id="@+id/checkbox_left"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/switch_selector"
+            <!--<CheckBox-->
+                <!--android:id="@+id/checkbox_left"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:button="@drawable/switch_selector"-->
+                <!--/>-->
+            <!--<CheckBox-->
+                <!--android:id="@+id/checkbox_middle"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:button="@drawable/switch_selector"-->
+                <!--/>-->
+            <!--<CheckBox-->
+                <!--android:id="@+id/checkbox_right"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:button="@drawable/switch_selector"-->
+                <!--/>-->
+            <ImageView
+                android:id="@+id/iv_fj_left"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/off"
                 />
-            <CheckBox
-                android:id="@+id/checkbox_middle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/switch_selector"
+            <ImageView
+                android:id="@+id/iv_fj_middle"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/off"
                 />
-            <CheckBox
-                android:id="@+id/checkbox_right"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/switch_selector"
+            <ImageView
+                android:id="@+id/iv_fj_right"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/off"
                 />
         </LinearLayout>
 

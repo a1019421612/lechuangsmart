@@ -385,6 +385,7 @@ public class SceneSettingActivity extends AppCompatActivity {
                             sceneDialog.dismiss();
                         }
                         SmartToast.show("修改成功");
+                        SPUtils.put(SceneSettingActivity.this,"editSceneName",true);
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
                     }
                 } catch (JSONException e) {

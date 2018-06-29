@@ -65,6 +65,7 @@ public class LinkageFragment extends Fragment {
     private List<LinkageBean.Linkages> mList = new ArrayList<>();
     private LinkageAdapter adapter;
     private SceneDialog sceneDialog;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -91,33 +92,41 @@ public class LinkageFragment extends Fragment {
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                flag=position;
+                flag = position;
                 switch (view.getId()) {
                     case R.id.ll_linkage_item:
-                        if (editStatus){
-                            String timingID = mList.get(position).timingID+"";
-                            startActivity(new Intent(getActivity(), LinkageSettingActivity.class).putExtra("linkageID",mList.get(position).id).putExtra("timingId",timingID));
+                        if (editStatus) {
+                            String timingID = mList.get(position).timingID + "";
+                            startActivity(new Intent(getActivity(), LinkageSettingActivity.class).putExtra("linkageID", mList.get(position).id).putExtra("timingId", timingID));
                         }
                         break;
                     case R.id.ll_linkage_item_del:
-                        mConnection.sendTextMessage("{\"pn\":\"LDTP\",\"linkageID\":\""+mList.get(position).id+"\"}");
+                        mConnection.sendTextMessage("{\"pn\":\"LDTP\",\"linkageID\":\"" + mList.get(position).id + "\"}");
                         break;
                     case R.id.ll_linkage_item_edt:
-                        sceneDialog = new SceneDialog(getActivity(), R.style.MyDialogStyle, dailogClicer,"修改联动名称");
+                        sceneDialog = new SceneDialog(getActivity(), R.style.MyDialogStyle, dailogClicer, "修改联动名称");
                         sceneDialog.setCanceledOnTouchOutside(true);
                         sceneDialog.show();
                         break;
-                    case R.id.checkbox_switch:
-                        if (mList.get(position).active==0){
-                            mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\""+mList.get(position).id+"\",\"active\":"+1+"}");
-                        }else {
-                            mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\""+mList.get(position).id+"\",\"active\":"+0+"}");
+//                    case R.id.checkbox_switch:
+//                        if (mList.get(position).active == 0) {
+//                            mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\"" + mList.get(position).id + "\",\"active\":" + 1 + "}");
+//                        } else {
+//                            mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\"" + mList.get(position).id + "\",\"active\":" + 0 + "}");
+//                        }
+//                        break;
+                    case R.id.iv_switch:
+                        if (mList.get(position).active == 0) {
+                            mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\"" + mList.get(position).id + "\",\"active\":" + 1 + "}");
+                        } else {
+                            mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\"" + mList.get(position).id + "\",\"active\":" + 0 + "}");
                         }
                         break;
                 }
             }
         });
     }
+
     public View.OnClickListener dailogClicer = new View.OnClickListener() {
 
         @Override
@@ -129,15 +138,16 @@ public class LinkageFragment extends Fragment {
                 case R.id.app_sure_tv:
                     //修改场景
                     String sceneName = sceneDialog.getSceneName();
-                    if (TextUtils.isEmpty(sceneName)){
+                    if (TextUtils.isEmpty(sceneName)) {
                         SmartToast.show("联动名称不能为空");
-                    }else {
-                        mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\""+mList.get(flag).id+"\",\"name\":\""+sceneName+"\"}");
+                    } else {
+                        mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\"" + mList.get(flag).id + "\",\"name\":\"" + sceneName + "\"}");
                     }
                     break;
             }
         }
     };
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -159,7 +169,7 @@ public class LinkageFragment extends Fragment {
                 }
                 break;
             case R.id.ll_add_linkage:
-                AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setMessage("请选择添加何种类型联动");
                 builder.setNegativeButton("设备联动", new DialogInterface.OnClickListener() {
                     @Override
@@ -168,7 +178,7 @@ public class LinkageFragment extends Fragment {
                         dialog.dismiss();
                     }
                 });
-                builder.setPositiveButton("取消",null);
+                builder.setPositiveButton("取消", null);
                 builder.setNeutralButton("时间联动", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -213,12 +223,12 @@ public class LinkageFragment extends Fragment {
             if (payload.contains("\"pn\":\"LUTP\"")) {
 //                修改联动名称
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (sceneDialog!=null){
+                    if (sceneDialog != null) {
                         sceneDialog.dismiss();
                     }
-                        mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
+                    mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
 //                    SmartToast.show("修改成功");
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -227,24 +237,25 @@ public class LinkageFragment extends Fragment {
             if (payload.contains("\"pn\":\"LDTP\"")) {
                 //删除联动
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            if (payload.contains("\"pn\":\"LATP\"")){
+            if (payload.contains("\"pn\":\"LATP\"")) {
                 //LATP
                 JSONObject jsonObject = null;
                 try {
                     jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     if (status) {
+                        mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
                         JSONObject linkage = jsonObject.getJSONObject("linkage");
                         String linkageID = linkage.getString("id");
                         String timingID = linkage.getString("timingID");
-                        startActivity(new Intent(getActivity(),LinkageSettingActivity.class).putExtra("linkageID",linkageID).putExtra("timingId",timingID));
+                        startActivity(new Intent(getActivity(), LinkageSettingActivity.class).putExtra("linkageID", linkageID).putExtra("timingId", timingID));
 
                     }
                 } catch (JSONException e) {
@@ -284,12 +295,16 @@ public class LinkageFragment extends Fragment {
 //        mConnection.disconnect();
 //    }
 //
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        Log.e(TAG, "onResume");
-//        socketConnect();
-//    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.e(TAG, "onResume");
+        boolean editLinkageName = (boolean) SPUtils.get(getActivity(), "editLinkageName", false);
+        if (editLinkageName){
+            mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
+            SPUtils.remove(getActivity(),"editLinkageName");
+        }
+    }
 
     @Override
     public void onHiddenChanged(boolean hidden) {

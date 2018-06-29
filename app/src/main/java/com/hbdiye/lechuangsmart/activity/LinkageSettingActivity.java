@@ -347,6 +347,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
                         }
                     }
 //                    SmartToast.show("修改成功");
+                    SPUtils.put(LinkageSettingActivity.this,"editLinkageName",true);
                     mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
                 } catch (JSONException e) {
                     e.printStackTrace();

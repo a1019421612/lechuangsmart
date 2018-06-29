@@ -10,7 +10,7 @@ import de.tavendo.autobahn.WebSocketHandler;
 public class CWebSocketHandler extends WebSocketHandler {
     @Override
     public void onTextMessage(String payload) {
-        if (payload.contains("{\"pn\":\"HRQP\"}")) {
+        if (payload.contains("{\"pn\":\"PRTP\"}")) {
             MyApp.finishAllActivity();
             Intent intent = new Intent(MyApp.getContextObject(), LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );

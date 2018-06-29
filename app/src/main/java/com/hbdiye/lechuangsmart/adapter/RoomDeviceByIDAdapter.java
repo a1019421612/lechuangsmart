@@ -74,62 +74,118 @@ public class RoomDeviceByIDAdapter extends BaseQuickAdapter<RoomDeviceBean.Devic
                         helper.setGone(R.id.ll_checkbox,false);
 
                         helper.setGone(R.id.ll_checkbox,true);
-                        helper.setGone(R.id.checkbox_right,false);
-                        helper.setGone(R.id.checkbox_middle,false);
-                        helper.setGone(R.id.checkbox_left,true);
+//                        helper.setGone(R.id.checkbox_right,false);
+//                        helper.setGone(R.id.checkbox_middle,false);
+//                        helper.setGone(R.id.checkbox_left,true);
+
+                        helper.setGone(R.id.iv_room_left,false);
+                        helper.setGone(R.id.iv_room_middle,false);
+                        helper.setGone(R.id.iv_room_right,true);
+
                         if (item.deviceAttributes.get(0).value==0){
-                            helper.setChecked(R.id.checkbox_left,false);
+//                            helper.setChecked(R.id.checkbox_left,false);
+
+                            Glide.with(mContext).load(R.drawable.off).into((ImageView) helper.getView(R.id.iv_room_left));
+
                         }else {
-                            helper.setChecked(R.id.checkbox_left,true);
+//                            helper.setChecked(R.id.checkbox_left,true);
+
+                            Glide.with(mContext).load(R.drawable.on).into((ImageView) helper.getView(R.id.iv_room_left));
+
                         }
                     }else if (item.product.proatts.size()==2){//双路开关
 
                         helper.setGone(R.id.ll_checkbox,false);
 
                         helper.setGone(R.id.ll_checkbox,true);
-                        helper.setGone(R.id.checkbox_left,true);
-                        helper.setGone(R.id.checkbox_right,false);
-                        helper.setGone(R.id.checkbox_middle,true);
+//                        helper.setGone(R.id.checkbox_left,true);
+//                        helper.setGone(R.id.checkbox_right,false);
+//                        helper.setGone(R.id.checkbox_middle,true);
+
+                        helper.setGone(R.id.iv_room_left,true);
+                        helper.setGone(R.id.iv_room_right,false);
+                        helper.setGone(R.id.iv_room_middle,true);
+
                         if (item.deviceAttributes.get(0).value==0){
-                            helper.setChecked(R.id.checkbox_left,false);
+//                            helper.setChecked(R.id.checkbox_left,false);
+
+                            Glide.with(mContext).load(R.drawable.off).into((ImageView) helper.getView(R.id.iv_room_left));
+
                         }else {
-                            helper.setChecked(R.id.checkbox_left,true);
+//                            helper.setChecked(R.id.checkbox_left,true);
+
+                            Glide.with(mContext).load(R.drawable.on).into((ImageView) helper.getView(R.id.iv_room_left));
+
                         }
                         if (item.deviceAttributes.get(1).value==0){
-                            helper.setChecked(R.id.checkbox_middle,false);
+//                            helper.setChecked(R.id.checkbox_middle,false);
+
+                            Glide.with(mContext).load(R.drawable.off).into((ImageView) helper.getView(R.id.iv_room_middle));
+
                         }else {
-                            helper.setChecked(R.id.checkbox_middle,true);
+//                            helper.setChecked(R.id.checkbox_middle,true);
+
+                            Glide.with(mContext).load(R.drawable.on).into((ImageView) helper.getView(R.id.iv_room_middle));
+
                         }
                     }else if (item.product.proatts.size()==3){//三路开关
 
                         helper.setGone(R.id.ll_checkbox,false);
 
                         helper.setGone(R.id.ll_checkbox,true);
-                        helper.setGone(R.id.checkbox_left,true);
-                        helper.setGone(R.id.checkbox_right,true);
-                        helper.setGone(R.id.checkbox_middle,true);
+//                        helper.setGone(R.id.checkbox_left,true);
+//                        helper.setGone(R.id.checkbox_right,true);
+//                        helper.setGone(R.id.checkbox_middle,true);
+
+                        helper.setGone(R.id.iv_room_left,true);
+                        helper.setGone(R.id.iv_room_right,true);
+                        helper.setGone(R.id.iv_room_middle,true);
+
                         if (item.deviceAttributes.get(0).value==0){
-                            helper.setChecked(R.id.checkbox_left,false);
+//                            helper.setChecked(R.id.checkbox_left,false);
+
+                            Glide.with(mContext).load(R.drawable.off).into((ImageView) helper.getView(R.id.iv_room_left));
+
                         }else {
-                            helper.setChecked(R.id.checkbox_left,true);
+//                            helper.setChecked(R.id.checkbox_left,true);
+
+                            Glide.with(mContext).load(R.drawable.on).into((ImageView) helper.getView(R.id.iv_room_left));
+
                         }
                         if (item.deviceAttributes.get(1).value==0){
-                            helper.setChecked(R.id.checkbox_middle,false);
+//                            helper.setChecked(R.id.checkbox_middle,false);
+
+                            Glide.with(mContext).load(R.drawable.off).into((ImageView) helper.getView(R.id.iv_room_middle));
+
                         }else {
-                            helper.setChecked(R.id.checkbox_middle,true);
+//                            helper.setChecked(R.id.checkbox_middle,true);
+
+                            Glide.with(mContext).load(R.drawable.on).into((ImageView) helper.getView(R.id.iv_room_middle));
+
                         }
                         if (item.deviceAttributes.get(2).value==0){
-                            helper.setChecked(R.id.checkbox_right,false);
+//                            helper.setChecked(R.id.checkbox_right,false);
+
+                            Glide.with(mContext).load(R.drawable.off).into((ImageView) helper.getView(R.id.iv_room_right));
+
                         }else {
-                            helper.setChecked(R.id.checkbox_right,true);
+//                            helper.setChecked(R.id.checkbox_right,true);
+
+                            Glide.with(mContext).load(R.drawable.on).into((ImageView) helper.getView(R.id.iv_room_right));
+
                         }
                     }
                 }
             }else {
                 helper.setGone(R.id.ll_checkbox,false);
-                helper.setGone(R.id.checkbox_left,false);
-                helper.setGone(R.id.checkbox_middle,false);
-                helper.setGone(R.id.checkbox_right,false);
+//                helper.setGone(R.id.checkbox_left,false);
+//                helper.setGone(R.id.checkbox_middle,false);
+//                helper.setGone(R.id.checkbox_right,false);
+
+                helper.setGone(R.id.iv_room_left,false);
+                helper.setGone(R.id.iv_room_middle,false);
+                helper.setGone(R.id.iv_room_right,false);
+
                 helper.setGone(R.id.ll_device_attr,false);
             }
 
@@ -137,9 +193,13 @@ public class RoomDeviceByIDAdapter extends BaseQuickAdapter<RoomDeviceBean.Devic
             //设备离线
             helper.setGone(R.id.tv_device_status,true);
             helper.setGone(R.id.ll_checkbox,false);
-            helper.setGone(R.id.checkbox_right,false);
-            helper.setGone(R.id.checkbox_middle,false);
-            helper.setGone(R.id.checkbox_left,false);
+//            helper.setGone(R.id.checkbox_right,false);
+//            helper.setGone(R.id.checkbox_middle,false);
+//            helper.setGone(R.id.checkbox_left,false);
+
+            helper.setGone(R.id.iv_room_right,false);
+            helper.setGone(R.id.iv_room_middle,false);
+            helper.setGone(R.id.iv_room_left,false);
         }
         if (isShow){
             helper.setGone(R.id.ll_scene_item_del,false);
@@ -150,14 +210,24 @@ public class RoomDeviceByIDAdapter extends BaseQuickAdapter<RoomDeviceBean.Devic
 
             helper.setGone(R.id.tv_device_status,false);
             helper.setGone(R.id.ll_checkbox,false);
-            helper.setGone(R.id.checkbox_left,false);
-            helper.setGone(R.id.checkbox_middle,false);
-            helper.setGone(R.id.checkbox_right,false);
+//            helper.setGone(R.id.checkbox_left,false);
+//            helper.setGone(R.id.checkbox_middle,false);
+//            helper.setGone(R.id.checkbox_right,false);
+
+            helper.setGone(R.id.iv_room_left,false);
+            helper.setGone(R.id.iv_room_middle,false);
+            helper.setGone(R.id.iv_room_right,false);
+
             helper.setGone(R.id.ll_device_attr,false);
         }
-        helper.addOnClickListener(R.id.checkbox_left);
-        helper.addOnClickListener(R.id.checkbox_middle);
-        helper.addOnClickListener(R.id.checkbox_right);
+//        helper.addOnClickListener(R.id.checkbox_left);
+//        helper.addOnClickListener(R.id.checkbox_middle);
+//        helper.addOnClickListener(R.id.checkbox_right);
+
+        helper.addOnClickListener(R.id.iv_room_left);
+        helper.addOnClickListener(R.id.iv_room_middle);
+        helper.addOnClickListener(R.id.iv_room_right);
+
         helper.addOnClickListener(R.id.ll_scene_device);
         helper.addOnClickListener(R.id.ll_scene_item_del);
         helper.addOnClickListener(R.id.ll_scene_item_edt);

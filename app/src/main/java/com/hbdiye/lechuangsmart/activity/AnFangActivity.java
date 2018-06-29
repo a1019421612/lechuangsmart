@@ -80,6 +80,9 @@ public class AnFangActivity extends BaseActivity {
             if (payload.contains("\"pn\":\"DOSTP\"")) {
 
             }
+            if (payload.contains("\"pn\":\"ATP\"")){
+                mConnection.sendTextMessage("{\"pn\":\"DGLTP\", \"classify\":\"protype\", \"id\":\"PROTYPE02\"}");
+            }
             if (payload.contains("\"pn\":\"DGLTP\"")) {
                 parseData(payload);
             }

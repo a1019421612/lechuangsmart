@@ -3,9 +3,11 @@ package com.hbdiye.lechuangsmart.activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -19,6 +21,7 @@ import com.hbdiye.lechuangsmart.google.zxing.activity.CaptureActivity;
 import com.hbdiye.lechuangsmart.google.zxing.encoding.EncodingHandler;
 import com.hbdiye.lechuangsmart.util.DensityUtils;
 import com.hbdiye.lechuangsmart.util.SPUtils;
+import com.hbdiye.lechuangsmart.views.SceneDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,14 +47,22 @@ public class FamilyNameActivity extends BaseActivity {
     TextView tvFamilyPhone;
     @BindView(R.id.iv_qrcode)
     ImageView ivQrcode;
+    @BindView(R.id.ll_family_name)
+    LinearLayout llFamilyName;
+    @BindView(R.id.ll_name)
+    LinearLayout llName;
+    @BindView(R.id.ll_phone)
+    LinearLayout llPhone;
     private WebSocketConnection mConnection;
     private String mobilephone;
     private String password;
 
-    private String TAG=FamilyNameActivity.class.getSimpleName();
-    private String erCode="";
+    private String TAG = FamilyNameActivity.class.getSimpleName();
+    private String erCode = "";
 
-    private boolean flag=false;
+    private boolean flag = false;
+
+    private SceneDialog sceneDialog;
 
     @Override
     protected void initData() {
@@ -88,7 +99,7 @@ public class FamilyNameActivity extends BaseActivity {
         return R.layout.activity_family_name;
     }
 
-    @OnClick({R.id.tv_family_member, R.id.tv_qrcode})
+    @OnClick({R.id.tv_family_member, R.id.tv_qrcode,R.id.ll_family_name, R.id.ll_name, R.id.ll_phone})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_family_member:
@@ -96,16 +107,69 @@ public class FamilyNameActivity extends BaseActivity {
                 break;
             case R.id.tv_qrcode:
 
-                startActivityForResult(new Intent(this, CaptureActivity.class),111);
+                startActivityForResult(new Intent(this, CaptureActivity.class), 111);
                 break;
+            case R.id.ll_family_name:
+                sceneDialog = new SceneDialog(this, R.style.MyDialogStyle, familyNameClicer,"修改家庭名称");
+                sceneDialog.setCanceledOnTouchOutside(true);
+                sceneDialog.show();
+                break;
+            case R.id.ll_name:
+                sceneDialog = new SceneDialog(this, R.style.MyDialogStyle, nameClicer,"修改姓名");
+                sceneDialog.setCanceledOnTouchOutside(true);
+                sceneDialog.show();
+                break;
+//            case R.id.ll_phone:
+//                sceneDialog = new SceneDialog(this, R.style.MyDialogStyle, phoneClicer,"修改电话");
+//                sceneDialog.setCanceledOnTouchOutside(true);
+//                sceneDialog.show();
+//                break;
         }
     }
+//    ("{\"pn\":\"UUITP\",\"fieldType\":\"pwd\",\"value\":\""+enterpsw+"\"}")
+    public View.OnClickListener familyNameClicer = new View.OnClickListener() {
 
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.app_cancle_tv:
+                    sceneDialog.dismiss();
+                    break;
+                case R.id.app_sure_tv:
+                    String sceneName = sceneDialog.getSceneName();
+                    if (TextUtils.isEmpty(sceneName)){
+                        SmartToast.show("家庭名称不能为空");
+                    }else {
+                        mConnection.sendTextMessage("{\"pn\":\"UUITP\",\"fieldType\":\"fn\",\"value\":\""+sceneName+"\"}");
+                    }
+                    break;
+            }
+        }
+    };
+    public View.OnClickListener nameClicer = new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.app_cancle_tv:
+                    sceneDialog.dismiss();
+                    break;
+                case R.id.app_sure_tv:
+                    String sceneName = sceneDialog.getSceneName();
+                    if (TextUtils.isEmpty(sceneName)){
+                        SmartToast.show("姓名不能为空");
+                    }else {
+                        mConnection.sendTextMessage("{\"pn\":\"UUITP\",\"fieldType\":\"un\",\"value\":\""+sceneName+"\"}");
+                    }
+                    break;
+            }
+        }
+    };
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 111 && resultCode == 4) {
-            flag=true;
+            flag = true;
             erCode = data.getStringExtra("erCode");
 
 //            textview.setText(s);
@@ -113,13 +177,15 @@ public class FamilyNameActivity extends BaseActivity {
         }
     }
 
+
+
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
             Log.e(TAG, "open");
             mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
-            if (flag){
-                mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\""+ erCode +"\"} ");
+            if (flag) {
+                mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\"" + erCode + "\"} ");
             }
         }
 
@@ -132,15 +198,30 @@ public class FamilyNameActivity extends BaseActivity {
             if (payload.contains("\"pn\":\"UITP\"")) {
                 parseData(payload);
             }
-            if (payload.contains("\"pn\":\"UJFTP\"")){
-                //扫描加入家庭
-                flag=false;
+            if (payload.contains("\"pn\":\"UUITP\"")){
                 try {
                     JSONObject jsonObject=new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     if (status){
+                        SmartToast.show("修改成功");
+                        if (sceneDialog!=null){
+                            sceneDialog.dismiss();
+                        }
+                        mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (payload.contains("\"pn\":\"UJFTP\"")) {
+                //扫描加入家庭
+                flag = false;
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status) {
                         SmartToast.show("成功加入家庭");
-                    }else {
+                    } else {
                         SmartToast.show("加入家庭失败");
                     }
                 } catch (JSONException e) {

@@ -31,17 +31,30 @@
             android:visibility="gone"
             android:text="设备离线"
             />
-        <CheckBox
-            android:id="@+id/checkbox_left"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:button="@drawable/switch_selector"
+        <!--<CheckBox-->
+            <!--android:id="@+id/checkbox_left"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:button="@drawable/switch_selector"-->
+            <!--/>-->
+        <!--<CheckBox-->
+            <!--android:id="@+id/checkbox_right"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:button="@drawable/switch_selector"-->
+            <!--android:layout_marginRight="20dp"-->
+            <!--/>-->
+        <ImageView
+            android:id="@+id/iv_cl_switch_left"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/off"
             />
-        <CheckBox
-            android:id="@+id/checkbox_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:button="@drawable/switch_selector"
+        <ImageView
+            android:id="@+id/iv_cl_switch_right"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/off"
             />
     </LinearLayout>
     <View

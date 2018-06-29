@@ -15,6 +15,7 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/ll_family_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">
@@ -39,6 +40,7 @@
             android:background="#e8e8e8"
             />
         <LinearLayout
+            android:id="@+id/ll_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">
@@ -63,6 +65,7 @@
             android:background="#e8e8e8"
             />
         <LinearLayout
+            android:id="@+id/ll_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">

@@ -223,6 +223,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
         public void onClose(int code, String reason) {
             Log.e(TAG, "onClose");
 //            socketConnect();
+
         }
     }
 
@@ -247,12 +248,18 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
 //        mSceneConnection.disconnect();
 //    }
 //
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        Log.e(TAG, "onResume");
-//        socketConnect();
-//    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.e(TAG, "onResume");
+        boolean editSceneName = (boolean) SPUtils.get(getActivity(), "editSceneName", false);
+        if (editSceneName){
+            if (mSceneConnection!=null){
+                mSceneConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+            }
+            SPUtils.remove(getActivity(),"editSceneName");
+        }
+    }
     @Override
     public void onHiddenChanged(boolean hidden) {
         if (hidden) {

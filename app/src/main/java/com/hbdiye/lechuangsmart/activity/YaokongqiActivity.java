@@ -102,6 +102,9 @@ public class YaokongqiActivity extends BaseActivity {
             if (payload.contains("\"pn\":\"DOSTP\"")) {
 
             }
+            if (payload.contains("\"pn\":\"ATP\"")){
+                mConnection.sendTextMessage("{\"pn\":\"DGLTP\", \"classify\":\"protype\", \"id\":\"PROTYPE09\"}");
+            }
             if (payload.contains("\"pn\":\"DGLTP\"")) {
                 parseData(payload);
             }
