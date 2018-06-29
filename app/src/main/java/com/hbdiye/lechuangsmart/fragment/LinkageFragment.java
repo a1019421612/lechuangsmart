@@ -22,9 +22,12 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.hbdiye.lechuangsmart.MainActivity;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.activity.DeviceTriggeredActivity;
 import com.hbdiye.lechuangsmart.activity.LinkageSettingActivity;
+import com.hbdiye.lechuangsmart.activity.LoginActivity;
 import com.hbdiye.lechuangsmart.activity.TimeTriggeredActivity;
 import com.hbdiye.lechuangsmart.adapter.LinkageAdapter;
 import com.hbdiye.lechuangsmart.bean.LinkageBean;
@@ -260,6 +263,16 @@ public class LinkageFragment extends Fragment {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                }
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                if (MyApp.mActivitys.contains(MainActivity.class)&&MyApp.mActivitys.size()==1){
+                    Log.e("LLL","只有MainActivity");
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }else {
+                    Log.e("LLL","多个Activity");
                 }
             }
         }

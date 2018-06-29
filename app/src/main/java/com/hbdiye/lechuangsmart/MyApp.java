@@ -20,7 +20,7 @@ public class MyApp extends Application {
     /**
      * 维护Activity 的list
      */
-    private static List<Activity> mActivitys = Collections
+    public static List<Activity> mActivitys = Collections
             .synchronizedList(new LinkedList<Activity>());
 
     private static Context context;

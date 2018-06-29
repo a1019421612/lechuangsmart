@@ -15,6 +15,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.coder.zzq.smartshow.toast.SmartToast;
+import com.hbdiye.lechuangsmart.MainActivity;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.activity.AboutUsActivity;
 import com.hbdiye.lechuangsmart.activity.EditPswActivity;
@@ -30,6 +33,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import de.tavendo.autobahn.WebSocketConnection;
+import de.tavendo.autobahn.WebSocketException;
+import de.tavendo.autobahn.WebSocketHandler;
 
 public class SettingFragment extends Fragment {
     @BindView(R.id.tv_setting_family_name)
@@ -52,11 +58,27 @@ public class SettingFragment extends Fragment {
 
     private GetPhotoPopwindow getPhotoPopwindow;
 
+    private WebSocketConnection mConnection;
+    private String mobilephone;
+    private String password;
+
+    private String TAG = SettingFragment.class.getName();
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_setting, container, false);
         unbinder = ButterKnife.bind(this, view);
+        mConnection = new WebSocketConnection();
+        mobilephone = (String) SPUtils.get(getActivity(), "mobilephone", "");
+        password = (String) SPUtils.get(getActivity(), "password", "");
+        try {
+            mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+
+        } catch (WebSocketException e) {
+            e.printStackTrace();
+            SmartToast.show("网络连接错误");
+        }
         tvSettingVersion.setText("版本号V"+getVersionName(getActivity()));
         return view;
     }
@@ -128,4 +150,67 @@ public class SettingFragment extends Fragment {
             }
         }
     };
+    class MyWebSocketHandler extends WebSocketHandler {
+        @Override
+        public void onOpen() {
+            Log.e(TAG, "open");
+            mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
+        }
+
+        @Override
+        public void onTextMessage(String payload) {
+            Log.e(TAG, "onTextMessage" + payload);
+            if (payload.contains("{\"pn\":\"HRQP\"}")) {
+                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+            }if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                if (MyApp.mActivitys.contains(MainActivity.class)&&MyApp.mActivitys.size()==1){
+                    Log.e("LLL","只有MainActivity");
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }else if (MyApp.mActivitys.contains(WiFiActivity.class)){
+                    Log.e("LLL","多个Activity");
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }else if (MyApp.mActivitys.contains(AboutUsActivity.class)){
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }
+            }
+        }
+
+        @Override
+        public void onClose(int code, String reason) {
+            Log.e(TAG, "onClose");
+        }
+    }
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        if (hidden) {
+            // 隐藏
+            Log.e(TAG, "home" + "隐藏");
+            mConnection.disconnect();
+
+        } else {
+            // 可视
+            Log.e(TAG, "home" + "显示");
+            if (mConnection != null) {
+                try {
+                    mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+
+                } catch (WebSocketException e) {
+                    e.printStackTrace();
+                    SmartToast.show("网络连接错误");
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mConnection.disconnect();
+    }
 }

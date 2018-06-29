@@ -16,12 +16,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.coder.zzq.smartshow.toast.SmartToast;
+import com.hbdiye.lechuangsmart.MainActivity;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.activity.AnFangActivity;
 import com.hbdiye.lechuangsmart.activity.ChuangLianActivity;
 import com.hbdiye.lechuangsmart.activity.ChuanganqiActivity;
 import com.hbdiye.lechuangsmart.activity.FangjianActivity;
 import com.hbdiye.lechuangsmart.activity.KaiguanActivity;
+import com.hbdiye.lechuangsmart.activity.LoginActivity;
 import com.hbdiye.lechuangsmart.activity.YaokongqiActivity;
 import com.hbdiye.lechuangsmart.activity.ZhaoMingActivity;
 import com.hbdiye.lechuangsmart.util.SPUtils;
@@ -202,6 +205,15 @@ public class HomeFragment extends Fragment {
             Log.e(TAG, "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+            }if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                if (MyApp.mActivitys.contains(MainActivity.class)&&MyApp.mActivitys.size()==1){
+                    Log.e("LLL","只有MainActivity");
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }else {
+                    Log.e("LLL","多个Activity");
+                }
             }
         }
 
