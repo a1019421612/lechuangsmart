@@ -27,6 +27,7 @@ import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.hbdiye.lechuangsmart.Global.ContentConfig;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.adapter.LinkageSettingAdapter;
 import com.hbdiye.lechuangsmart.adapter.LinkageSettingDeviceAdapter;
@@ -328,6 +329,11 @@ public class LinkageSettingActivity extends AppCompatActivity {
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
 
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(LinkageSettingActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
             if (payload.contains("\"pn\":\"LCTP\"")) {
                 parseData(payload);

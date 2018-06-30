@@ -15,6 +15,7 @@ import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.zxing.WriterException;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.bean.FamilyNameBean;
 import com.hbdiye.lechuangsmart.google.zxing.activity.CaptureActivity;
@@ -194,6 +195,11 @@ public class FamilyNameActivity extends BaseActivity {
             Log.e(TAG, "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(FamilyNameActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
             if (payload.contains("\"pn\":\"UITP\"")) {
                 parseData(payload);

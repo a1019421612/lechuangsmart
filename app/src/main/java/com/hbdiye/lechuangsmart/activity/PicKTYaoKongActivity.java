@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.coder.zzq.smartshow.toast.SmartToast;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.util.Logger;
 import com.hbdiye.lechuangsmart.util.SPUtils;
@@ -221,6 +222,11 @@ public class PicKTYaoKongActivity extends BaseActivity {
             Log.e("TAG", "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(PicKTYaoKongActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
             if (payload.contains("\"pn\":\"IRTP\"")){
 

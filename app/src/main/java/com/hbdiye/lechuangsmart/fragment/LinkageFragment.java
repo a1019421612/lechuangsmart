@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.fragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -205,7 +206,7 @@ public class LinkageFragment extends Fragment {
             SmartToast.show("网络连接错误");
         }
     }
-
+    private List<String> mList_a= new ArrayList<>();
     class MyLinkageWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -266,8 +267,17 @@ public class LinkageFragment extends Fragment {
                 }
             }
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                if (MyApp.mActivitys.contains(MainActivity.class)&&MyApp.mActivitys.size()==1){
+                for (Activity activity : MyApp.mActivitys) {
+                    String packageName = activity.getLocalClassName();
+                    Log.e("LLL",packageName);
+                    mList_a.add(packageName);
+                }
+                if (mList_a.contains("MainActivity")&&MyApp.mActivitys.size()==1){
                     Log.e("LLL","只有MainActivity");
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }else if (mList_a.contains("MainActivity")&&mList_a.contains("BetaActivity")&&MyApp.mActivitys.size()==2){
                     MyApp.finishAllActivity();
                     Intent intent = new Intent(getActivity(), LoginActivity.class);
                     startActivity(intent);

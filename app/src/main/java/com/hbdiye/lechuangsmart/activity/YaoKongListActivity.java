@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.adapter.YaoKongQiListAdapter;
 import com.hbdiye.lechuangsmart.bean.YaoKongListBean;
@@ -379,6 +380,11 @@ public class YaoKongListActivity extends BaseActivity {
             }
             if (payload.contains("\"pn\":\"DOSTP\"")) {
 
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(YaoKongListActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
             if (payload.contains("\"pn\":\"IRLTP\"")) {
                 parseData(payload);

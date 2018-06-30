@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.coder.zzq.smartshow.toast.SmartToast;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.util.ImageUtil;
 import com.hbdiye.lechuangsmart.util.SPUtils;
@@ -309,6 +311,11 @@ public class DVDActivity extends BaseActivity {
             }
             if (payload.contains("\"pn\":\"IRTP\"")) {
 
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(DVDActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
         }
 

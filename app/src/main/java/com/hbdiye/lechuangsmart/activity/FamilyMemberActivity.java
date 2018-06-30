@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +9,7 @@ import android.util.Log;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.adapter.FamilyMemberAdapter;
 import com.hbdiye.lechuangsmart.bean.FamilyNameBean;
@@ -84,6 +86,11 @@ public class FamilyMemberActivity extends BaseActivity {
             Log.e(TAG, "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(FamilyMemberActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
             if (payload.contains("\"pn\":\"UITP\"")) {
                 parseData(payload);

@@ -10,6 +10,7 @@ import android.view.View;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.adapter.KaiGuanAdapter;
 import com.hbdiye.lechuangsmart.adapter.YaoKongAdapter;
@@ -98,6 +99,11 @@ public class YaokongqiActivity extends BaseActivity {
             Log.e("TAG", "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(YaokongqiActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
             if (payload.contains("\"pn\":\"DOSTP\"")) {
 

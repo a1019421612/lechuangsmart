@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.coder.zzq.smartshow.toast.SmartToast;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.hzy.tvmao.KookongSDK;
@@ -121,6 +123,11 @@ public class DFActivity extends BaseActivity {
             }
             if (payload.contains("\"pn\":\"IRTP\"")) {
 
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(DFActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
         }
 

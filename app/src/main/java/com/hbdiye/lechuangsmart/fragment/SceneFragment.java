@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -153,7 +154,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 break;
         }
     }
-
+    private List<String> mList_a= new ArrayList<>();
     class MySceneWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -221,8 +222,17 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 }
             }
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                if (MyApp.mActivitys.contains(MainActivity.class)&&MyApp.mActivitys.size()==1){
+                for (Activity activity : MyApp.mActivitys) {
+                    String packageName = activity.getLocalClassName();
+                    Log.e("LLL",packageName);
+                    mList_a.add(packageName);
+                }
+                if (mList_a.contains("MainActivity")&&MyApp.mActivitys.size()==1){
                     Log.e("LLL","只有MainActivity");
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }else if (mList_a.contains("MainActivity")&&mList_a.contains("BetaActivity")&&MyApp.mActivitys.size()==2){
                     MyApp.finishAllActivity();
                     Intent intent = new Intent(getActivity(), LoginActivity.class);
                     startActivity(intent);

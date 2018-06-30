@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -7,6 +8,7 @@ import android.util.Log;
 
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.adapter.AnFangAdapter;
 import com.hbdiye.lechuangsmart.bean.AnFangBean;
@@ -79,6 +81,11 @@ public class AnFangActivity extends BaseActivity {
             }
             if (payload.contains("\"pn\":\"DOSTP\"")) {
 
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(AnFangActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
             if (payload.contains("\"pn\":\"ATP\"")){
                 mConnection.sendTextMessage("{\"pn\":\"DGLTP\", \"classify\":\"protype\", \"id\":\"PROTYPE02\"}");

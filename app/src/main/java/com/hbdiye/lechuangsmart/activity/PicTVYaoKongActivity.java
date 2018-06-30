@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.hbdiye.lechuangsmart.MainActivity;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.bean.AnFangBean;
 import com.hbdiye.lechuangsmart.util.Logger;
@@ -196,6 +197,11 @@ public class PicTVYaoKongActivity extends BaseActivity {
             Log.e("TAG", "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(PicTVYaoKongActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
             if (payload.contains("\"pn\":\"IRTP\"")){
 //                AlertDialog.Builder builder=new AlertDialog.Builder(PicTVYaoKongActivity.this);

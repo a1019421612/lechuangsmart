@@ -101,6 +101,11 @@ public class EditPswActivity extends BaseActivity {
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(EditPswActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
             if (payload.contains("\"pn\":\"UUITP\"")){
 //                修改密码UUITP
                 try {

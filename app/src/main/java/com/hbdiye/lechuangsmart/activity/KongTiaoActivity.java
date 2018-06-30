@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.coder.zzq.smartshow.toast.SmartToast;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.util.Logger;
 import com.hbdiye.lechuangsmart.util.SPUtils;
@@ -373,6 +375,11 @@ public class KongTiaoActivity extends BaseActivity {
             }
             if (payload.contains("\"pn\":\"IRTP\"")) {
 
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(KongTiaoActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
         }
 

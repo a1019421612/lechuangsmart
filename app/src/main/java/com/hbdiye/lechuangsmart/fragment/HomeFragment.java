@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,8 +29,11 @@ import com.hbdiye.lechuangsmart.activity.LoginActivity;
 import com.hbdiye.lechuangsmart.activity.YaokongqiActivity;
 import com.hbdiye.lechuangsmart.activity.ZhaoMingActivity;
 import com.hbdiye.lechuangsmart.util.SPUtils;
+import com.tencent.bugly.beta.ui.BetaActivity;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -193,6 +197,7 @@ public class HomeFragment extends Fragment {
 //            Log.e(TAG, "onClose");
 //        }
 //    }
+    private List<String> mList= new ArrayList<>();
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -206,8 +211,17 @@ public class HomeFragment extends Fragment {
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                if (MyApp.mActivitys.contains(MainActivity.class)&&MyApp.mActivitys.size()==1){
+                for (Activity activity : MyApp.mActivitys) {
+                    String packageName = activity.getLocalClassName();
+                    Log.e("LLL",packageName);
+                    mList.add(packageName);
+                }
+                if (mList.contains("MainActivity")&&MyApp.mActivitys.size()==1){
                     Log.e("LLL","只有MainActivity");
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }else if (mList.contains("MainActivity")&&mList.contains("BetaActivity")&&MyApp.mActivitys.size()==2){
                     MyApp.finishAllActivity();
                     Intent intent = new Intent(getActivity(), LoginActivity.class);
                     startActivity(intent);

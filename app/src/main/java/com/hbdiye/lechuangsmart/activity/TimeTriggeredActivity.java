@@ -2,6 +2,7 @@ package com.hbdiye.lechuangsmart.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,6 +15,7 @@ import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
 import com.bigkoo.pickerview.view.OptionsPickerView;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.hbdiye.lechuangsmart.Global.ContentConfig;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.bean.LinkageSettingBean;
 import com.hbdiye.lechuangsmart.util.SPUtils;
@@ -201,6 +203,11 @@ public class TimeTriggeredActivity extends BaseActivity {
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
 
+            }
+            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                MyApp.finishAllActivity();
+                Intent intent = new Intent(TimeTriggeredActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
             if (payload.contains("\"pn\":\"LUTP\"")) {
                 try {
