@@ -213,7 +213,7 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
                 int value = Integer.parseInt(s);
 
                 if (linkage == null) {
-                    mConnection.sendTextMessage("{\"pn\":\"LATP\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + type + ",\"value\":" + value + ",\"name\":\"新联动\"}");
+                    mConnection.sendTextMessage("{\"pn\":\"LATP\",\"linkageID\":\"" + linkageID + "\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + type + ",\"value\":" + value + ",\"name\":\"新联动\"}");
                 } else {
                     mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\"" + linkageID + "\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + type + ",\"value\":" + value + "}");
                 }

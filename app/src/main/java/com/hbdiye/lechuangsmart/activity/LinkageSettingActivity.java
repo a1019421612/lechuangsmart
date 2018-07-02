@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -314,7 +315,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
             }
         }
     };
-
+    private List<String> mList_a= new ArrayList<>();
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -331,9 +332,16 @@ public class LinkageSettingActivity extends AppCompatActivity {
 
             }
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                MyApp.finishAllActivity();
-                Intent intent = new Intent(LinkageSettingActivity.this, LoginActivity.class);
-                startActivity(intent);
+                for (Activity activity : MyApp.mActivitys) {
+                    String packageName = activity.getLocalClassName();
+                    Log.e("LLL",packageName);
+                    mList_a.add(packageName);
+                }
+                if (mList_a.get(mList_a.size()-1).equals("LinkageSettingActivity")){
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(LinkageSettingActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
             }
             if (payload.contains("\"pn\":\"LCTP\"")) {
                 parseData(payload);
@@ -499,20 +507,19 @@ public class LinkageSettingActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.e("TAG", "onstop");
-        mConnection.disconnect();
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        Log.e("TAG", "onstop");
+//        mConnection.disconnect();
+//    }
 
     @Override
     protected void onRestart() {
         super.onRestart();
         Log.e("TAG", "onrestart");
-        if (mConnection != null) {
-            socketConnection();
-        }
+        mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
+        mConnection.sendTextMessage("{\"pn\":\"LDLTP\",\"type\":1}");
     }
 
     @Override
