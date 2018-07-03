@@ -526,6 +526,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.e("TAG", "onstop");
+        SPUtils.put(this,"linkageRef",true);
         mConnection.disconnect();
     }
 }

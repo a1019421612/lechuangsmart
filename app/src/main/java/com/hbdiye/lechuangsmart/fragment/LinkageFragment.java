@@ -323,9 +323,14 @@ public class LinkageFragment extends Fragment {
         super.onResume();
         Log.e(TAG, "onResume");
         boolean editLinkageName = (boolean) SPUtils.get(getActivity(), "editLinkageName", false);
+        boolean linkageRef = (boolean) SPUtils.get(getActivity(), "linkageRef", false);
         if (editLinkageName){
             mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
             SPUtils.remove(getActivity(),"editLinkageName");
+        }
+        if (linkageRef){
+            mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
+            SPUtils.remove(getActivity(),"linkageRef");
         }
     }
 

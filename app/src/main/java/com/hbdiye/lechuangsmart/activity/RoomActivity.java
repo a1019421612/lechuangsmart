@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -190,6 +191,10 @@ public class RoomActivity extends BaseActivity {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
+                for (Activity activity : MyApp.mActivitys) {
+                    String packageName = activity.getLocalClassName();
+                    Log.e("LLL",packageName);
+                }
                 MyApp.finishAllActivity();
                 Intent intent = new Intent(RoomActivity.this, LoginActivity.class);
                 startActivity(intent);

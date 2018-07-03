@@ -76,6 +76,8 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
     private boolean isOpen = false;//默认侧边栏关闭
     private String TAG = DeviceTriggeredActivity.class.getSimpleName();
 
+    private boolean closeAll=true;
+
     private WebSocketConnection mConnection;
     private String mobilephone;
     private String password;
@@ -213,7 +215,7 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
                 int value = Integer.parseInt(s);
 
                 if (linkage == null) {
-                    mConnection.sendTextMessage("{\"pn\":\"LATP\",\"linkageID\":\"" + linkageID + "\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + type + ",\"value\":" + value + ",\"name\":\"新联动\"}");
+                    mConnection.sendTextMessage("{\"pn\":\"LATP\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + type + ",\"value\":" + value + ",\"name\":\"新联动\"}");
                 } else {
                     mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\"" + linkageID + "\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + type + ",\"value\":" + value + "}");
                 }
@@ -324,16 +326,18 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
 
             }
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                MyApp.finishAllActivity();
-                Intent intent = new Intent(DeviceTriggeredActivity.this, LoginActivity.class);
-                startActivity(intent);
+                if (closeAll){
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(DeviceTriggeredActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
             }
             if (payload.contains("\"pn\":\"LDLTP\"")) {
                 //设备列表
                 parseDeviceData(payload);
             }
             if (payload.contains("\"pn\":\"LUTP\"")) {
-                //修改触发设备 LATP
+                //修改触发设备
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
@@ -356,6 +360,7 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
                     if (status) {
                         JSONObject linkage = jsonObject.getJSONObject("linkage");
                         String linkageID = linkage.getString("id");
+                        closeAll=false;
                         startActivity(new Intent(DeviceTriggeredActivity.this, LinkageSettingActivity.class).putExtra("linkageID", linkageID).putExtra("timingId", "null"));
                         finish();
                     }

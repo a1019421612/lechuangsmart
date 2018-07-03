@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -165,7 +166,7 @@ public class FamilyManagerActivity extends BaseActivity {
             }
         }
     };
-
+    private List<String> mList_a= new ArrayList<>();
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -181,9 +182,16 @@ public class FamilyManagerActivity extends BaseActivity {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                MyApp.finishAllActivity();
-                Intent intent = new Intent(FamilyManagerActivity.this, LoginActivity.class);
-                startActivity(intent);
+                for (Activity activity : MyApp.mActivitys) {
+                    String packageName = activity.getLocalClassName();
+                    Log.e("LLL",packageName);
+                    mList_a.add(packageName);
+                }
+                if (mList_a.get(mList_a.size()-1).equals("FamilyManagerActivity")){
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(FamilyManagerActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
             }
             if (payload.contains("\"pn\":\"RGLTP\"")) {
                 parseData(payload);
@@ -247,19 +255,19 @@ public class FamilyManagerActivity extends BaseActivity {
         adapter.notifyDataSetChanged();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mConnection.disconnect();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        if (mConnection != null) {
-            socketConnect();
-        }
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        mConnection.disconnect();
+//    }
+//
+//    @Override
+//    protected void onRestart() {
+//        super.onRestart();
+//        if (mConnection != null) {
+//            socketConnect();
+//        }
+//    }
 
     private void socketConnect() {
         try {

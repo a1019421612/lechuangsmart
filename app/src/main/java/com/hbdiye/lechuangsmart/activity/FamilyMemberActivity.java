@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,7 +47,7 @@ public class FamilyMemberActivity extends BaseActivity {
 
     private void socketConnect() {
         try {
-            mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+            mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new FamilyMemberWebSocketHandler());
 
         } catch (WebSocketException e) {
             e.printStackTrace();
@@ -73,8 +74,7 @@ public class FamilyMemberActivity extends BaseActivity {
         return R.layout.activity_family_member;
     }
 
-
-    class MyWebSocketHandler extends WebSocketHandler {
+    class FamilyMemberWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
             Log.e(TAG, "open");
@@ -88,9 +88,9 @@ public class FamilyMemberActivity extends BaseActivity {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                MyApp.finishAllActivity();
-                Intent intent = new Intent(FamilyMemberActivity.this, LoginActivity.class);
-                startActivity(intent);
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(FamilyMemberActivity.this, LoginActivity.class);
+                    startActivity(intent);
             }
             if (payload.contains("\"pn\":\"UITP\"")) {
                 parseData(payload);

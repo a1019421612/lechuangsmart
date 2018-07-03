@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -26,6 +27,9 @@ import com.hbdiye.lechuangsmart.views.SceneDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -71,7 +75,7 @@ public class FamilyNameActivity extends BaseActivity {
         password = (String) SPUtils.get(this, "password", "");
         mConnection = new WebSocketConnection();
         try {
-            mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+            mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new FamilyNameWebSocketHandler());
 
         } catch (WebSocketException e) {
             e.printStackTrace();
@@ -179,8 +183,8 @@ public class FamilyNameActivity extends BaseActivity {
     }
 
 
-
-    class MyWebSocketHandler extends WebSocketHandler {
+    private List<String> mList_a= new ArrayList<>();
+    class FamilyNameWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
             Log.e(TAG, "open");
@@ -197,9 +201,16 @@ public class FamilyNameActivity extends BaseActivity {
                 mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                MyApp.finishAllActivity();
-                Intent intent = new Intent(FamilyNameActivity.this, LoginActivity.class);
-                startActivity(intent);
+                for (Activity activity : MyApp.mActivitys) {
+                    String packageName = activity.getLocalClassName();
+                    Log.e("LLL",packageName);
+                    mList_a.add(packageName);
+                }
+                if (mList_a.get(mList_a.size()-1).equals("FamilyNameActivity")){
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(FamilyNameActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
             }
             if (payload.contains("\"pn\":\"UITP\"")) {
                 parseData(payload);
@@ -270,27 +281,27 @@ public class FamilyNameActivity extends BaseActivity {
         super.onResume();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.e(TAG, "onstop");
-        mConnection.disconnect();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.e(TAG, "onrestart");
-        if (mConnection != null) {
-            try {
-                mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-            } catch (WebSocketException e) {
-                e.printStackTrace();
-                SmartToast.show("网络连接错误");
-            }
-        }
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        Log.e(TAG, "onstop");
+//        mConnection.disconnect();
+//    }
+//
+//    @Override
+//    protected void onRestart() {
+//        super.onRestart();
+//        Log.e(TAG, "onrestart");
+//        if (mConnection != null) {
+//            try {
+//                mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new FamilyNameWebSocketHandler());
+//
+//            } catch (WebSocketException e) {
+//                e.printStackTrace();
+//                SmartToast.show("网络连接错误");
+//            }
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
