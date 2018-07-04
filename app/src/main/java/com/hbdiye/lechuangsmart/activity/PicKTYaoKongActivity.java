@@ -245,6 +245,7 @@ public class PicKTYaoKongActivity extends BaseActivity {
                     boolean status = jsonObject.getBoolean("status");
                     if (status){
                         sceneDialog.dismiss();
+                        SPUtils.put(PicKTYaoKongActivity.this,"yaokRe",true);
                         startActivity(new Intent(PicKTYaoKongActivity.this,YaoKongListActivity.class));
                     }
                 } catch (JSONException e) {

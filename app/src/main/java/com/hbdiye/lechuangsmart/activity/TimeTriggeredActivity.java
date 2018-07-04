@@ -57,6 +57,7 @@ public class TimeTriggeredActivity extends BaseActivity {
     private WebSocketConnection mConnection;
     private String mobilephone;
     private String password;
+    private String timing;
 
     @Override
     protected void initData() {
@@ -67,7 +68,7 @@ public class TimeTriggeredActivity extends BaseActivity {
         mConnection = new WebSocketConnection();
         socketConnection();
         String cronExpression = linkage.timingRecord.cronExpression;
-        String timing = linkage.timingRecord.timing;
+        timing = linkage.timingRecord.timing;
         tvTime.setText(timing);
         if (TextUtils.isEmpty(cronExpression)){
             tvTimeRepeat.setText("仅一次");
@@ -94,7 +95,7 @@ public class TimeTriggeredActivity extends BaseActivity {
     protected void initView() {
         ivBaseEdit.setVisibility(View.VISIBLE);
         ivBaseEdit.setImageResource(R.drawable.duigou);
-        initCustomTimePicker();
+
         ivBaseBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,6 +126,7 @@ public class TimeTriggeredActivity extends BaseActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.ll_time_dotime:
+                initCustomTimePicker();
                 if (pickerBuilder != null){
                     pickerBuilder.show();
                 }
@@ -162,6 +164,11 @@ public class TimeTriggeredActivity extends BaseActivity {
         }
     }
     private void initCustomTimePicker() {
+        String[] split = timing.split(":");
+        int position0 = ContentConfig.getHourPosition(split[0]);
+        int position1 = ContentConfig.getMandSPosition(split[1]);
+        int position2 = ContentConfig.getMandSPosition(split[2]);
+        Log.e("fff",position0+" "+position1+"   "+position2+"   "+timing);
         pickerBuilder = new OptionsPickerBuilder(this, new OnOptionsSelectListener() {
             @Override
             public void onOptionsSelect(int options1, int options2, int options3, View v) {
@@ -185,6 +192,7 @@ public class TimeTriggeredActivity extends BaseActivity {
             }
         }).setLabels("时", "分", "秒")
                 .isCenterLabel(true)
+                .setSelectOptions(position0,position1,position2)
                 .build();
         pickerBuilder.setNPicker(ContentConfig.getTimeHours(), ContentConfig.getTimeMin(), ContentConfig.getTimeSeco());
     }

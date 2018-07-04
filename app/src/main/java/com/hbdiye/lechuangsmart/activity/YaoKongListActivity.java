@@ -82,7 +82,7 @@ public class YaoKongListActivity extends BaseActivity {
     private String city;
     private String district;
     private String mac;
-
+    private boolean closeAll=false;
     @Override
     protected void initData() {
         deviceID = getIntent().getStringExtra("deviceID");
@@ -382,9 +382,13 @@ public class YaoKongListActivity extends BaseActivity {
 
             }
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                MyApp.finishAllActivity();
-                Intent intent = new Intent(YaoKongListActivity.this, LoginActivity.class);
-                startActivity(intent);
+                if (closeAll){
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(YaoKongListActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }else {
+                    closeAll=true;
+                }
             }
             if (payload.contains("\"pn\":\"IRLTP\"")) {
                 parseData(payload);
@@ -444,19 +448,19 @@ public class YaoKongListActivity extends BaseActivity {
 //        mConnection.sendTextMessage("{\"pn\":\"SDOSTP\"}");
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mConnection.disconnect();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        if (mConnection != null) {
-            socketConnect();
-        }
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        mConnection.disconnect();
+//    }
+//
+//    @Override
+//    protected void onRestart() {
+//        super.onRestart();
+//        if (mConnection != null) {
+//            socketConnect();
+//        }
+//    }
 
     private void socketConnect() {
         try {
@@ -466,6 +470,16 @@ public class YaoKongListActivity extends BaseActivity {
             e.printStackTrace();
             SmartToast.show("网络连接错误");
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        boolean yaokRe= (boolean) SPUtils.get(YaoKongListActivity.this,"yaokRe",false);
+        if (yaokRe){
+            mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + deviceID + "\"}");
+        }
+        SPUtils.remove(YaoKongListActivity.this,"yaokRe");
     }
 
     @Override

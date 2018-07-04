@@ -230,6 +230,7 @@ public class PicTVYaoKongActivity extends BaseActivity {
                     boolean status = jsonObject.getBoolean("status");
                     if (status){
                         sceneDialog.dismiss();
+                        SPUtils.put(PicTVYaoKongActivity.this,"yaokRe",true);
                         startActivity(new Intent(PicTVYaoKongActivity.this,YaoKongListActivity.class));
                     }
                 } catch (JSONException e) {

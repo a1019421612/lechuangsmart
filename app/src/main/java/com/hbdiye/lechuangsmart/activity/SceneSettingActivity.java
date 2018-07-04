@@ -113,11 +113,17 @@ public class SceneSettingActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         initView();
         initData();
-        initCustomTimePicker();
+
         handleClick();
     }
 
-    private void initCustomTimePicker() {
+    private void initCustomTimePicker(int position) {
+        String timing = ContentConfig.secToTime(mList.get(position).delaytime);
+        String[] split = timing.split(":");
+        int position0 = ContentConfig.getHourPosition(split[0]);
+        int position1 = ContentConfig.getMandSPosition(split[1]);
+        int position2 = ContentConfig.getMandSPosition(split[2]);
+        Log.e("fff",position0+" "+position1+"   "+position2+"   "+timing);
         pickerBuilder = new OptionsPickerBuilder(this, new OnOptionsSelectListener() {
             @Override
             public void onOptionsSelect(int options1, int options2, int options3, View v) {
@@ -128,6 +134,7 @@ public class SceneSettingActivity extends AppCompatActivity {
             }
         }).setLabels("时", "分", "秒")
                 .isCenterLabel(true)
+                .setSelectOptions(position0,position1,position2)
                 .build();
         pickerBuilder.setNPicker(ContentConfig.getTimeHours(), ContentConfig.getTimeMin(), ContentConfig.getTimeSeco());
     }
@@ -139,6 +146,7 @@ public class SceneSettingActivity extends AppCompatActivity {
                 timeFlag = position;
                 switch (view.getId()) {
                     case R.id.tv_scene_setting_time:
+                        initCustomTimePicker(position);
                         if (pickerBuilder != null) {
                             pickerBuilder.show();
                         }

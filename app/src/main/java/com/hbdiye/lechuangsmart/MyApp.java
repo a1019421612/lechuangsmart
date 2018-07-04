@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.coder.zzq.smartshow.toast.SmartToast;
+import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
 
@@ -109,6 +110,7 @@ public class MyApp extends Application {
         for (Activity activity : mActivitys) {
             activity.finish();
         }
+        SPUtils.clear(context);
         mActivitys.clear();
     }
 

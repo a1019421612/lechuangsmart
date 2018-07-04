@@ -37,7 +37,7 @@ public class RoomDeviceByIDAdapter extends BaseQuickAdapter<RoomDeviceBean.Devic
             //检测器
             if (modelPath.equals("pro_sensor_realtime")){
                 helper.setGone(R.id.ll_device_attr,true);
-
+                helper.setGone(R.id.ll_checkbox,false);
                 List<RoomDeviceBean.Devices.DeviceAttributes> deviceAttributes = item.deviceAttributes;
                 if (deviceAttributes!=null){
                     for (int i = 0; i < deviceAttributes.size(); i++) {
@@ -63,6 +63,7 @@ public class RoomDeviceByIDAdapter extends BaseQuickAdapter<RoomDeviceBean.Devic
                     }
                 }
             }else if (modelPath.equals("pro_switch")){
+                helper.setGone(R.id.ll_device_attr,false);
                 checkboxUserIdList.add(adapterPosition);
                 helper.setTag(R.id.ll_root,adapterPosition);
                 int tag = (int) helper.getView(R.id.ll_root).getTag();
@@ -78,9 +79,9 @@ public class RoomDeviceByIDAdapter extends BaseQuickAdapter<RoomDeviceBean.Devic
 //                        helper.setGone(R.id.checkbox_middle,false);
 //                        helper.setGone(R.id.checkbox_left,true);
 
-                        helper.setGone(R.id.iv_room_left,false);
+                        helper.setGone(R.id.iv_room_left,true);
                         helper.setGone(R.id.iv_room_middle,false);
-                        helper.setGone(R.id.iv_room_right,true);
+                        helper.setGone(R.id.iv_room_right,false);
 
                         if (item.deviceAttributes.get(0).value==0){
 //                            helper.setChecked(R.id.checkbox_left,false);
@@ -196,7 +197,7 @@ public class RoomDeviceByIDAdapter extends BaseQuickAdapter<RoomDeviceBean.Devic
 //            helper.setGone(R.id.checkbox_right,false);
 //            helper.setGone(R.id.checkbox_middle,false);
 //            helper.setGone(R.id.checkbox_left,false);
-
+            helper.setGone(R.id.ll_device_attr,false);
             helper.setGone(R.id.iv_room_right,false);
             helper.setGone(R.id.iv_room_middle,false);
             helper.setGone(R.id.iv_room_left,false);

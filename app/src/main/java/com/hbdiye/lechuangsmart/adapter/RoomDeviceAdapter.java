@@ -37,6 +37,7 @@ public class RoomDeviceAdapter extends BaseQuickAdapter<RoomDeviceBean.Devices,B
             //检测器
             if (modelPath.equals("pro_sensor_realtime")){
                 helper.setGone(R.id.ll_device_attr,true);
+                helper.setGone(R.id.ll_checkbox,false);
 
                 List<RoomDeviceBean.Devices.DeviceAttributes> deviceAttributes = item.deviceAttributes;
                 if (deviceAttributes!=null){
@@ -63,6 +64,7 @@ public class RoomDeviceAdapter extends BaseQuickAdapter<RoomDeviceBean.Devices,B
                     }
                 }
             }else if (modelPath.equals("pro_switch")){
+                helper.setGone(R.id.ll_device_attr,false);
                 checkboxUserIdList.add(adapterPosition);
                 helper.setTag(R.id.ll_root,adapterPosition);
                 int tag = (int) helper.getView(R.id.ll_root).getTag();
@@ -180,6 +182,7 @@ public class RoomDeviceAdapter extends BaseQuickAdapter<RoomDeviceBean.Devices,B
             //设备离线
             helper.setGone(R.id.tv_device_status,true);
             helper.setGone(R.id.ll_checkbox,false);
+            helper.setGone(R.id.ll_device_attr,false);
 //            helper.setGone(R.id.checkbox_right,false);
 //            helper.setGone(R.id.checkbox_middle,false);
 //            helper.setGone(R.id.checkbox_left,false);

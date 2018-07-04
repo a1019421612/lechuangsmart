@@ -1,5 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
@@ -69,7 +71,7 @@ public class FangjianActivity extends AppCompatActivity {
     private List<RoomDeviceBean.Devices> mList = new ArrayList<>();
     private List<Boolean> mList_status = new ArrayList<>();
 
-    private int flagRoomPosition=0;
+    private int flagRoomPosition=-1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -163,6 +165,17 @@ public class FangjianActivity extends AppCompatActivity {
                 }
             }
         });
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (mList.get(position).product.modelPath.equals("pro_dispatcher")){
+                    startActivity(new Intent(FangjianActivity.this, YaoKongListActivity.class)
+                            .putExtra("deviceID", mList.get(position).id)
+                            .putExtra("deviceName", mList.get(position).name)
+                            .putExtra("mac", mList.get(position).mac));
+                }
+            }
+        });
     }
 
     protected void initData() {
@@ -181,7 +194,7 @@ public class FangjianActivity extends AppCompatActivity {
             SmartToast.show("网络连接错误");
         }
     }
-
+    private List<String> mList_a= new ArrayList<>();
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -201,12 +214,42 @@ public class FangjianActivity extends AppCompatActivity {
 
             }
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                MyApp.finishAllActivity();
-                Intent intent = new Intent(FangjianActivity.this, LoginActivity.class);
-                startActivity(intent);
+                for (Activity activity : MyApp.mActivitys) {
+                    String packageName = activity.getLocalClassName();
+                    Log.e("LLL",packageName);
+                    mList_a.add(packageName);
+                }
+                if (mList_a.get(mList_a.size()-1).equals("FangjianActivity")){
+                    MyApp.finishAllActivity();
+                    Intent intent = new Intent(FangjianActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
             }
             if (payload.contains("\"pn\":\"ATP\"")){
-                    mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + list_room.get(flagRoomPosition).id + "\"}");
+//                    mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + list_room.get(flagRoomPosition).id + "\"}");
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+                    String deviceID = jsonObject.getString("deviceID");
+                    String proAttID = jsonObject.getString("proAttID");
+                    int value =Integer.parseInt(jsonObject.getString("value"));
+                    for (int i = 0; i < mList.size(); i++) {
+                        if (mList.get(i).id.equals(deviceID)){
+                            RoomDeviceBean.Devices devices = mList.get(i);
+                            List<RoomDeviceBean.Devices.DeviceAttributes> deviceAttributes = devices.deviceAttributes;
+                            for (int j = 0; j < deviceAttributes.size(); j++) {
+                                if (deviceAttributes.get(j).proAttID.equals(proAttID)){
+//                                    mList.get(i).deviceAttributes.get(j).value;
+                                    deviceAttributes.get(j).value=value;
+                                    mList.set(i,devices);
+                                    adapter.notifyItemChanged(i);
+                                }
+                            }
+                        }
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
             if (payload.contains("\"pn\":\"DGLTP\"")) {
                 parseData(payload);

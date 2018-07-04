@@ -176,7 +176,7 @@ public class FamilyNameActivity extends BaseActivity {
         if (requestCode == 111 && resultCode == 4) {
             flag = true;
             erCode = data.getStringExtra("erCode");
-
+            mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\"" + erCode + "\"} ");
 //            textview.setText(s);
 //            SmartToast.show(erCode);
         }

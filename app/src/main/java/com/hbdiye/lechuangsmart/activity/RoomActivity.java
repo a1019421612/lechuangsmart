@@ -248,6 +248,32 @@ public class RoomActivity extends BaseActivity {
                 }
 //                SmartToast.showLong(payload);
             }
+            if (payload.contains("\"pn\":\"ATP\"")){
+//                    mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + list_room.get(flagRoomPosition).id + "\"}");
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+                    String deviceID = jsonObject.getString("deviceID");
+                    String proAttID = jsonObject.getString("proAttID");
+                    int value =Integer.parseInt(jsonObject.getString("value"));
+                    for (int i = 0; i < mList.size(); i++) {
+                        if (mList.get(i).id.equals(deviceID)){
+                            RoomDeviceBean.Devices devices = mList.get(i);
+                            List<RoomDeviceBean.Devices.DeviceAttributes> deviceAttributes = devices.deviceAttributes;
+                            for (int j = 0; j < deviceAttributes.size(); j++) {
+                                if (deviceAttributes.get(j).proAttID.equals(proAttID)){
+//                                    mList.get(i).deviceAttributes.get(j).value;
+                                    deviceAttributes.get(j).value=value;
+                                    mList.set(i,devices);
+                                    adapter.notifyItemChanged(i);
+                                }
+                            }
+                        }
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
 
         }
 
