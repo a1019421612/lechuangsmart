@@ -13,10 +13,10 @@ public class InterfaceManager {
     public static InterfaceManager getInstance(){
         if (manager==null){
             manager=new InterfaceManager();
-            urlManager.put(InterfaceManager.LOGIN,"http://39.104.119.0:8888/SmarthomeHTTPServer/Login.php");
-            urlManager.put(InterfaceManager.REGISTER,"http://39.104.119.0:8088/SmartHome-java-user/user/register");
-            urlManager.put(InterfaceManager.GETVAILCODE,"http://39.104.119.0:8088/SmartHome-java-user/user/getValidateCode");
-            urlManager.put(InterfaceManager.FORGETPSW,"http://39.104.119.0:8088/SmartHome-java-user/user/resetPassword");
+            urlManager.put(InterfaceManager.LOGIN,"http://39.104.119.0/SmartHome-java-user/user/login");
+            urlManager.put(InterfaceManager.REGISTER,"http://39.104.119.0:80/SmartHome-java-user/user/register");
+            urlManager.put(InterfaceManager.GETVAILCODE,"http://39.104.119.0:80/SmartHome-java-user/user/getValidateCode");
+            urlManager.put(InterfaceManager.FORGETPSW,"http://39.104.119.0:80/SmartHome-java-user/user/resetPassword");
         }
         return manager;
     }

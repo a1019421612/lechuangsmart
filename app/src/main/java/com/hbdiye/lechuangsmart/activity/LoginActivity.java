@@ -84,9 +84,9 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    private void loginLC(String mPhone, String mPassword) {
+    private void loginLC(final String mPhone, final String mPassword) {
 
-        OkHttpUtils.post()
+        OkHttpUtils.get()
                 .url(InterfaceManager.getInstance().getURL(InterfaceManager.LOGIN))
                 .addParams("mobilephone",mPhone)
                 .addParams("password",mPassword)
@@ -102,13 +102,13 @@ public class LoginActivity extends BaseActivity {
                         Log.e("TAG",response);
                         try {
                             JSONObject jsonObject=new JSONObject(response);
-                            int result = jsonObject.getInt("result");
-                            if (result==1){
-                                JSONObject jsonObject1=jsonObject.getJSONObject("data");
-                                String mobilephone = jsonObject1.getString("mobilephone");
-                                String password = jsonObject1.getString("password");
-                                SPUtils.put(LoginActivity.this,"mobilephone",mobilephone);
-                                SPUtils.put(LoginActivity.this,"password",password);
+                            int result = jsonObject.getInt("errcode");
+                            if (result==0){
+//                                JSONObject jsonObject1=jsonObject.getJSONObject("data");
+//                                String mobilephone = jsonObject1.getString("mobilephone");
+//                                String password = jsonObject1.getString("password");
+                                SPUtils.put(LoginActivity.this,"mobilephone",mPhone);
+                                SPUtils.put(LoginActivity.this,"password",mPassword);
                                 startActivity(new Intent(LoginActivity.this,MainActivity.class));
                                 finish();
                             }else {
