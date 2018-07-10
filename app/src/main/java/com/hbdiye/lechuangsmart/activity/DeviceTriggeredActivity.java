@@ -427,7 +427,7 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
 
     private void socketConnection() {
         try {
-            mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
 
         } catch (WebSocketException e) {
             e.printStackTrace();

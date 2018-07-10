@@ -86,20 +86,20 @@
                 <!--/>-->
             <ImageView
                 android:id="@+id/iv_kg_left"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
                 android:src="@drawable/off"
                 />
             <ImageView
                 android:id="@+id/iv_kg_middle"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
                 android:src="@drawable/off"
                 />
             <ImageView
                 android:id="@+id/iv_kg_right"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
                 android:src="@drawable/off"
                 />
     </LinearLayout>

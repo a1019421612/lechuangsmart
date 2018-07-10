@@ -115,20 +115,20 @@
                 <!--/>-->
             <ImageView
                 android:id="@+id/iv_room_left"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@drawable/off"
                 />
             <ImageView
                 android:id="@+id/iv_room_middle"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@drawable/off"
                 />
             <ImageView
                 android:id="@+id/iv_room_right"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@drawable/off"
                 />
         </LinearLayout>

@@ -82,7 +82,7 @@ public class HomeFragment extends Fragment {
         mobilephone = (String) SPUtils.get(getActivity(), "mobilephone", "");
         password = (String) SPUtils.get(getActivity(), "password", "");
         try {
-            mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
 
         } catch (WebSocketException e) {
             e.printStackTrace();
@@ -122,7 +122,7 @@ public class HomeFragment extends Fragment {
             switch (msg.what) {
                 case 1:
                     long sysTime = System.currentTimeMillis();
-                    CharSequence sysTimeStr = DateFormat.format("hh:mm:ss", sysTime);
+                    CharSequence sysTimeStr = DateFormat.format("hh:mm", sysTime);
                     try {
                         tvTime.setText(sysTimeStr); //更新时间
                     } catch (Exception e) {
@@ -249,7 +249,7 @@ public class HomeFragment extends Fragment {
             Log.e(TAG, "home" + "显示");
             if (mConnection != null) {
                 try {
-                    mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+                    mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
 
                 } catch (WebSocketException e) {
                     e.printStackTrace();

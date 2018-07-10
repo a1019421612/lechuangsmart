@@ -75,7 +75,7 @@ public class FamilyNameActivity extends BaseActivity {
         password = (String) SPUtils.get(this, "password", "");
         mConnection = new WebSocketConnection();
         try {
-            mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new FamilyNameWebSocketHandler());
+            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new FamilyNameWebSocketHandler());
 
         } catch (WebSocketException e) {
             e.printStackTrace();

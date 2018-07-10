@@ -123,7 +123,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
 
     private void socketConnect() {
         try {
-            mSceneConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new MySceneWebSocketHandler());
+            mSceneConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MySceneWebSocketHandler());
 
         } catch (WebSocketException e) {
             e.printStackTrace();

@@ -47,7 +47,7 @@ public class FamilyMemberActivity extends BaseActivity {
 
     private void socketConnect() {
         try {
-            mConnection.connect("ws://39.104.105.10:18888/mobilephone=" + mobilephone + "&password=" + password, new FamilyMemberWebSocketHandler());
+            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new FamilyMemberWebSocketHandler());
 
         } catch (WebSocketException e) {
             e.printStackTrace();

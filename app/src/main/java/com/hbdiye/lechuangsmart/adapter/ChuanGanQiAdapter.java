@@ -33,14 +33,14 @@ public class ChuanGanQiAdapter extends BaseQuickAdapter<ChuanGanQiBean.Devices,B
                 if (deviceAttributes!=null){
                         for (int i = 0; i < deviceAttributes.size(); i++) {
                             String proAttID = deviceAttributes.get(i).proAttID;
-                            if (proAttID.equals("11")){
+                            if (proAttID.equals("12")){
                                 //温度
                                 int value = deviceAttributes.get(i).value;
 //                                int wd = Math.round(value / 100);
                                 String wd = String.format("%.1f", (float)value / 100);
                                 helper.setText(R.id.tv_wd,wd+"℃");
                             }
-                            if (proAttID.equals("12")){
+                            if (proAttID.equals("11")){
                                 //湿度
                                 int value = deviceAttributes.get(i).value;
 //                                int round = Math.round(value / 100);
