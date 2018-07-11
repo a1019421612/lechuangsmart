@@ -1,6 +1,7 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.EditText;
@@ -64,6 +65,7 @@ public class WiFiActivity extends BaseActivity {
                 String data="{\"wifi_password\":\""+wifiPsw+"\",\"wifi_ssid\":\""+wifiName+"\",\"mobile_userid\":\""+mobilephone+"\"}";
                 Bitmap qrCode = EncodingHandler.createQRCode(data, DensityUtils.dp2px(this, 150));
                 Glide.with(WiFiActivity.this).load(qrCode).into(ivWifi);
+                ivWifi.setBackgroundColor(Color.parseColor("#ffffff"));
             } catch (WriterException e) {
                 e.printStackTrace();
             }

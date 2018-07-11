@@ -30,17 +30,29 @@ import com.google.gson.JsonSyntaxException;
 import com.hbdiye.lechuangsmart.Global.ContentConfig;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.adapter.LinkageDeviceMenuAdapter;
 import com.hbdiye.lechuangsmart.adapter.LinkageSettingAdapter;
 import com.hbdiye.lechuangsmart.adapter.LinkageSettingDeviceAdapter;
+import com.hbdiye.lechuangsmart.adapter.LinkageYaoKongQiListAdapter;
 import com.hbdiye.lechuangsmart.bean.LinkageDeviceBean;
 import com.hbdiye.lechuangsmart.bean.LinkageSettingBean;
+import com.hbdiye.lechuangsmart.bean.YaoKongListBean;
+import com.hbdiye.lechuangsmart.util.Logger;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.hbdiye.lechuangsmart.views.SceneDialog;
+import com.hzy.tvmao.KookongSDK;
+import com.hzy.tvmao.interf.IRequestResult;
+import com.hzy.tvmao.ir.Device;
+import com.kookong.app.data.AppConst;
+import com.kookong.app.data.IrData;
+import com.kookong.app.data.IrDataList;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -49,6 +61,17 @@ import butterknife.OnClick;
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
+
+import static com.hzy.tvmao.ir.Device.AC;
+import static com.hzy.tvmao.ir.Device.AIR_CLEANER;
+import static com.hzy.tvmao.ir.Device.BOX;
+import static com.hzy.tvmao.ir.Device.DVD;
+import static com.hzy.tvmao.ir.Device.FAN;
+import static com.hzy.tvmao.ir.Device.PA;
+import static com.hzy.tvmao.ir.Device.PRO;
+import static com.hzy.tvmao.ir.Device.SLR;
+import static com.hzy.tvmao.ir.Device.STB;
+import static com.hzy.tvmao.ir.Device.TV;
 
 public class LinkageSettingActivity extends AppCompatActivity {
     @BindView(R.id.iv_base_back)
@@ -73,6 +96,12 @@ public class LinkageSettingActivity extends AppCompatActivity {
     LinearLayout llAddDevice;
     @BindView(R.id.rv_linkage_device)
     RecyclerView rvLinkageDevice;
+    @BindView(R.id.rv_hongwai_device)
+    RecyclerView rvHongwaiDevice;
+    @BindView(R.id.iv_device_back)
+    ImageView ivDeviceBack;
+    @BindView(R.id.rv_device_menu)
+    RecyclerView rvDeviceMenu;
     private boolean isOpen = false;//默认侧边栏关闭
 
     private WebSocketConnection mConnection;
@@ -86,13 +115,19 @@ public class LinkageSettingActivity extends AppCompatActivity {
 
     private List<LinkageSettingBean.Lts> mList = new ArrayList<>();
     private LinkageSettingAdapter adapter;
+    //遥控列表
+    private List<YaoKongListBean.Irremotes> mList_yk = new ArrayList<>();
+    private LinkageYaoKongQiListAdapter adapter_yk;
 
+    //遥控按钮
+    private ArrayList<IrData.IrKey> mList_menu=new ArrayList<>();
+    private LinkageDeviceMenuAdapter adapter_menu;
 
     //头布局 时间联动
     private TextView tv_time_mode, tv_time_timing;
     private LinearLayout ll_dingshi;
     //头布局 设备联动
-    private TextView tv_device_name,tv_device_cfgn,tv_device_cftj;
+    private TextView tv_device_name, tv_device_cfgn, tv_device_cftj;
     private LinearLayout ll_device;
 
     private SceneDialog sceneDialog;
@@ -102,8 +137,10 @@ public class LinkageSettingActivity extends AppCompatActivity {
 
     private int dialogflag;//开关列表标志
     private LinkageSettingBean.Linkage linkage;
-    private String timingId="";
+    private String timingId = "";
     private ImageView iv_header;
+
+    private int level=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,22 +172,22 @@ public class LinkageSettingActivity extends AppCompatActivity {
                         break;
                     case R.id.tv_scene_setting_switch:
                         //开关
-                        dialogflag=-1;
+                        dialogflag = -1;
                         List<LinkageSettingBean.Lts.ProActs> proActs = mList.get(position).proActs;
                         String proActID = mList.get(position).proActID;
                         String[] proActs_name = new String[proActs.size()];
                         for (int i = 0; i < proActs.size(); i++) {
-                            proActs_name[i]=proActs.get(i).name;
-                            if (proActID.equals(proActs.get(i).id)){
-                                dialogflag=i;
+                            proActs_name[i] = proActs.get(i).name;
+                            if (proActID.equals(proActs.get(i).id)) {
+                                dialogflag = i;
                             }
                         }
-                        AlertDialog.Builder proActs_list=new AlertDialog.Builder(LinkageSettingActivity.this);
+                        AlertDialog.Builder proActs_list = new AlertDialog.Builder(LinkageSettingActivity.this);
                         proActs_list.setSingleChoiceItems(proActs_name, dialogflag, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 //                                SmartToast.show(proActs.get(which).name);
-                                if (which!=dialogflag){
+                                if (which != dialogflag) {
                                     mConnection.sendTextMessage("{\"pn\":\"LTUTP\",\"ltID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + mList.get(position).proActs.get(which).id + "\",\"delaytime\":\"" + mList.get(position).delaytime + "\"}");
                                 }
                                 dialog.dismiss();
@@ -164,8 +201,151 @@ public class LinkageSettingActivity extends AppCompatActivity {
         mAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                mConnection.sendTextMessage("{\"pn\":\"LTATP\",\"linkageID\":\"" + linkageID + "\",\"deviceID\":\"" + mList_device.get(position).id + "\",\"proActID\":\"" + mList_device.get(position).product.proacts.get(0).id + "\",\"type\":\"0\",\"delaytime\":\"0\"}");
+                if (mList_device.get(position).product.modelPath.equals("pro_dispatcher")) {
+                    level=1;
+                    mList_yk.clear();
+                    adapter_yk.notifyDataSetChanged();
+                    rvLinkageDevice.setVisibility(View.GONE);
+                    ivDeviceBack.setVisibility(View.VISIBLE);
+                    rvHongwaiDevice.setVisibility(View.VISIBLE);
+                    mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + mList_device.get(position).id + "\"}");
+                } else {
+                    mConnection.sendTextMessage("{\"pn\":\"LTATP\",\"linkageID\":\"" + linkageID + "\",\"deviceID\":\"" + mList_device.get(position).id + "\",\"proActID\":\"" + mList_device.get(position).product.proacts.get(0).id + "\",\"type\":\"0\",\"delaytime\":\"0\"}");
+                }
             }
+        });
+        //遥控列表
+        adapter_yk.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                level=2;
+                mList_menu.clear();
+                adapter_menu.notifyDataSetChanged();
+                ivDeviceBack.setVisibility(View.VISIBLE);
+                rvLinkageDevice.setVisibility(View.GONE);
+                rvHongwaiDevice.setVisibility(View.GONE);
+                rvDeviceMenu.setVisibility(View.VISIBLE);
+
+                String rtype = mList_yk.get(position).rtype;
+                String rid = mList_yk.get(position).rid;
+                if (rtype.equals("TV")) {
+                    getIRDataById(rid,TV);
+                }else if (rtype.equals("BOX")){
+                    getIRDataById(rid,BOX);
+                }else if (rtype.equals("STB")){
+                    getIRDataById(rid,STB);
+                }else if (rtype.equals("DVD")){
+                    getIRDataById(rid,DVD);
+                }else if (rtype.equals("AC")){
+                    getNoStateIRDataById(rid,AC);
+                }else if (rtype.equals("PRO")){
+                    getIRDataById(rid,PRO);
+                }else if (rtype.equals("PA")){
+                    getIRDataById(rid,PA);
+                }else if (rtype.equals("FAN")){
+                    getIRDataById(rid,FAN);
+                }else if (rtype.equals("SLR")){
+                    getIRDataById(rid,SLR);
+                }else if (rtype.equals("AIR_CLEANER")){
+                    getIRDataById(rid,AIR_CLEANER);
+                }
+            }
+        });
+    }
+
+    /**
+     * 电视
+     */
+    private void getIRDataById(String rid,int type) {
+        KookongSDK.getIRDataById(rid, type, true, new IRequestResult<IrDataList>() {
+
+            @Override
+            public void onSuccess(String msg, IrDataList result) {
+                List<IrData> irDatas = result.getIrDataList();
+                ArrayList<IrData.IrKey> keys = irDatas.get(0).keys;
+
+                if (mList_menu.size() > 0) {
+                    mList_menu.clear();
+                }
+                mList_menu.addAll(keys);
+                adapter_menu.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFail(Integer errorCode, String msg) {
+                //按红外设备授权的客户，才会用到这两个值
+                if (errorCode == AppConst.CUSTOMER_DEVICE_REMOTE_NUM_LIMIT) {//同一个设备下载遥控器超过了50套限制
+                    msg = "下载的遥控器超过了套数限制";
+                } else if (errorCode == AppConst.CUSTOMER_DEVICE_NUM_LIMIT) {//设备总数超过了授权的额度
+                    msg = "设备总数超过了授权的额度";
+                }
+                SmartToast.show(msg);
+
+            }
+        });
+    }
+
+    /**
+     * 空调
+     */
+    public void getNoStateIRDataById(String rid,int type){
+        KookongSDK.getNoStateIRDataById(rid + "", type, true, new IRequestResult<IrDataList>() {
+
+            @Override
+            public void onSuccess(String msg, IrDataList result) {
+                List<IrData> irDatas = result.getIrDataList();
+                for (int i = 0; i < irDatas.size(); i++) {
+                    IrData irData = irDatas.get(i);
+                    Logger.d("空调：" + irData.rid);
+                    //空调支持的模式、温度、风速
+                    HashMap<Integer, String> exts = irData.exts;
+                    //遥控器参数
+                    //空调的组合按键
+                    ArrayList<IrData.IrKey> keyList = irData.keys;
+                    if (mList_menu.size() > 0) {
+                        mList_menu.clear();
+                    }
+
+                    String keySize = irData.rid + "的组合按键个数：" + (keyList == null ? "0" : keyList.size()) + "\n";
+                    Logger.d(keySize);
+                    if (keyList != null) {
+                        IrData.IrKey irKey = keyList.get(0);
+                        Logger.d("按键参数：" + irKey.fkey + "=" + irKey.pulse);
+                        IrData.IrKey irKey1 = keyList.get(1);
+                        Logger.d("按键参数：" + irKey1.fkey + "=" + irKey1.pulse);
+                        IrData.IrKey irKey2 = keyList.get(keyList.size() - 1);
+                        Logger.d("按键参数：" + irKey2.fkey + "=" + irKey2.pulse);
+                        String power_on = irKey.pulse.replace(" ", "").replace(",", "");
+                        String power_off = irKey2.pulse.replace(" ", "").replace(",", "");
+
+                        String default_fpulse = irKey1.pulse.replace(" ", "").replace(",", "");
+//                        String data = "{\"pn\":\"IRTP\", \"sdMAC\":\"" + mac + "\", \"rcode\":\"" + rcode + "\",\"fpulse\":\"" + replace + "\"}}";
+//                        mConnection.sendTextMessage(data);
+                        IrData.IrKey irdata_irkey=new IrData.IrKey();
+                        irdata_irkey.fname="开";
+                        irdata_irkey.pulse=power_on;
+                        IrData.IrKey irdata_irkey1=new IrData.IrKey();
+                        irdata_irkey1.fname="关";
+                        irdata_irkey1.pulse=power_off;
+                        mList_menu.add(irdata_irkey);
+                        mList_menu.add(irdata_irkey1);
+                    }
+
+                    adapter_menu.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFail(Integer errorCode, String msg) {
+                //按红外设备授权的客户，才会用到这两个值
+                if (errorCode == AppConst.CUSTOMER_DEVICE_REMOTE_NUM_LIMIT) {//同一个设备下载遥控器超过了50套限制
+                    msg = "下载的遥控器超过了套数限制";
+                } else if (errorCode == AppConst.CUSTOMER_DEVICE_NUM_LIMIT) {//设备总数超过了授权的额度
+                    msg = "设备总数超过了授权的额度";
+                }
+                SmartToast.show(msg);
+            }
+
         });
     }
     private void initCustomTimePicker() {
@@ -182,6 +362,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
                 .build();
         pickerBuilder.setNPicker(ContentConfig.getTimeHours(), ContentConfig.getTimeMin(), ContentConfig.getTimeSeco());
     }
+
     private void initData() {
         linkageID = getIntent().getStringExtra("linkageID");
 
@@ -231,27 +412,40 @@ public class LinkageSettingActivity extends AppCompatActivity {
         adapter = new LinkageSettingAdapter(mList);
         rvLinkageSetting.setAdapter(adapter);
 
-        if (timingId.equals("null")){
+        LinearLayoutManager manager_yk = new LinearLayoutManager(this);
+        manager_yk.setOrientation(LinearLayoutManager.VERTICAL);
+        rvHongwaiDevice.setLayoutManager(manager_yk);
+        adapter_yk = new LinkageYaoKongQiListAdapter(mList_yk);
+        rvHongwaiDevice.setAdapter(adapter_yk);
+
+
+        LinearLayoutManager manager_menu=new LinearLayoutManager(this);
+        manager_menu.setOrientation(LinearLayoutManager.VERTICAL);
+        rvDeviceMenu.setLayoutManager(manager_menu);
+        adapter_menu=new LinkageDeviceMenuAdapter(mList_menu);
+        rvDeviceMenu.setAdapter(adapter_menu);
+
+        if (timingId.equals("null")) {
             //设备联动
             addDeviceHeader();
-        }else {
+        } else {
             //时间联动
             addTimeHeader();
         }
     }
 
     private void addDeviceHeader() {
-        View view=getLayoutInflater().inflate(R.layout.device_linkage_head, (ViewGroup) rvLinkageSetting.getParent(),false);
+        View view = getLayoutInflater().inflate(R.layout.device_linkage_head, (ViewGroup) rvLinkageSetting.getParent(), false);
         adapter.addHeaderView(view);
         tv_device_name = view.findViewById(R.id.tv_device_linkage_name);
-        tv_device_cfgn=view.findViewById(R.id.tv_chufagn);
-        tv_device_cftj=view.findViewById(R.id.tv_chufatj);
-        ll_device=view.findViewById(R.id.ll_device);
+        tv_device_cfgn = view.findViewById(R.id.tv_chufagn);
+        tv_device_cftj = view.findViewById(R.id.tv_chufatj);
+        ll_device = view.findViewById(R.id.ll_device);
         iv_header = view.findViewById(R.id.iv_header);
         ll_device.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LinkageSettingActivity.this,DeviceTriggeredActivity.class).putExtra("LinkageData",linkage).putExtra("linkageID",linkageID));
+                startActivity(new Intent(LinkageSettingActivity.this, DeviceTriggeredActivity.class).putExtra("LinkageData", linkage).putExtra("linkageID", linkageID));
             }
         });
     }
@@ -265,13 +459,13 @@ public class LinkageSettingActivity extends AppCompatActivity {
         ll_dingshi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LinkageSettingActivity.this,TimeTriggeredActivity.class).putExtra("LinkageData",linkage));
+                startActivity(new Intent(LinkageSettingActivity.this, TimeTriggeredActivity.class).putExtra("LinkageData", linkage));
             }
         });
     }
 
 
-    @OnClick({R.id.iv_base_back, R.id.iv_linkage_edit, R.id.ll_add_device})
+    @OnClick({R.id.iv_base_back, R.id.iv_linkage_edit, R.id.ll_add_device,R.id.iv_device_back})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_linkage_edit:
@@ -284,6 +478,11 @@ public class LinkageSettingActivity extends AppCompatActivity {
                     drawerLayout.closeDrawers();
                 } else {
                     drawerLayout.openDrawer(GravityCompat.END);
+                    level=0;
+                    ivDeviceBack.setVisibility(View.INVISIBLE);
+                    rvLinkageDevice.setVisibility(View.VISIBLE);
+                    rvHongwaiDevice.setVisibility(View.GONE);
+                    rvDeviceMenu.setVisibility(View.GONE);
                 }
                 break;
             case R.id.iv_base_back:
@@ -291,6 +490,18 @@ public class LinkageSettingActivity extends AppCompatActivity {
                     drawerLayout.closeDrawers();
                 } else {
                     finish();
+                }
+                break;
+            case R.id.iv_device_back:
+                if (level==2){
+                    rvDeviceMenu.setVisibility(View.GONE);
+                    rvHongwaiDevice.setVisibility(View.VISIBLE);
+                    level=1;
+                }else if (level==1){
+                    rvHongwaiDevice.setVisibility(View.GONE);
+                    rvLinkageDevice.setVisibility(View.VISIBLE);
+                    ivDeviceBack.setVisibility(View.INVISIBLE);
+                    level=0;
                 }
                 break;
         }
@@ -315,7 +526,8 @@ public class LinkageSettingActivity extends AppCompatActivity {
             }
         }
     };
-    private List<String> mList_a= new ArrayList<>();
+    private List<String> mList_a = new ArrayList<>();
+
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -334,10 +546,10 @@ public class LinkageSettingActivity extends AppCompatActivity {
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
                 for (Activity activity : MyApp.mActivitys) {
                     String packageName = activity.getLocalClassName();
-                    Log.e("LLL",packageName);
+                    Log.e("LLL", packageName);
                     mList_a.add(packageName);
                 }
-                if (mList_a.get(mList_a.size()-1).equals("LinkageSettingActivity")){
+                if (mList_a.get(mList_a.size() - 1).equals("LinkageSettingActivity")) {
                     MyApp.finishAllActivity();
                     Intent intent = new Intent(LinkageSettingActivity.this, LoginActivity.class);
                     startActivity(intent);
@@ -350,6 +562,9 @@ public class LinkageSettingActivity extends AppCompatActivity {
                 //设备列表
                 parseDeviceData(payload);
             }
+            if (payload.contains("\"pn\":\"IRLTP\"")) {
+                parseDataHW(payload);
+            }
             if (payload.contains("\"pn\":\"LUTP\"")) {
 //                修改联动名称
                 try {
@@ -361,7 +576,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
                         }
                     }
 //                    SmartToast.show("修改成功");
-                    SPUtils.put(LinkageSettingActivity.this,"editLinkageName",true);
+                    SPUtils.put(LinkageSettingActivity.this, "editLinkageName", true);
                     mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -381,7 +596,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-            if (payload.contains("\"pn\":\"LTUTP\"")){
+            if (payload.contains("\"pn\":\"LTUTP\"")) {
 //                延时时间修改 LTUTP
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
@@ -395,7 +610,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-            if (payload.contains("\"pn\":\"LTATP\"")){
+            if (payload.contains("\"pn\":\"LTATP\"")) {
 //                联动添加设备 LTATP
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
@@ -415,6 +630,16 @@ public class LinkageSettingActivity extends AppCompatActivity {
         public void onClose(int code, String reason) {
             Log.e("TAG", "onClose");
         }
+    }
+
+    private void parseDataHW(String payload) {
+        YaoKongListBean yaoKongListBean = new Gson().fromJson(payload, YaoKongListBean.class);
+        List<YaoKongListBean.Irremotes> irremotes = yaoKongListBean.irremotes;
+        if (mList_yk.size() > 0) {
+            mList_yk.clear();
+        }
+        mList_yk.addAll(irremotes);
+        adapter_yk.notifyDataSetChanged();
     }
 
     private void parseDeviceData(String payload) {
@@ -438,7 +663,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
             linkage = linkageSettingBean.linkage;
             String name = linkageSettingBean.linkage.name;
             tvLinkageName.setText(name);
-            if (timingId.equals("null")){
+            if (timingId.equals("null")) {
                 //设备联动
                 String name1 = linkageSettingBean.linkage.device.name;
                 String name2 = linkageSettingBean.linkage.proAtt.name;
@@ -447,30 +672,30 @@ public class LinkageSettingActivity extends AppCompatActivity {
                 Glide.with(this).load(ContentConfig.drawableByIcon(linkageSettingBean.linkage.device.product.icon)).into(iv_header);
                 tv_device_cfgn.setText(name2);
                 int value = linkageSettingBean.linkage.value;
-                if (modelPath.equals("pro_switch")){
-                    if (value==0){
+                if (modelPath.equals("pro_switch")) {
+                    if (value == 0) {
                         tv_device_cftj.setText("关闭");
-                    }else {
+                    } else {
                         tv_device_cftj.setText("开启");
                     }
-                }else {
+                } else {
                     int value1 = linkageSettingBean.linkage.value;
                     int type = linkageSettingBean.linkage.type;
-                    if (type==-1){
-                        tv_device_cftj.setText("(>)"+value1);
-                    }else if (type==0){
-                        tv_device_cftj.setText("(=)"+value1);
-                    }else if (type==1){
-                        tv_device_cftj.setText("(<)"+value1);
+                    if (type == -1) {
+                        tv_device_cftj.setText("(>)" + value1);
+                    } else if (type == 0) {
+                        tv_device_cftj.setText("(=)" + value1);
+                    } else if (type == 1) {
+                        tv_device_cftj.setText("(<)" + value1);
                     }
                 }
-            }else {
+            } else {
                 //时间联动
                 String cronExpression = linkageSettingBean.linkage.timingRecord.cronExpression;
                 String timing = linkageSettingBean.linkage.timingRecord.timing;
-                if (TextUtils.isEmpty(cronExpression)){
+                if (TextUtils.isEmpty(cronExpression)) {
                     tv_time_mode.setText("仅一次");
-                }else {
+                } else {
                     tv_time_mode.setText(cronExpression);
                 }
                 tv_time_timing.setText(timing);
@@ -526,7 +751,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.e("TAG", "onstop");
-        SPUtils.put(this,"linkageRef",true);
+        SPUtils.put(this, "linkageRef", true);
         mConnection.disconnect();
     }
 }

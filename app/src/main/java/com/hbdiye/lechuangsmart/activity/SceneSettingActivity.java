@@ -35,17 +35,27 @@ import com.hbdiye.lechuangsmart.Global.ContentConfig;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.adapter.ImageAdapter;
+import com.hbdiye.lechuangsmart.adapter.LinkageDeviceMenuAdapter;
+import com.hbdiye.lechuangsmart.adapter.LinkageYaoKongQiListAdapter;
 import com.hbdiye.lechuangsmart.adapter.SceneSettingAdapter;
 import com.hbdiye.lechuangsmart.adapter.SceneSettingDeviceAdapter;
 import com.hbdiye.lechuangsmart.bean.ImageBean;
 import com.hbdiye.lechuangsmart.bean.SceneDeviceBean;
+import com.hbdiye.lechuangsmart.bean.YaoKongListBean;
+import com.hbdiye.lechuangsmart.util.Logger;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.hbdiye.lechuangsmart.views.SceneDialog;
+import com.hzy.tvmao.KookongSDK;
+import com.hzy.tvmao.interf.IRequestResult;
+import com.kookong.app.data.AppConst;
+import com.kookong.app.data.IrData;
+import com.kookong.app.data.IrDataList;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -54,6 +64,17 @@ import butterknife.OnClick;
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
+
+import static com.hzy.tvmao.ir.Device.AC;
+import static com.hzy.tvmao.ir.Device.AIR_CLEANER;
+import static com.hzy.tvmao.ir.Device.BOX;
+import static com.hzy.tvmao.ir.Device.DVD;
+import static com.hzy.tvmao.ir.Device.FAN;
+import static com.hzy.tvmao.ir.Device.PA;
+import static com.hzy.tvmao.ir.Device.PRO;
+import static com.hzy.tvmao.ir.Device.SLR;
+import static com.hzy.tvmao.ir.Device.STB;
+import static com.hzy.tvmao.ir.Device.TV;
 
 public class SceneSettingActivity extends AppCompatActivity {
     @BindView(R.id.iv_base_back)
@@ -78,6 +99,12 @@ public class SceneSettingActivity extends AppCompatActivity {
     RecyclerView rvSceneDevice;
     @BindView(R.id.iv_scene_setting_icon)
     ImageView ivSceneSettingIcon;
+    @BindView(R.id.iv_device_back)
+    ImageView ivDeviceBack;
+    @BindView(R.id.rv_hongwai_device)
+    RecyclerView rvHongwaiDevice;
+    @BindView(R.id.rv_device_menu)
+    RecyclerView rvDeviceMenu;
     private boolean isOpen = false;//默认侧边栏关闭
     private String sceneID = "";
 
@@ -90,6 +117,14 @@ public class SceneSettingActivity extends AppCompatActivity {
 
     private SceneSettingDeviceAdapter mAdapter;
     private List<SceneDeviceBean.Devices> mList_device = new ArrayList<>();
+
+    //遥控列表
+    private List<YaoKongListBean.Irremotes> mList_yk = new ArrayList<>();
+    private LinkageYaoKongQiListAdapter adapter_yk;
+
+    //遥控按钮
+    private ArrayList<IrData.IrKey> mList_menu=new ArrayList<>();
+    private LinkageDeviceMenuAdapter adapter_menu;
 
     private TimePickerView timePickerView;
     private OptionsPickerView pickerBuilder;
@@ -104,7 +139,9 @@ public class SceneSettingActivity extends AppCompatActivity {
     private PopupWindow popupWindow;
     private RecyclerView rv_image_list;
 
-    private List<ImageBean> mList_image=new ArrayList<>();
+    private List<ImageBean> mList_image = new ArrayList<>();
+
+    private int level=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +160,7 @@ public class SceneSettingActivity extends AppCompatActivity {
         int position0 = ContentConfig.getHourPosition(split[0]);
         int position1 = ContentConfig.getMandSPosition(split[1]);
         int position2 = ContentConfig.getMandSPosition(split[2]);
-        Log.e("fff",position0+" "+position1+"   "+position2+"   "+timing);
+        Log.e("fff", position0 + " " + position1 + "   " + position2 + "   " + timing);
         pickerBuilder = new OptionsPickerBuilder(this, new OnOptionsSelectListener() {
             @Override
             public void onOptionsSelect(int options1, int options2, int options3, View v) {
@@ -134,7 +171,7 @@ public class SceneSettingActivity extends AppCompatActivity {
             }
         }).setLabels("时", "分", "秒")
                 .isCenterLabel(true)
-                .setSelectOptions(position0,position1,position2)
+                .setSelectOptions(position0, position1, position2)
                 .build();
         pickerBuilder.setNPicker(ContentConfig.getTimeHours(), ContentConfig.getTimeMin(), ContentConfig.getTimeSeco());
     }
@@ -196,11 +233,152 @@ public class SceneSettingActivity extends AppCompatActivity {
         mAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                mConnection.sendTextMessage("{\"pn\":\"STATP\",\"sceneID\":\"" + sceneID + "\",\"deviceID\":\"" + sceneDeviceBean.devices.get(position).id + "\",\"proActID\":\"" + sceneDeviceBean.devices.get(position).product.proacts.get(0).id + "\",\"type\":\"0\",\"delaytime\":\"0\"}");
+                if (mList_device.get(position).product.modelPath.equals("pro_dispatcher")) {
+                    level=1;
+                    mList_yk.clear();
+                    adapter_yk.notifyDataSetChanged();
+                    rvSceneDevice.setVisibility(View.GONE);
+                    ivDeviceBack.setVisibility(View.VISIBLE);
+                    rvHongwaiDevice.setVisibility(View.VISIBLE);
+                    mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + mList_device.get(position).id + "\"}");
+                } else {
+                    mConnection.sendTextMessage("{\"pn\":\"STATP\",\"sceneID\":\"" + sceneID + "\",\"deviceID\":\"" + sceneDeviceBean.devices.get(position).id + "\",\"proActID\":\"" + sceneDeviceBean.devices.get(position).product.proacts.get(0).id + "\",\"type\":\"0\",\"delaytime\":\"0\"}");
+                }
+            }
+        });
+        //遥控列表
+        adapter_yk.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                level=2;
+                mList_menu.clear();
+                adapter_menu.notifyDataSetChanged();
+                ivDeviceBack.setVisibility(View.VISIBLE);
+                rvSceneDevice.setVisibility(View.GONE);
+                rvHongwaiDevice.setVisibility(View.GONE);
+                rvDeviceMenu.setVisibility(View.VISIBLE);
+
+                String rtype = mList_yk.get(position).rtype;
+                String rid = mList_yk.get(position).rid;
+                if (rtype.equals("TV")) {
+                    getIRDataById(rid,TV);
+                }else if (rtype.equals("BOX")){
+                    getIRDataById(rid,BOX);
+                }else if (rtype.equals("STB")){
+                    getIRDataById(rid,STB);
+                }else if (rtype.equals("DVD")){
+                    getIRDataById(rid,DVD);
+                }else if (rtype.equals("AC")){
+                    getNoStateIRDataById(rid,AC);
+                }else if (rtype.equals("PRO")){
+                    getIRDataById(rid,PRO);
+                }else if (rtype.equals("PA")){
+                    getIRDataById(rid,PA);
+                }else if (rtype.equals("FAN")){
+                    getIRDataById(rid,FAN);
+                }else if (rtype.equals("SLR")){
+                    getIRDataById(rid,SLR);
+                }else if (rtype.equals("AIR_CLEANER")){
+                    getIRDataById(rid,AIR_CLEANER);
+                }
+            }
+        });
+    }
+    /**
+     * 电视
+     */
+    private void getIRDataById(String rid,int type) {
+        KookongSDK.getIRDataById(rid, type, true, new IRequestResult<IrDataList>() {
+
+            @Override
+            public void onSuccess(String msg, IrDataList result) {
+                List<IrData> irDatas = result.getIrDataList();
+                ArrayList<IrData.IrKey> keys = irDatas.get(0).keys;
+
+                if (mList_menu.size() > 0) {
+                    mList_menu.clear();
+                }
+                mList_menu.addAll(keys);
+                adapter_menu.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFail(Integer errorCode, String msg) {
+                //按红外设备授权的客户，才会用到这两个值
+                if (errorCode == AppConst.CUSTOMER_DEVICE_REMOTE_NUM_LIMIT) {//同一个设备下载遥控器超过了50套限制
+                    msg = "下载的遥控器超过了套数限制";
+                } else if (errorCode == AppConst.CUSTOMER_DEVICE_NUM_LIMIT) {//设备总数超过了授权的额度
+                    msg = "设备总数超过了授权的额度";
+                }
+                SmartToast.show(msg);
+
             }
         });
     }
 
+    /**
+     * 空调
+     */
+    public void getNoStateIRDataById(String rid,int type){
+        KookongSDK.getNoStateIRDataById(rid + "", type, true, new IRequestResult<IrDataList>() {
+
+            @Override
+            public void onSuccess(String msg, IrDataList result) {
+                List<IrData> irDatas = result.getIrDataList();
+                for (int i = 0; i < irDatas.size(); i++) {
+                    IrData irData = irDatas.get(i);
+                    Logger.d("空调：" + irData.rid);
+                    //空调支持的模式、温度、风速
+                    HashMap<Integer, String> exts = irData.exts;
+                    //遥控器参数
+                    //空调的组合按键
+                    ArrayList<IrData.IrKey> keyList = irData.keys;
+                    if (mList_menu.size() > 0) {
+                        mList_menu.clear();
+                    }
+
+                    String keySize = irData.rid + "的组合按键个数：" + (keyList == null ? "0" : keyList.size()) + "\n";
+                    Logger.d(keySize);
+                    if (keyList != null) {
+                        IrData.IrKey irKey = keyList.get(0);
+                        Logger.d("按键参数：" + irKey.fkey + "=" + irKey.pulse);
+                        IrData.IrKey irKey1 = keyList.get(1);
+                        Logger.d("按键参数：" + irKey1.fkey + "=" + irKey1.pulse);
+                        IrData.IrKey irKey2 = keyList.get(keyList.size() - 1);
+                        Logger.d("按键参数：" + irKey2.fkey + "=" + irKey2.pulse);
+                        String power_on = irKey.pulse.replace(" ", "").replace(",", "");
+                        String power_off = irKey2.pulse.replace(" ", "").replace(",", "");
+
+                        String default_fpulse = irKey1.pulse.replace(" ", "").replace(",", "");
+//                        String data = "{\"pn\":\"IRTP\", \"sdMAC\":\"" + mac + "\", \"rcode\":\"" + rcode + "\",\"fpulse\":\"" + replace + "\"}}";
+//                        mConnection.sendTextMessage(data);
+                        IrData.IrKey irdata_irkey=new IrData.IrKey();
+                        irdata_irkey.fname="开";
+                        irdata_irkey.pulse=power_on;
+                        IrData.IrKey irdata_irkey1=new IrData.IrKey();
+                        irdata_irkey1.fname="关";
+                        irdata_irkey1.pulse=power_off;
+                        mList_menu.add(irdata_irkey);
+                        mList_menu.add(irdata_irkey1);
+                    }
+
+                    adapter_menu.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFail(Integer errorCode, String msg) {
+                //按红外设备授权的客户，才会用到这两个值
+                if (errorCode == AppConst.CUSTOMER_DEVICE_REMOTE_NUM_LIMIT) {//同一个设备下载遥控器超过了50套限制
+                    msg = "下载的遥控器超过了套数限制";
+                } else if (errorCode == AppConst.CUSTOMER_DEVICE_NUM_LIMIT) {//设备总数超过了授权的额度
+                    msg = "设备总数超过了授权的额度";
+                }
+                SmartToast.show(msg);
+            }
+
+        });
+    }
     private void initData() {
         sceneID = getIntent().getStringExtra("sceneID");
         mobilephone = (String) SPUtils.get(this, "mobilephone", "");
@@ -212,20 +390,62 @@ public class SceneSettingActivity extends AppCompatActivity {
     }
 
     private void initImageData() {
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.changjing1);setIconName("changjing1");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.huijia);setIconName("changjing2");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.youxi);setIconName("changjing3");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.ipod);setIconName("changjing4");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.zixingche);setIconName("changjing5");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.chuang);setIconName("changjing6");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.jita);setIconName("changjing7");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.dianhua);setIconName("changjing8");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.dangao);setIconName("changjing9");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.guangdie);setIconName("changjing10");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.erji);setIconName("changjing11");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.suo);setIconName("changjing12");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.kaisuo);setIconName("changjing13");}});
-        mList_image.add(new ImageBean(){{setDrawableId(R.mipmap.mojing);setIconName("changjing14");}});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.changjing1);
+            setIconName("changjing1");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.huijia);
+            setIconName("changjing2");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.youxi);
+            setIconName("changjing3");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.ipod);
+            setIconName("changjing4");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.zixingche);
+            setIconName("changjing5");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.chuang);
+            setIconName("changjing6");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.jita);
+            setIconName("changjing7");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.dianhua);
+            setIconName("changjing8");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.dangao);
+            setIconName("changjing9");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.guangdie);
+            setIconName("changjing10");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.erji);
+            setIconName("changjing11");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.suo);
+            setIconName("changjing12");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.kaisuo);
+            setIconName("changjing13");
+        }});
+        mList_image.add(new ImageBean() {{
+            setDrawableId(R.mipmap.mojing);
+            setIconName("changjing14");
+        }});
     }
 
     private void initView() {
@@ -267,9 +487,22 @@ public class SceneSettingActivity extends AppCompatActivity {
         rvSceneDevice.setLayoutManager(manager1);
         mAdapter = new SceneSettingDeviceAdapter(mList_device);
         rvSceneDevice.setAdapter(mAdapter);
+
+        LinearLayoutManager manager_yk = new LinearLayoutManager(this);
+        manager_yk.setOrientation(LinearLayoutManager.VERTICAL);
+        rvHongwaiDevice.setLayoutManager(manager_yk);
+        adapter_yk = new LinkageYaoKongQiListAdapter(mList_yk);
+        rvHongwaiDevice.setAdapter(adapter_yk);
+
+
+        LinearLayoutManager manager_menu=new LinearLayoutManager(this);
+        manager_menu.setOrientation(LinearLayoutManager.VERTICAL);
+        rvDeviceMenu.setLayoutManager(manager_menu);
+        adapter_menu=new LinkageDeviceMenuAdapter(mList_menu);
+        rvDeviceMenu.setAdapter(adapter_menu);
     }
 
-    @OnClick({R.id.iv_base_back, R.id.iv_base_right, R.id.iv_scene_edit, R.id.ll_add_device, R.id.iv_scene_setting_icon})
+    @OnClick({R.id.iv_base_back, R.id.iv_base_right, R.id.iv_scene_edit, R.id.ll_add_device, R.id.iv_scene_setting_icon,R.id.iv_device_back})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_scene_edit:
@@ -282,6 +515,11 @@ public class SceneSettingActivity extends AppCompatActivity {
                     drawerLayout.closeDrawers();
                 } else {
                     drawerLayout.openDrawer(GravityCompat.END);
+                    level=0;
+                    ivDeviceBack.setVisibility(View.INVISIBLE);
+                    rvSceneDevice.setVisibility(View.VISIBLE);
+                    rvHongwaiDevice.setVisibility(View.GONE);
+                    rvDeviceMenu.setVisibility(View.GONE);
                 }
                 break;
             case R.id.iv_base_back:
@@ -294,11 +532,23 @@ public class SceneSettingActivity extends AppCompatActivity {
             case R.id.iv_scene_setting_icon:
                 showPopWindow(getView());
                 break;
+            case R.id.iv_device_back:
+                if (level==2){
+                    rvDeviceMenu.setVisibility(View.GONE);
+                    rvHongwaiDevice.setVisibility(View.VISIBLE);
+                    level=1;
+                }else if (level==1){
+                    rvHongwaiDevice.setVisibility(View.GONE);
+                    rvSceneDevice.setVisibility(View.VISIBLE);
+                    ivDeviceBack.setVisibility(View.INVISIBLE);
+                    level=0;
+                }
+                break;
         }
     }
 
     private void showPopWindow(View view) {
-        popupWindow=new PopupWindow(view, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow = new PopupWindow(view, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
         ColorDrawable cd = new ColorDrawable(0x00ffffff);// 背景颜色全透明
@@ -316,23 +566,25 @@ public class SceneSettingActivity extends AppCompatActivity {
             }
         });
     }
+
     // 设置popupWindow背景半透明
     public void backgroundAlpha(float bgAlpha) {
         WindowManager.LayoutParams lp = getWindow().getAttributes();
         lp.alpha = bgAlpha;// 0.0-1.0
         getWindow().setAttributes(lp);
     }
+
     private View getView() {
-        View view= LayoutInflater.from(this).inflate(R.layout.popup_image_list,null);
+        View view = LayoutInflater.from(this).inflate(R.layout.popup_image_list, null);
         rv_image_list = view.findViewById(R.id.rv_image_list);
-        rv_image_list.setLayoutManager(new GridLayoutManager(this,9));
-        ImageAdapter imageAdapter=new ImageAdapter(mList_image);
+        rv_image_list.setLayoutManager(new GridLayoutManager(this, 9));
+        ImageAdapter imageAdapter = new ImageAdapter(mList_image);
         rv_image_list.setAdapter(imageAdapter);
         imageAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 String s = tvSceneName.getText().toString();
-                mConnection.sendTextMessage("{\"pn\":\"SUTP\",\"sceneID\":\"" + sceneID + "\",\"icon\":\""+mList_image.get(position).getIconName()+"\",\"name\":\"" + s + "\"}");
+                mConnection.sendTextMessage("{\"pn\":\"SUTP\",\"sceneID\":\"" + sceneID + "\",\"icon\":\"" + mList_image.get(position).getIconName() + "\",\"name\":\"" + s + "\"}");
                 popupWindow.dismiss();
             }
         });
@@ -390,17 +642,20 @@ public class SceneSettingActivity extends AppCompatActivity {
             if (payload.contains("\"pn\":\"STLTP\"")) {
                 parseData(payload);
             }
+            if (payload.contains("\"pn\":\"IRLTP\"")) {
+                parseDataHW(payload);
+            }
             if (payload.contains("\"pn\":\"SUTP\"")) {
                 //修改场景名称
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     if (status) {
-                        if (sceneDialog!=null){
+                        if (sceneDialog != null) {
                             sceneDialog.dismiss();
                         }
                         SmartToast.show("修改成功");
-                        SPUtils.put(SceneSettingActivity.this,"editSceneName",true);
+                        SPUtils.put(SceneSettingActivity.this, "editSceneName", true);
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
                     }
                 } catch (JSONException e) {
@@ -451,7 +706,15 @@ public class SceneSettingActivity extends AppCompatActivity {
             Log.e("TAG", "onClose");
         }
     }
-
+    private void parseDataHW(String payload) {
+        YaoKongListBean yaoKongListBean = new Gson().fromJson(payload, YaoKongListBean.class);
+        List<YaoKongListBean.Irremotes> irremotes = yaoKongListBean.irremotes;
+        if (mList_yk.size() > 0) {
+            mList_yk.clear();
+        }
+        mList_yk.addAll(irremotes);
+        adapter_yk.notifyDataSetChanged();
+    }
     private void parseData(String payload) {
         try {
             sceneDeviceBean = new Gson().fromJson(payload, SceneDeviceBean.class);
