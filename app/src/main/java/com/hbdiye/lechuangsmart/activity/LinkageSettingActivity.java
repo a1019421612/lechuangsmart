@@ -1,8 +1,11 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GravityCompat;
@@ -30,6 +33,7 @@ import com.google.gson.JsonSyntaxException;
 import com.hbdiye.lechuangsmart.Global.ContentConfig;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.adapter.LinkageDeviceMenuAdapter;
 import com.hbdiye.lechuangsmart.adapter.LinkageSettingAdapter;
 import com.hbdiye.lechuangsmart.adapter.LinkageSettingDeviceAdapter;
@@ -105,8 +109,9 @@ public class LinkageSettingActivity extends AppCompatActivity {
     private boolean isOpen = false;//默认侧边栏关闭
 
     private WebSocketConnection mConnection;
-    private String mobilephone;
-    private String password;
+    private HomeReceiver homeReceiver;
+//    private String mobilephone;
+//    private String password;
 
     private String linkageID = "";
 
@@ -141,6 +146,9 @@ public class LinkageSettingActivity extends AppCompatActivity {
     private ImageView iv_header;
 
     private int level=0;
+    private LinkageDeviceBean.Devices devices;
+    private YaoKongListBean.Irremotes irremotes;
+    private String rcode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,6 +209,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
         mAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                devices = mList_device.get(position);
                 if (mList_device.get(position).product.modelPath.equals("pro_dispatcher")) {
                     level=1;
                     mList_yk.clear();
@@ -225,7 +234,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
                 rvLinkageDevice.setVisibility(View.GONE);
                 rvHongwaiDevice.setVisibility(View.GONE);
                 rvDeviceMenu.setVisibility(View.VISIBLE);
-
+                irremotes = mList_yk.get(position);
                 String rtype = mList_yk.get(position).rtype;
                 String rid = mList_yk.get(position).rid;
                 if (rtype.equals("TV")) {
@@ -251,6 +260,16 @@ public class LinkageSettingActivity extends AppCompatActivity {
                 }
             }
         });
+        adapter_menu.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                String data="{\"pn\":\"LTATP\",\"linkageID\":\""+linkageID+"\",\"deviceID\":\""+devices.id+"\",\"proActID\":\""+devices.product.proacts.get(0).id+"\",\"param\":\""+irremotes.id+"\",\"type\":\"1\",\"delaytime\":null,\"rcode\":\""+rcode+"\",\"fpulse\":\""+mList_menu.get(position).pulse.replace(" ", "").replace(",", "")+"\",\"irremoteid\":\""+irremotes.id+"\",\"proname\":\""+mList_menu.get(position).fname+"\"}";
+                Log.e("TTT",data);
+                mConnection.sendTextMessage(data);
+//                mConnection.sendTextMessage("{\"pn\":\"LTATP\",\"linkageID\":\""+linkageID+"\",\"deviceID\":\""+devices.id+"\",\"proActID\":\""+devices.product.proacts.get(0).id+"\",\"param\":\""+irremotes.id+"\",\"type\":\"1\",\"delaytime\":null,\"rcode\":\""+mList_menu.get(0).exts.get(99999)+"\",\"fpulse\":\""+mList_menu.get(position).pulse+"\",\"irremoteid\":\""+irremotes.id+"\",\"proname\":\"%@\"}");
+                drawerLayout.closeDrawers();
+            }
+        });
     }
 
     /**
@@ -262,6 +281,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
             @Override
             public void onSuccess(String msg, IrDataList result) {
                 List<IrData> irDatas = result.getIrDataList();
+                rcode = irDatas.get(0).exts.get(99999);
                 ArrayList<IrData.IrKey> keys = irDatas.get(0).keys;
 
                 if (mList_menu.size() > 0) {
@@ -299,6 +319,7 @@ public class LinkageSettingActivity extends AppCompatActivity {
                     Logger.d("空调：" + irData.rid);
                     //空调支持的模式、温度、风速
                     HashMap<Integer, String> exts = irData.exts;
+                    rcode = exts.get(99999);
                     //遥控器参数
                     //空调的组合按键
                     ArrayList<IrData.IrKey> keyList = irData.keys;
@@ -366,10 +387,20 @@ public class LinkageSettingActivity extends AppCompatActivity {
     private void initData() {
         linkageID = getIntent().getStringExtra("linkageID");
 
-        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
-        password = (String) SPUtils.get(this, "password", "");
-        mConnection = new WebSocketConnection();
-        socketConnection();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("LCTP");
+        intentFilter.addAction("LDLTP");
+        intentFilter.addAction("IRLTP");
+        intentFilter.addAction("LUTP");
+        intentFilter.addAction("LTDTP");
+        intentFilter.addAction("LTUTP");
+        intentFilter.addAction("LTATP");
+        homeReceiver = new HomeReceiver();
+        registerReceiver(homeReceiver,intentFilter);
+        mConnection = SingleWebSocketConnection.getInstance();
+        mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
+        mConnection.sendTextMessage("{\"pn\":\"LDLTP\",\"type\":1}");
+//        socketConnection();
     }
 
     private void initView() {
@@ -464,6 +495,11 @@ public class LinkageSettingActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(homeReceiver);
+    }
 
     @OnClick({R.id.iv_base_back, R.id.iv_linkage_edit, R.id.ll_add_device,R.id.iv_device_back})
     public void onViewClicked(View view) {
@@ -526,6 +562,85 @@ public class LinkageSettingActivity extends AppCompatActivity {
             }
         }
     };
+    class HomeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String payload = intent.getStringExtra("message");
+            if (action.equals("LLTP")){
+                parseData(payload);
+            }if (action.equals("LCTP")) {
+                parseData(payload);
+            }
+            if (action.equals("LDLTP")) {
+                //设备列表
+                parseDeviceData(payload);
+            }
+            if (action.equals("IRLTP")) {
+                parseDataHW(payload);
+            }
+            if (action.equals("LUTP")) {
+//                修改联动名称
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status) {
+                        if (sceneDialog != null) {
+                            sceneDialog.dismiss();
+                        }
+                    }
+//                    SmartToast.show("修改成功");
+                    SPUtils.put(LinkageSettingActivity.this, "editLinkageName", true);
+                    mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (action.equals("LTDTP")) {
+//                删除联动设备 LTDTP
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status) {
+                        SmartToast.show("修改成功");
+                        mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (action.equals("LTUTP")) {
+//                延时时间修改 LTUTP
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status) {
+                        SmartToast.show("修改成功");
+                        mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (action.equals("LTATP")) {
+//                联动添加设备 LTATP
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status) {
+                        mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
+                        drawerLayout.closeDrawers();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
     private List<String> mList_a = new ArrayList<>();
 
     class MyWebSocketHandler extends WebSocketHandler {
@@ -722,15 +837,15 @@ public class LinkageSettingActivity extends AppCompatActivity {
         }
     }
 
-    private void socketConnection() {
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
-    }
+//    private void socketConnection() {
+//        try {
+//            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+//
+//        } catch (WebSocketException e) {
+//            e.printStackTrace();
+//            SmartToast.show("网络连接错误");
+//        }
+//    }
 
 //    @Override
 //    protected void onStop() {
@@ -739,19 +854,19 @@ public class LinkageSettingActivity extends AppCompatActivity {
 //        mConnection.disconnect();
 //    }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.e("TAG", "onrestart");
-        mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
-        mConnection.sendTextMessage("{\"pn\":\"LDLTP\",\"type\":1}");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.e("TAG", "onstop");
-        SPUtils.put(this, "linkageRef", true);
-        mConnection.disconnect();
-    }
+//    @Override
+//    protected void onRestart() {
+//        super.onRestart();
+//        Log.e("TAG", "onrestart");
+//        mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
+//        mConnection.sendTextMessage("{\"pn\":\"LDLTP\",\"type\":1}");
+//    }
+//
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        Log.e("TAG", "onstop");
+//        SPUtils.put(this, "linkageRef", true);
+//        mConnection.disconnect();
+//    }
 }

@@ -1,7 +1,10 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +15,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.adapter.FamilyMemberAdapter;
 import com.hbdiye.lechuangsmart.bean.FamilyNameBean;
 import com.hbdiye.lechuangsmart.util.SPUtils;
@@ -29,9 +33,7 @@ public class FamilyMemberActivity extends BaseActivity {
     @BindView(R.id.rv_member_list)
     RecyclerView rvMemberList;
     private WebSocketConnection mConnection;
-    private String mobilephone;
-    private String password;
-
+    private HomeReceiver homeReceiver;
     private List<FamilyNameBean.FamilyUsers> mList=new ArrayList<>();
     private FamilyMemberAdapter adapter;
 
@@ -39,20 +41,12 @@ public class FamilyMemberActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
-        password = (String) SPUtils.get(this, "password", "");
-        mConnection = new WebSocketConnection();
-        socketConnect();
-    }
-
-    private void socketConnect() {
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new FamilyMemberWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("UITP");
+        homeReceiver = new HomeReceiver();
+        registerReceiver(homeReceiver,intentFilter);
+        mConnection = SingleWebSocketConnection.getInstance();
+        mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
     }
 
     @Override
@@ -73,7 +67,17 @@ public class FamilyMemberActivity extends BaseActivity {
     protected int getLayoutID() {
         return R.layout.activity_family_member;
     }
+    class HomeReceiver extends BroadcastReceiver {
 
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String payload = intent.getStringExtra("message");
+            if (action.equals("UITP")) {
+                parseData(payload);
+            }
+        }
+    }
     class FamilyMemberWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -116,26 +120,12 @@ public class FamilyMemberActivity extends BaseActivity {
             e.printStackTrace();
         }
     }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.e(TAG, "onstop");
-        mConnection.disconnect();
-    }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.e(TAG, "onrestart");
-        if (mConnection != null) {
-            socketConnect();
-        }
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.e(TAG, "onstop");
-        mConnection.disconnect();
+        unregisterReceiver(homeReceiver);
     }
 }

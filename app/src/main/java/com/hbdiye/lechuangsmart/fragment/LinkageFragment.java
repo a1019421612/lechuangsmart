@@ -2,8 +2,11 @@ package com.hbdiye.lechuangsmart.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,6 +29,7 @@ import com.google.gson.JsonSyntaxException;
 import com.hbdiye.lechuangsmart.MainActivity;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.activity.DeviceTriggeredActivity;
 import com.hbdiye.lechuangsmart.activity.LinkageSettingActivity;
 import com.hbdiye.lechuangsmart.activity.LoginActivity;
@@ -60,6 +64,7 @@ public class LinkageFragment extends Fragment {
     private Unbinder unbinder;
 
     private WebSocketConnection mConnection;
+    private HomeReceiver homeReceiver;
     private String mobilephone;
     private String password;
 
@@ -76,20 +81,31 @@ public class LinkageFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_linkage, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        mConnection = new WebSocketConnection();
-        mobilephone = (String) SPUtils.get(getActivity(), "mobilephone", "");
-        password = (String) SPUtils.get(getActivity(), "password", "");
-
+        mConnection = SingleWebSocketConnection.getInstance();
+        mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("LLTP");
+        intentFilter.addAction("LUTP");
+        intentFilter.addAction("LDTP");
+        intentFilter.addAction("LATP");
+        homeReceiver = new HomeReceiver();
+        getActivity().registerReceiver(homeReceiver,intentFilter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvLinkage.setLayoutManager(manager);
         adapter = new LinkageAdapter(mList);
         rvLinkage.setAdapter(adapter);
 
-        socketConnect();
+//        socketConnect();
 
         handleClick();
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
     }
 
     private void handleClick() {
@@ -156,6 +172,7 @@ public class LinkageFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        getActivity().unregisterReceiver(homeReceiver);
     }
 
     @OnClick({R.id.iv_linkage_edit, R.id.ll_add_linkage})
@@ -197,15 +214,69 @@ public class LinkageFragment extends Fragment {
         }
     }
 
-    private void socketConnect() {
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyLinkageWebSocketHandler());
+//    private void socketConnect() {
+//        try {
+//            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyLinkageWebSocketHandler());
+//
+//        } catch (WebSocketException e) {
+//            e.printStackTrace();
+//            SmartToast.show("网络连接错误");
+//        }
+//    }
+class HomeReceiver extends BroadcastReceiver {
 
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        String action = intent.getAction();
+        String message = intent.getStringExtra("message");
+        if (action.equals("LLTP")){
+            parseData(message);
         }
+        if (action.equals("LUTP")){
+//                修改联动名称
+            try {
+                JSONObject jsonObject = new JSONObject(message);
+                boolean status = jsonObject.getBoolean("status");
+                if (sceneDialog != null) {
+                    sceneDialog.dismiss();
+                }
+                mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
+//                    SmartToast.show("修改成功");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        if (action.equals("LDTP")){
+            //删除联动
+            try {
+                JSONObject jsonObject = new JSONObject(message);
+                boolean status = jsonObject.getBoolean("status");
+                mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        if (action.equals("LATP")) {
+            //LATP
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject(message);
+                boolean status = jsonObject.getBoolean("status");
+                if (status) {
+                    mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
+                    JSONObject linkage = jsonObject.getJSONObject("linkage");
+                    String linkageID = linkage.getString("id");
+                    String timingID = linkage.getString("timingID");
+                    startActivity(new Intent(getActivity(), LinkageSettingActivity.class).putExtra("linkageID", linkageID).putExtra("timingId", timingID));
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
+}
     private List<String> mList_a= new ArrayList<>();
     class MyLinkageWebSocketHandler extends WebSocketHandler {
         @Override
@@ -318,40 +389,48 @@ public class LinkageFragment extends Fragment {
 //        mConnection.disconnect();
 //    }
 //
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.e(TAG, "onResume");
-        boolean editLinkageName = (boolean) SPUtils.get(getActivity(), "editLinkageName", false);
-        boolean linkageRef = (boolean) SPUtils.get(getActivity(), "linkageRef", false);
-        if (editLinkageName){
-            mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
-            SPUtils.remove(getActivity(),"editLinkageName");
-        }
-        if (linkageRef){
-            mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
-            SPUtils.remove(getActivity(),"linkageRef");
-        }
-    }
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        Log.e(TAG, "onResume");
+//        boolean editLinkageName = (boolean) SPUtils.get(getActivity(), "editLinkageName", false);
+//        boolean linkageRef = (boolean) SPUtils.get(getActivity(), "linkageRef", false);
+//        if (editLinkageName){
+//            try {
+//                mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            SPUtils.remove(getActivity(),"editLinkageName");
+//        }
+//        if (linkageRef){
+//            try {
+//                mConnection.sendTextMessage("{\"pn\":\"LLTP\"}");
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            SPUtils.remove(getActivity(),"linkageRef");
+//        }
+//    }
 
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        if (hidden) {
-            // 隐藏
-            Log.e(TAG, "linkage" + "隐藏");
-            mConnection.disconnect();
-            boolean connected = mConnection.isConnected();
-            Log.e(TAG, "是否断开连接" + connected);
-        } else {
-            // 可视
-            Log.e(TAG, "linkage" + "显示");
-            socketConnect();
-        }
-    }
+//    @Override
+//    public void onHiddenChanged(boolean hidden) {
+//        if (hidden) {
+//            // 隐藏
+//            Log.e(TAG, "linkage" + "隐藏");
+//            mConnection.disconnect();
+//            boolean connected = mConnection.isConnected();
+//            Log.e(TAG, "是否断开连接" + connected);
+//        } else {
+//            // 可视
+//            Log.e(TAG, "linkage" + "显示");
+//            socketConnect();
+//        }
+//    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mConnection.disconnect();
-    }
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        mConnection.disconnect();
+//    }
 }

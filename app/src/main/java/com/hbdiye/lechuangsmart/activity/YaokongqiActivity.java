@@ -1,7 +1,10 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +16,7 @@ import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.adapter.KaiGuanAdapter;
 import com.hbdiye.lechuangsmart.adapter.YaoKongAdapter;
 import com.hbdiye.lechuangsmart.bean.KaiGuanBean;
@@ -38,19 +42,21 @@ public class YaokongqiActivity extends BaseActivity {
     @BindView(R.id.rv_yaokong)
     RecyclerView rvYaokong;
     private WebSocketConnection mConnection;
-    private String mobilephone;
-    private String password;
-
+    private HomeReceiver homeReceiver;
     private List<YaoKongBean.Devices> mList = new ArrayList<>();
     private YaoKongAdapter adapter;
     private List<Boolean> mList_status = new ArrayList<>();
 
     @Override
     protected void initData() {
-        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
-        password = (String) SPUtils.get(this, "password", "");
-        mConnection = new WebSocketConnection();
-        socketConnect();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("DGLTP");
+        intentFilter.addAction("ATP");
+        intentFilter.addAction("SDOSTP");
+        homeReceiver = new HomeReceiver();
+        registerReceiver(homeReceiver,intentFilter);
+        mConnection = SingleWebSocketConnection.getInstance();
+        mConnection.sendTextMessage("{\"pn\":\"DGLTP\", \"classify\":\"protype\", \"id\":\"PROTYPE09\"}");
     }
 
     @Override
@@ -85,7 +91,36 @@ public class YaokongqiActivity extends BaseActivity {
     protected int getLayoutID() {
         return R.layout.activity_yaokongqi;
     }
+    class HomeReceiver extends BroadcastReceiver {
 
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String payload = intent.getStringExtra("message");
+            if (action.equals("DGLTP")) {
+                parseData(payload);
+            }
+            if (action.equals("ATP")){
+                mConnection.sendTextMessage("{\"pn\":\"DGLTP\", \"classify\":\"protype\", \"id\":\"PROTYPE09\"}");
+            }
+            if(action.equals("SDOSTP")){
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    String sdMAC = jsonObject.getString("sdMAC");
+                    //子设备在线
+                    for (int i = 0; i < mList.size(); i++) {
+                        if (mList.get(i).mac.equals(sdMAC)){
+                            mList_status.set(i,status);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
     private List<String> mList_a= new ArrayList<>();
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
@@ -173,19 +208,10 @@ public class YaokongqiActivity extends BaseActivity {
 //        }
 //    }
 
-    private void socketConnect() {
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mConnection.disconnect();
+       unregisterReceiver(homeReceiver);
     }
 }

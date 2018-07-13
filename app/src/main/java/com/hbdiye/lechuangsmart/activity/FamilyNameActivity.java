@@ -1,7 +1,10 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -18,6 +21,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.zxing.WriterException;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.bean.FamilyNameBean;
 import com.hbdiye.lechuangsmart.google.zxing.activity.CaptureActivity;
 import com.hbdiye.lechuangsmart.google.zxing.encoding.EncodingHandler;
@@ -59,8 +63,7 @@ public class FamilyNameActivity extends BaseActivity {
     @BindView(R.id.ll_phone)
     LinearLayout llPhone;
     private WebSocketConnection mConnection;
-    private String mobilephone;
-    private String password;
+    private HomeReceiver homeReceiver;
 
     private String TAG = FamilyNameActivity.class.getSimpleName();
     private String erCode = "";
@@ -71,17 +74,14 @@ public class FamilyNameActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
-        password = (String) SPUtils.get(this, "password", "");
-        mConnection = new WebSocketConnection();
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new FamilyNameWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
-
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("UITP");
+        intentFilter.addAction("UUITP");
+        intentFilter.addAction("UJFTP");
+        homeReceiver = new HomeReceiver();
+        registerReceiver(homeReceiver,intentFilter);
+        mConnection = SingleWebSocketConnection.getInstance();
+        mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
     }
 
     @Override
@@ -177,12 +177,53 @@ public class FamilyNameActivity extends BaseActivity {
             flag = true;
             erCode = data.getStringExtra("erCode");
             mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\"" + erCode + "\"} ");
-//            textview.setText(s);
+//            textview.setText(s);乐创家庭小乐4号
 //            SmartToast.show(erCode);
         }
     }
 
+    class HomeReceiver extends BroadcastReceiver {
 
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String payload = intent.getStringExtra("message");
+            if (action.equals("UITP")) {
+                parseData(payload);
+            }
+            if (action.equals("UUITP")){
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status){
+                        SmartToast.show("修改成功");
+                        if (sceneDialog!=null){
+                            sceneDialog.dismiss();
+                        }
+                        mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (action.equals("UJFTP")) {
+                //扫描加入家庭
+                flag = false;
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status) {
+                        SmartToast.show("成功加入家庭");
+                    } else {
+                        SmartToast.show("加入家庭失败");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+//                SmartToast.showLong(payload);
+            }
+        }
+    }
     private List<String> mList_a= new ArrayList<>();
     class FamilyNameWebSocketHandler extends WebSocketHandler {
         @Override
@@ -276,10 +317,6 @@ public class FamilyNameActivity extends BaseActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
 
 //    @Override
 //    protected void onStop() {
@@ -307,6 +344,6 @@ public class FamilyNameActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.e(TAG, "onstop");
-        mConnection.disconnect();
+        unregisterReceiver(homeReceiver);
     }
 }

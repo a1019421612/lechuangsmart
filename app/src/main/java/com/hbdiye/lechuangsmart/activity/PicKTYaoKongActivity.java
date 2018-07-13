@@ -1,7 +1,10 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +16,7 @@ import android.widget.TextView;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.util.Logger;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.hbdiye.lechuangsmart.util.TipsUtil;
@@ -55,8 +59,7 @@ public class PicKTYaoKongActivity extends BaseActivity {
     private int flag=0;//点击测试按钮标志
 
     private WebSocketConnection mConnection;
-    private String mobilephone;
-    private String password;
+    private HomeReceiver homeReceiver;
     private String mac;
     private String deviceId;
     private Integer rid;
@@ -65,10 +68,13 @@ public class PicKTYaoKongActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
-        password = (String) SPUtils.get(this, "password", "");
-        mConnection = new WebSocketConnection();
-        socketConnect();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("IRTP");
+        intentFilter.addAction("IRATP");
+        homeReceiver = new HomeReceiver();
+        registerReceiver(homeReceiver,intentFilter);
+        mConnection = SingleWebSocketConnection.getInstance();
+
         type = getIntent().getIntExtra("type", -1);
         brandId = getIntent().getIntExtra("brandId", -1);
         mac = getIntent().getStringExtra("mac");
@@ -209,6 +215,37 @@ public class PicKTYaoKongActivity extends BaseActivity {
             }
         });
     }
+    class HomeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String payload = intent.getStringExtra("message");
+            if (action.equals("IRTP")){
+
+                SmartToast.show(payload);
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (action.equals("IRATP")){
+                //添加红外遥控 IRATP
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status){
+                        sceneDialog.dismiss();
+                        startActivity(new Intent(PicKTYaoKongActivity.this,YaoKongListActivity.class));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -220,14 +257,6 @@ public class PicKTYaoKongActivity extends BaseActivity {
         public void onTextMessage(String payload) {
 
             Log.e("TAG", "onTextMessage" + payload);
-            if (payload.contains("{\"pn\":\"HRQP\"}")) {
-                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
-            }
-            if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                MyApp.finishAllActivity();
-                Intent intent = new Intent(PicKTYaoKongActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
             if (payload.contains("\"pn\":\"IRTP\"")){
 
                 SmartToast.show(payload);
@@ -295,33 +324,9 @@ public class PicKTYaoKongActivity extends BaseActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        mConnection.disconnect();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        if (mConnection != null) {
-            socketConnect();
-        }
-    }
-
-    private void socketConnect() {
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
-        mConnection.disconnect();
+        unregisterReceiver(homeReceiver);
     }
     private void acMode(JSONObject jo, String mode) throws JSONException {
         String speed = jo.optString("speed");

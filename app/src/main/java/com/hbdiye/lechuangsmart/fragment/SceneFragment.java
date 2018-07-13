@@ -1,7 +1,10 @@
 package com.hbdiye.lechuangsmart.fragment;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,6 +29,7 @@ import com.google.gson.JsonSyntaxException;
 import com.hbdiye.lechuangsmart.MainActivity;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.activity.LoginActivity;
 import com.hbdiye.lechuangsmart.activity.SceneSettingActivity;
 import com.hbdiye.lechuangsmart.adapter.SceneAdapter;
@@ -52,7 +56,8 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
     private LinearLayout ll_add_scene;
     SceneAdapter adapter;
 
-    private WebSocketConnection mSceneConnection;
+    private WebSocketConnection mConnection;
+    private HomeReceiver homeReceiver;
     private String mobilephone;
     private String password;
 
@@ -74,9 +79,18 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
         ll_add_scene = view.findViewById(R.id.ll_add_scene);
 
 //        adapter.expandAll();
-        mSceneConnection = new WebSocketConnection();
-        mobilephone = (String) SPUtils.get(getActivity(), "mobilephone", "");
-        password = (String) SPUtils.get(getActivity(), "password", "");
+        mConnection = SingleWebSocketConnection.getInstance();
+        mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("SLTP");
+        intentFilter.addAction("SSTP");
+        intentFilter.addAction("SUTP");
+        intentFilter.addAction("SDTP");
+        intentFilter.addAction("SATP");
+        homeReceiver = new HomeReceiver();
+        getActivity().registerReceiver(homeReceiver,intentFilter);
+//        mobilephone = (String) SPUtils.get(getActivity(), "mobilephone", "");
+//        password = (String) SPUtils.get(getActivity(), "password", "");
 
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -84,7 +98,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
         adapter = new SceneAdapter(mList);
         mRecyclerView.setAdapter(adapter);
 
-        socketConnect();
+//        socketConnect();
 
         handleClick();
         return view;
@@ -99,7 +113,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 flag=position;
                 switch (view.getId()) {
                     case R.id.ll_scene_item_del:
-                        mSceneConnection.sendTextMessage("{\"pn\":\"SDTP\",\"sceneID\":\""+mList.get(position).id+"\"}");
+                        mConnection.sendTextMessage("{\"pn\":\"SDTP\",\"sceneID\":\""+mList.get(position).id+"\"}");
                         break;
                     case R.id.ll_scene_item_edt:
                         isAddScene=false;
@@ -113,7 +127,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                         } else {
                             String sceneId = mList.get(position).id;
                             sceneName = mList.get(position).name;
-                            mSceneConnection.sendTextMessage("{\"pn\":\"SSTP\",\"sceneID\":\"" + sceneId + "\"}");
+                            mConnection.sendTextMessage("{\"pn\":\"SSTP\",\"sceneID\":\"" + sceneId + "\"}");
                         }
                         break;
                 }
@@ -121,15 +135,15 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-    private void socketConnect() {
-        try {
-            mSceneConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MySceneWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
-    }
+//    private void socketConnect() {
+//        try {
+//            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MySceneWebSocketHandler());
+//
+//        } catch (WebSocketException e) {
+//            e.printStackTrace();
+//            SmartToast.show("网络连接错误");
+//        }
+//    }
 
     @Override
     public void onClick(View v) {
@@ -154,19 +168,83 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 break;
         }
     }
+    class HomeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String message = intent.getStringExtra("message");
+            if (action.equals("SLTP")){
+                Log.e("bbb",message);
+                parseData(message);
+            }
+            if (action.equals("SSTP")){
+                try {
+                    JSONObject jsonObject = new JSONObject(message);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status){
+                        SmartToast.show("场景：" + sceneName + "已启用！");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (action.equals("SUTP")){
+                //修改场景名称
+                try {
+                    JSONObject jsonObject=new JSONObject(message);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status){
+                        if (sceneDialog!=null){
+                            sceneDialog.dismiss();
+                        }
+                        SmartToast.show("修改成功");
+                        mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (action.equals("SDTP")){
+                //删除场景
+                try {
+                    JSONObject jsonObject=new JSONObject(message);
+                    boolean status = jsonObject.getBoolean("status");
+                    SmartToast.show("删除成功");
+                    mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (action.equals("SATP")){
+                //添加场景
+                try {
+                    JSONObject jsonObject=new JSONObject(message);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status){
+                        sceneDialog.dismiss();
+                        SmartToast.show("添加场景成功");
+                        mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
     private List<String> mList_a= new ArrayList<>();
     class MySceneWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
             Log.e(TAG, "open");
-            mSceneConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+            mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
         }
 
         @Override
         public void onTextMessage(String payload) {
             Log.e(TAG, "onTextMessage" + payload);
             if (payload.contains("{\"pn\":\"HRQP\"}")) {
-                mSceneConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
             }
             if (payload.contains("\"pn\":\"SLTP\"")) {
                 parseData(payload);
@@ -191,7 +269,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                     if (status){
                         sceneDialog.dismiss();
                         SmartToast.show("修改成功");
-                        mSceneConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                        mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -203,7 +281,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                     JSONObject jsonObject=new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     SmartToast.show("删除成功");
-                    mSceneConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                    mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -215,7 +293,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                     if (status){
                         sceneDialog.dismiss();
                         SmartToast.show("添加场景成功");
-                        mSceneConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                        mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -268,37 +346,30 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
 //    public void onStop() {
 //        super.onStop();
 //        Log.e("TAG", "onstop");
-//        mSceneConnection.disconnect();
+//        mConnection.disconnect();
 //    }
 //
     @Override
     public void onResume() {
         super.onResume();
-        Log.e(TAG, "onResume");
-        boolean editSceneName = (boolean) SPUtils.get(getActivity(), "editSceneName", false);
-        if (editSceneName){
-            if (mSceneConnection!=null){
-                mSceneConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
-            }
-            SPUtils.remove(getActivity(),"editSceneName");
-        }
+        mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
     }
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        if (hidden) {
-            // 隐藏
-            Log.e(TAG, "scen" + "隐藏");
-            mSceneConnection.disconnect();
-            boolean connected = mSceneConnection.isConnected();
-            Log.e(TAG, "是否断开连接" + connected);
-        } else {
-            // 可视
-            Log.e(TAG, "scen" + "显示");
-            if (mSceneConnection!=null){
-                socketConnect();
-            }
-        }
-    }
+//    @Override
+//    public void onHiddenChanged(boolean hidden) {
+//        if (hidden) {
+//            // 隐藏
+//            Log.e(TAG, "scen" + "隐藏");
+//            mConnection.disconnect();
+//            boolean connected = mConnection.isConnected();
+//            Log.e(TAG, "是否断开连接" + connected);
+//        } else {
+//            // 可视
+//            Log.e(TAG, "scen" + "显示");
+//            if (mConnection!=null){
+//                socketConnect();
+//            }
+//        }
+//    }
 
     public View.OnClickListener dailogClicer = new View.OnClickListener() {
 
@@ -315,7 +386,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                         if (TextUtils.isEmpty(sceneName)){
                             SmartToast.show("场景名称不能为空");
                         }else {
-                            mSceneConnection.sendTextMessage("{\"pn\":\"SATP\",\"icon\":\"changjing1\",\"name\":\""+sceneName+"\"}");
+                            mConnection.sendTextMessage("{\"pn\":\"SATP\",\"icon\":\"changjing1\",\"name\":\""+sceneName+"\"}");
                         }
                     }else {
                         //修改场景
@@ -323,7 +394,7 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                         if (TextUtils.isEmpty(sceneName)){
                             SmartToast.show("场景名称不能为空");
                         }else {
-                            mSceneConnection.sendTextMessage("{\"pn\":\"SUTP\",\"sceneID\":\""+mList.get(flag).id+"\",\"name\":\""+sceneName+"\"}");
+                            mConnection.sendTextMessage("{\"pn\":\"SUTP\",\"sceneID\":\""+mList.get(flag).id+"\",\"name\":\""+sceneName+"\"}");
                         }
                     }
                     break;
@@ -333,6 +404,6 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mSceneConnection.disconnect();
+        getActivity().unregisterReceiver(homeReceiver);
     }
 }

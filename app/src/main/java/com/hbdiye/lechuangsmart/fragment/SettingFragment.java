@@ -63,8 +63,6 @@ public class SettingFragment extends Fragment {
     private GetPhotoPopwindow getPhotoPopwindow;
 
     private WebSocketConnection mConnection;
-    private String mobilephone;
-    private String password;
 
     private String TAG = SettingFragment.class.getName();
 
@@ -73,16 +71,16 @@ public class SettingFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_setting, container, false);
         unbinder = ButterKnife.bind(this, view);
-        mConnection = new WebSocketConnection();
-        mobilephone = (String) SPUtils.get(getActivity(), "mobilephone", "");
-        password = (String) SPUtils.get(getActivity(), "password", "");
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
+//        mConnection = new WebSocketConnection();
+//        mobilephone = (String) SPUtils.get(getActivity(), "mobilephone", "");
+//        password = (String) SPUtils.get(getActivity(), "password", "");
+//        try {
+//            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+//
+//        } catch (WebSocketException e) {
+//            e.printStackTrace();
+//            SmartToast.show("网络连接错误");
+//        }
         tvSettingVersion.setText("版本号V"+getVersionName(getActivity()));
         return view;
     }
@@ -221,31 +219,31 @@ public class SettingFragment extends Fragment {
             Log.e(TAG, "onClose");
         }
     }
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        if (hidden) {
-            // 隐藏
-            Log.e(TAG, "home" + "隐藏");
-            mConnection.disconnect();
+//    @Override
+//    public void onHiddenChanged(boolean hidden) {
+//        if (hidden) {
+//            // 隐藏
+//            Log.e(TAG, "home" + "隐藏");
+//            mConnection.disconnect();
+//
+//        } else {
+//            // 可视
+//            Log.e(TAG, "home" + "显示");
+//            if (mConnection != null) {
+//                try {
+//                    mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+//
+//                } catch (WebSocketException e) {
+//                    e.printStackTrace();
+//                    SmartToast.show("网络连接错误");
+//                }
+//            }
+//        }
+//    }
 
-        } else {
-            // 可视
-            Log.e(TAG, "home" + "显示");
-            if (mConnection != null) {
-                try {
-                    mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-                } catch (WebSocketException e) {
-                    e.printStackTrace();
-                    SmartToast.show("网络连接错误");
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mConnection.disconnect();
-    }
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        mConnection.disconnect();
+//    }
 }

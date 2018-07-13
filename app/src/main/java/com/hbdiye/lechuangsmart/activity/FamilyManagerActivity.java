@@ -1,7 +1,10 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +19,7 @@ import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.adapter.RoomsManagerAdapter;
 import com.hbdiye.lechuangsmart.bean.RoomBean;
 import com.hbdiye.lechuangsmart.util.SPUtils;
@@ -41,9 +45,7 @@ public class FamilyManagerActivity extends BaseActivity {
     LinearLayout tvAddroom;
     private String TAG = FamilyManagerActivity.class.getSimpleName();
     private WebSocketConnection mConnection;
-    private String mobilephone;
-    private String password;
-
+    private HomeReceiver homeReceiver;
     private RoomsManagerAdapter adapter;
     private List<RoomBean.Rooms> mList = new ArrayList<>();
 
@@ -54,10 +56,15 @@ public class FamilyManagerActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
-        password = (String) SPUtils.get(this, "password", "");
-        mConnection = new WebSocketConnection();
-        socketConnect();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("RGLTP");
+        intentFilter.addAction("RUTP");
+        intentFilter.addAction("RATP");
+        intentFilter.addAction("RDTP");
+        homeReceiver = new HomeReceiver();
+        registerReceiver(homeReceiver,intentFilter);
+        mConnection = SingleWebSocketConnection.getInstance();
+        mConnection.sendTextMessage("{\"pn\":\"RGLTP\"}");
     }
 
     @Override
@@ -166,6 +173,58 @@ public class FamilyManagerActivity extends BaseActivity {
             }
         }
     };
+    class HomeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String payload = intent.getStringExtra("message");
+            if (action.equals("RGLTP")) {
+                parseData(payload);
+            }
+            if (action.equals("RUTP")) {
+                //修改房间名称 RUTP
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status) {
+                        sceneDialog.dismiss();
+                        SmartToast.show("修改房间名称成功");
+                        mConnection.sendTextMessage("{\"pn\":\"RGLTP\"}");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (action.equals("RATP")) {
+                //添加新房间 RATP
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status) {
+                        sceneDialog.dismiss();
+                        SmartToast.show("添加房间成功");
+                        mConnection.sendTextMessage("{\"pn\":\"RGLTP\"}");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (action.equals("RDTP")){
+                //删除房间 RDTP
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status) {
+                        SmartToast.show("删除房间成功");
+                        mConnection.sendTextMessage("{\"pn\":\"RGLTP\"}");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
     private List<String> mList_a= new ArrayList<>();
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
@@ -269,19 +328,10 @@ public class FamilyManagerActivity extends BaseActivity {
 //        }
 //    }
 
-    private void socketConnect() {
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mConnection.disconnect();
+      unregisterReceiver(homeReceiver);
     }
 }

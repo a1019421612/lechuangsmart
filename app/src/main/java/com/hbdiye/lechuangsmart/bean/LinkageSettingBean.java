@@ -23,6 +23,8 @@ public class LinkageSettingBean implements Serializable {
         public String proActID;
         public String id;
         public Object fpulse;
+        public String proname;
+        public String irremotename;
         public List<ProActs> proActs;
 
         public class ProActs implements Serializable {

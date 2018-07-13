@@ -3,12 +3,14 @@ package com.hbdiye.lechuangsmart;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
 import com.coder.zzq.smartshow.toast.SmartToast;
+import com.hbdiye.lechuangsmart.activity.LoginActivity;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
@@ -16,6 +18,9 @@ import com.tencent.bugly.beta.Beta;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.tavendo.autobahn.WebSocketConnection;
+import de.tavendo.autobahn.WebSocketException;
 
 public class MyApp extends Application {
     /**
@@ -25,6 +30,12 @@ public class MyApp extends Application {
             .synchronizedList(new LinkedList<Activity>());
 
     private static Context context;
+
+    private String mobilephone;
+    private String password;
+    public WebSocketConnection mConnection;
+    public MyWebSocketHandler instance;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -32,6 +43,183 @@ public class MyApp extends Application {
         SmartToast.plainToast(this);
         registerActivityListener();
         updateApk();
+//        initWebSocket();
+    }
+    private void initWebSocket() {
+        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
+        password = (String) SPUtils.get(this, "password", "");
+        mConnection = SingleWebSocketConnection.getInstance();
+        instance = SingleWebSocketHandler.getInstance(mConnection, "{\"pn\":\"UITP\"}");
+        try {
+            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, instance);
+        } catch (WebSocketException e) {
+            e.printStackTrace();
+        }
+        instance.SetSocketsendMessage(new SocketSendMessage() {
+            @Override
+            public void websocketSendMessage(String message) {
+                if (message.contains("\"pn\":\"PRTP\"")) {
+                    Log.e("EEE",message);
+//                    finishAllActivity();
+//                    Intent intent = new Intent(context, LoginActivity.class);
+//                    startActivity(intent);
+                }if (message.contains("\"pn\":\"SLTP\"")){
+                    websocketSendBroadcase(message,"SLTP");
+                }if (message.contains("\"pn\":\"UITP\"")){
+                    websocketSendBroadcase(message,"UITP");
+                }if (message.contains("\"pn\":\"SSTP\"")) {
+                    //开启场景
+                    websocketSendBroadcase(message,"SSTP");
+                }if (message.contains("\"pn\":\"SUTP\"")){
+                    //修改场景名称
+                    websocketSendBroadcase(message,"SUTP");
+                }if (message.contains("\"pn\":\"SDTP\"")){
+                    //删除场景
+                    websocketSendBroadcase(message,"SDTP");
+                }if (message.contains("\"pn\":\"SATP\"")){
+                    //添加场景
+                    websocketSendBroadcase(message,"SATP");
+                }if (message.contains("\"pn\":\"LLTP\"")){
+                    //联动
+                    websocketSendBroadcase(message,"LLTP");
+                }if (message.contains("\"pn\":\"LUTP\"")) {
+//                修改联动名称
+                    websocketSendBroadcase(message,"LUTP");
+                }if (message.contains("\"pn\":\"LDTP\"")) {
+                    //删除联动
+                    websocketSendBroadcase(message,"LDTP");
+                }if (message.contains("\"pn\":\"LATP\"")) {
+                    //LATPSPUtils.put(this,"isTrigger",true);
+                    boolean isTrigger= (boolean) SPUtils.get(context,"isTrigger",false);
+                    if (!isTrigger){
+                        websocketSendBroadcase(message,"LATP");
+                    }else {
+                        websocketSendBroadcase(message,"LATP_T");
+                    }
+                }
+//========================scenesettingActivity======================================
+                if (message.contains("\"pn\":\"STLTP\"")) {
+                    //STLTP  scenesettingActivity
+                    websocketSendBroadcase(message,"STLTP");
+                }if (message.contains("\"pn\":\"IRLTP\"")) {
+                    //IRLTP
+                    websocketSendBroadcase(message,"IRLTP");
+                }if (message.contains("\"pn\":\"SUTP\"")) {
+                    //修改场景名称
+                    websocketSendBroadcase(message,"SUTP");
+                }if (message.contains("\"pn\":\"STATP\"")) {
+                    //添加设备
+                    websocketSendBroadcase(message,"STATP");
+                }if (message.contains("\"pn\":\"STUTP\"")) {
+                    //设置延时
+                    websocketSendBroadcase(message,"STUTP");
+                }if (message.contains("\"pn\":\"STDTP\"")) {
+                    //删除设备
+                    websocketSendBroadcase(message,"STDTP");
+                }
+//========================LinkageSettingActivity=====================
+                if (message.contains("\"pn\":\"LCTP\"")) {
+                    //
+                    websocketSendBroadcase(message,"LCTP");
+                }if (message.contains("\"pn\":\"LDLTP\"")) {
+                    //
+                    websocketSendBroadcase(message,"LDLTP");
+                }  if (message.contains("\"pn\":\"IRLTP\"")) {
+                    //设备列表
+                    websocketSendBroadcase(message,"IRLTP");
+                }if (message.contains("\"pn\":\"LUTP\"")) {
+                    //修改联动名称
+                    websocketSendBroadcase(message,"LUTP");
+                } if (message.contains("\"pn\":\"LTDTP\"")) {
+                    // 删除联动设备 LTDTP
+                    websocketSendBroadcase(message,"LTDTP");
+                }if (message.contains("\"pn\":\"LTUTP\"")) {
+                    //  延时时间修改 LTUTP
+                    websocketSendBroadcase(message,"LTUTP");
+                }  if (message.contains("\"pn\":\"LTATP\"")) {
+                    //   联动添加设备 LTATP
+                    websocketSendBroadcase(message,"LTATP");
+                }
+// =========================devicetriggeredactivity============
+                if (message.contains("\"pn\":\"LDLTP\"")) {
+                    //  设备列表
+                    websocketSendBroadcase(message,"LDLTP");
+                }if (message.contains("\"pn\":\"LUTP\"")) {
+                    //  修改触发设备
+                    websocketSendBroadcase(message,"LUTP");
+                }if (message.contains("\"pn\":\"LCTP\"")) {
+                    //
+                    websocketSendBroadcase(message,"LCTP");
+                }
+//=========================FamilyNameActivity==================
+                if (message.contains("\"pn\":\"UITP\"")) {
+                    //
+                    websocketSendBroadcase(message,"UITP");
+                }if (message.contains("\"pn\":\"UUITP\"")) {
+                    //
+                    websocketSendBroadcase(message,"UUITP");
+                }if (message.contains("\"pn\":\"UJFTP\"")) {
+                    //扫描加入家庭
+                    websocketSendBroadcase(message,"UJFTP");
+                }
+//======================editpswactivity=================
+                if (message.contains("\"pn\":\"UUITP\"")) {
+                    //修改密码
+                    websocketSendBroadcase(message,"UUITP");
+                }
+//======================FamilyManagerActivity===================
+                if (message.contains("\"pn\":\"RGLTP\"")) {
+                    //房间管理
+                    websocketSendBroadcase(message,"RGLTP");
+                }if (message.contains("\"pn\":\"RUTP\"")) {
+                    //修改房间名
+                    websocketSendBroadcase(message,"RUTP");
+                }if (message.contains("\"pn\":\"RATP\"")) {
+                    //添加新房间 RATP
+                    websocketSendBroadcase(message,"RATP");
+                }if (message.contains("\"pn\":\"RDTP\"")) {
+                    //删除房间
+                    websocketSendBroadcase(message,"RDTP");
+                }
+//=========================RoomActivity========================
+                if (message.contains("\"pn\":\"SDOSTP\"")) {
+                    //子设备在线
+                    websocketSendBroadcase(message,"SDOSTP");
+                }if (message.contains("\"pn\":\"DUTP\"")) {
+                    //修改设备名称
+                    websocketSendBroadcase(message,"DUTP");
+                }if (message.contains("\"pn\":\"DGLTP\"")) {
+                    //列表
+                    websocketSendBroadcase(message,"DGLTP");
+                }if (message.contains("\"pn\":\"SDBTP\"")) {
+                    //扫描加入家庭
+                    websocketSendBroadcase(message,"SDBTP");
+                }if (message.contains("\"pn\":\"ATP\"")) {
+                    websocketSendBroadcase(message,"ATP");
+                }
+//==========================YaoKongListActivity=========================
+                if (message.contains("\"pn\":\"IRUTP\"")) {
+                    //                修改设备名称 IRUTP
+                    websocketSendBroadcase(message,"IRUTP");
+                }if (message.contains("\"pn\":\"IRDTP\"")) {
+                    //删除 IRDTP
+                    websocketSendBroadcase(message,"IRDTP");
+                }
+//===========================PicKTYaoKongActivity=====================
+                if (message.contains("\"pn\":\"IRTP\"")) {
+                    websocketSendBroadcase(message,"IRTP");
+                } if (message.contains("\"pn\":\"IRATP\"")) {
+                    websocketSendBroadcase(message,"IRATP");
+                }
+            }
+        });
+    }
+
+    private void websocketSendBroadcase(String message,String param) {
+        Intent intent = new Intent();
+        intent.setAction(param);
+        intent.putExtra("message",message);
+        sendBroadcast(intent);
     }
 
     private void updateApk() {

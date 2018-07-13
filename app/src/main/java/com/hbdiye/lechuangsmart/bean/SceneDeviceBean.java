@@ -81,6 +81,8 @@ public class SceneDeviceBean implements Serializable {
         public String sceneID;
         public String id;
         public Object fpulse;
+        public String proname;
+        public String irremotename;
         public List<ProActs> proActs;
 
         public class ProActs implements Serializable {

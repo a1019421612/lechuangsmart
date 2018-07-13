@@ -1,8 +1,11 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,6 +20,7 @@ import com.coder.zzq.smartshow.toast.SmartToast;
 import com.hbdiye.lechuangsmart.Global.ContentConfig;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.bean.LinkageSettingBean;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 
@@ -55,18 +59,18 @@ public class TimeTriggeredActivity extends BaseActivity {
     private LinkageSettingBean.Linkage linkage;
 
     private WebSocketConnection mConnection;
-    private String mobilephone;
-    private String password;
+    private HomeReceiver homeReceiver;
     private String timing;
 
     @Override
     protected void initData() {
 
         linkage= (LinkageSettingBean.Linkage) getIntent().getSerializableExtra("LinkageData");
-        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
-        password = (String) SPUtils.get(this, "password", "");
-        mConnection = new WebSocketConnection();
-        socketConnection();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("LUTP");
+        homeReceiver = new HomeReceiver();
+        registerReceiver(homeReceiver,intentFilter);
+        mConnection = SingleWebSocketConnection.getInstance();
         String cronExpression = linkage.timingRecord.cronExpression;
         timing = linkage.timingRecord.timing;
         tvTime.setText(timing);
@@ -196,7 +200,25 @@ public class TimeTriggeredActivity extends BaseActivity {
                 .build();
         pickerBuilder.setNPicker(ContentConfig.getTimeHours(), ContentConfig.getTimeMin(), ContentConfig.getTimeSeco());
     }
+    class HomeReceiver extends BroadcastReceiver {
 
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String payload = intent.getStringExtra("message");
+            if (action.equals("LUTP")) {
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status){
+                        finish();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -239,35 +261,34 @@ public class TimeTriggeredActivity extends BaseActivity {
     private void parseData(String payload) {
     }
 
-    private void socketConnection() {
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
-    }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.e(TAG, "onstop");
-        mConnection.disconnect();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.e(TAG, "onrestart");
-        if (mConnection != null) {
-            socketConnection();
-        }
-    }
+//    private void socketConnection() {
+//        try {
+//            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+//
+//        } catch (WebSocketException e) {
+//            e.printStackTrace();
+//            SmartToast.show("网络连接错误");
+//        }
+//    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        Log.e(TAG, "onstop");
+//        mConnection.disconnect();
+//    }
+//
+//    @Override
+//    protected void onRestart() {
+//        super.onRestart();
+//        Log.e(TAG, "onrestart");
+//        if (mConnection != null) {
+//            socketConnection();
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e(TAG, "onstop");
-        mConnection.disconnect();
+       unregisterReceiver(homeReceiver);
     }
 }

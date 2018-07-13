@@ -1,6 +1,9 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -10,6 +13,7 @@ import android.widget.TextView;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.hzy.tvmao.KookongSDK;
 import com.hzy.tvmao.interf.IRequestResult;
@@ -37,17 +41,17 @@ public class KQjhqActivity extends BaseActivity {
     private int type;
 
     private WebSocketConnection mConnection;
-    private String mobilephone;
-    private String password;
+    private HomeReceiver homeReceiver;
     private String mac;
     private String power;
     private String rcode;
     @Override
     protected void initData() {
-        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
-        password = (String) SPUtils.get(this, "password", "");
-        mConnection = new WebSocketConnection();
-        socketConnect();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("IRTP");
+        homeReceiver = new HomeReceiver();
+        registerReceiver(homeReceiver,intentFilter);
+        mConnection = SingleWebSocketConnection.getInstance();
         type = getIntent().getIntExtra("type", -1);
         rid = getIntent().getStringExtra("rid");
         mac = getIntent().getStringExtra("mac");
@@ -112,6 +116,15 @@ public class KQjhqActivity extends BaseActivity {
         String data = "{\"pn\":\"IRTP\",\"sdMAC\":\"" + mac + "\",\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + power + "\"}";
         mConnection.sendTextMessage(data);
     }
+    class HomeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String payload = intent.getStringExtra("message");
+
+        }
+    }
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -143,32 +156,8 @@ public class KQjhqActivity extends BaseActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        mConnection.disconnect();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        if (mConnection != null) {
-            socketConnect();
-        }
-    }
-
-    private void socketConnect() {
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
-        mConnection.disconnect();
+       unregisterReceiver(homeReceiver);
     }
 }

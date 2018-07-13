@@ -1,6 +1,9 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,6 +15,7 @@ import com.alibaba.fastjson.JSON;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.util.SPUtils;
 
 import org.json.JSONException;
@@ -36,14 +40,18 @@ public class EditPswActivity extends BaseActivity {
     TextView tvEditSubmit;
     private String TAG = EditPswActivity.class.getSimpleName();
     private WebSocketConnection mConnection;
+    private HomeReceiver homeReceiver;
     private String mobilephone;
     private String password;
     @Override
     protected void initData() {
         mobilephone = (String) SPUtils.get(this, "mobilephone", "");
         password = (String) SPUtils.get(this, "password", "");
-        mConnection = new WebSocketConnection();
-        socketConnect();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("UUITP");
+        homeReceiver = new HomeReceiver();
+        registerReceiver(homeReceiver,intentFilter);
+        mConnection = SingleWebSocketConnection.getInstance();
     }
 
     @Override
@@ -87,6 +95,28 @@ public class EditPswActivity extends BaseActivity {
             SmartToast.show("旧密码错误，请重新输入");
         }
     }
+    class HomeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String payload = intent.getStringExtra("message");
+            if (action.equals("UUITP")) {
+//                修改密码UUITP
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status){
+                        SmartToast.show("修改成功");
+                        MyApp.finishAllActivity();
+                        startActivity(new Intent(EditPswActivity.this,LoginActivity.class));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -128,33 +158,11 @@ public class EditPswActivity extends BaseActivity {
             Log.e(TAG, "onClose");
         }
     }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mConnection.disconnect();
-    }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        if (mConnection != null) {
-            socketConnect();
-        }
-    }
-
-    private void socketConnect() {
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mConnection.disconnect();
+        unregisterReceiver(homeReceiver);
     }
 }

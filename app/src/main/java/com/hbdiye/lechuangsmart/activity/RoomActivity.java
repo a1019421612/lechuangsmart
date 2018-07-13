@@ -1,7 +1,10 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +21,7 @@ import com.google.gson.JsonObject;
 import com.hbdiye.lechuangsmart.Global.CWebSocketHandler;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.adapter.RoomDeviceAdapter;
 import com.hbdiye.lechuangsmart.adapter.RoomDeviceByIDAdapter;
 import com.hbdiye.lechuangsmart.bean.RoomBean;
@@ -50,8 +54,7 @@ public class RoomActivity extends BaseActivity {
 
     private String TAG = RoomActivity.class.getSimpleName();
     private WebSocketConnection mConnection;
-    private String mobilephone;
-    private String password;
+    private HomeReceiver homeReceiver;
     private String roomId="";
 
     private RoomDeviceByIDAdapter adapter;
@@ -69,11 +72,17 @@ public class RoomActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
-        password = (String) SPUtils.get(this, "password", "");
         roomId = getIntent().getStringExtra("roomId");
-        mConnection = new WebSocketConnection();
-        socketConnect();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("DGLTP");
+        intentFilter.addAction("SDOSTP");
+        intentFilter.addAction("DUTP");
+        intentFilter.addAction("SDBTP");
+        intentFilter.addAction("ATP");
+        homeReceiver = new HomeReceiver();
+        registerReceiver(homeReceiver,intentFilter);
+        mConnection = SingleWebSocketConnection.getInstance();
+        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
     }
 
     @Override
@@ -170,6 +179,89 @@ public class RoomActivity extends BaseActivity {
 
 //            textview.setText(s);
 //            SmartToast.show(erCode);
+        }
+    }
+    class HomeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String payload = intent.getStringExtra("message");
+            if (action.equals("DGLTP")) {
+                parseData(payload);
+            }
+            if (action.equals("SDOSTP")) {
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    String sdMAC = jsonObject.getString("sdMAC");
+                    //子设备在线
+                    for (int i = 0; i < mList.size(); i++) {
+                        if (mList.get(i).mac.equals(sdMAC)) {
+                            mList_status.set(i, status);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                adapter.notifyDataSetChanged();
+            }
+            if (action.equals("DUTP")){
+                //修改设备名称 DUTP
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status){
+                        sceneDialog.dismiss();
+                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (action.equals("SDBTP")){
+                //扫描加入家庭
+                flag_code=false;
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status){
+                        SmartToast.show("成功加入");
+                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
+                    }else {
+                        SmartToast.show("加入失败");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+//                SmartToast.showLong(payload);
+            }
+            if (action.equals("ATP")){
+//                    mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + list_room.get(flagRoomPosition).id + "\"}");
+                try {
+                    JSONObject jsonObject=new JSONObject(payload);
+                    String deviceID = jsonObject.getString("deviceID");
+                    String proAttID = jsonObject.getString("proAttID");
+                    int value =Integer.parseInt(jsonObject.getString("value"));
+                    for (int i = 0; i < mList.size(); i++) {
+                        if (mList.get(i).id.equals(deviceID)){
+                            RoomDeviceBean.Devices devices = mList.get(i);
+                            List<RoomDeviceBean.Devices.DeviceAttributes> deviceAttributes = devices.deviceAttributes;
+                            for (int j = 0; j < deviceAttributes.size(); j++) {
+                                if (deviceAttributes.get(j).proAttID.equals(proAttID)){
+//                                    mList.get(i).deviceAttributes.get(j).value;
+                                    deviceAttributes.get(j).value=value;
+                                    mList.set(i,devices);
+                                    adapter.notifyItemChanged(i);
+                                }
+                            }
+                        }
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
     class MyWebSocketHandler extends WebSocketHandler {
@@ -301,32 +393,8 @@ public class RoomActivity extends BaseActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        mConnection.disconnect();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        if (mConnection != null) {
-            socketConnect();
-        }
-    }
-
-    private void socketConnect() {
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
-        mConnection.disconnect();
+        unregisterReceiver(homeReceiver);
     }
 }

@@ -18,7 +18,11 @@ public class SceneSettingAdapter extends BaseQuickAdapter<SceneDeviceBean.SceneT
     @Override
     protected void convert(BaseViewHolder helper, SceneDeviceBean.SceneTasks item) {
         helper.setText(R.id.tv_scene_setting_name,item.device.name);
-        helper.setText(R.id.tv_scene_setting_switch,item.proAct.name);
+        if (item.device.product.modelPath.equals("pro_dispatcher")){
+            helper.setText(R.id.tv_scene_setting_switch,item.irremotename+"-"+item.proname);
+        }else {
+            helper.setText(R.id.tv_scene_setting_switch,item.proAct.name);
+        }
         helper.setText(R.id.tv_scene_setting_time, ContentConfig.secToTime(item.delaytime));
         helper.addOnClickListener(R.id.iv_scene_setting_del);
         helper.addOnClickListener(R.id.tv_scene_setting_time);

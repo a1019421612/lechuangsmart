@@ -22,7 +22,11 @@ public class LinkageSettingAdapter extends BaseQuickAdapter<LinkageSettingBean.L
     protected void convert(BaseViewHolder helper, LinkageSettingBean.Lts item) {
         helper.setText(R.id.tv_name,"联动设备");
         helper.setText(R.id.tv_scene_setting_name,item.device.name);
-        helper.setText(R.id.tv_scene_setting_switch,item.proAct.name);
+        if (item.device.product.modelPath.equals("pro_dispatcher")){
+            helper.setText(R.id.tv_scene_setting_switch,item.irremotename+"-"+item.proname);
+        }else {
+            helper.setText(R.id.tv_scene_setting_switch,item.proAct.name);
+        }
         helper.setText(R.id.tv_scene_setting_time, ContentConfig.secToTime(item.delaytime));
         Glide.with(mContext).load(ContentConfig.drawableByIcon(item.device.product.icon)).into((ImageView) helper.getView(R.id.iv_linkage_icon));
         helper.addOnClickListener(R.id.iv_scene_setting_del);

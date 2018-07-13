@@ -1,7 +1,10 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,6 +30,7 @@ import com.google.gson.JsonSyntaxException;
 import com.hbdiye.lechuangsmart.Global.ContentConfig;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.adapter.DeviceTriggeredAdapter;
 import com.hbdiye.lechuangsmart.bean.DeviceTriggerBean;
 import com.hbdiye.lechuangsmart.bean.LinkageSettingBean;
@@ -79,9 +83,7 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
     private boolean closeAll=true;
 
     private WebSocketConnection mConnection;
-    private String mobilephone;
-    private String password;
-
+    private HomeReceiver homeReceiver;
     private List<DeviceTriggerBean.Devices> mList = new ArrayList<>();
     private DeviceTriggeredAdapter adapter;
 
@@ -109,12 +111,19 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
     }
 
     private void initData() {
+        SPUtils.put(this,"isTrigger",true);
         linkage = (LinkageSettingBean.Linkage) getIntent().getSerializableExtra("LinkageData");
         linkageID = getIntent().getStringExtra("linkageID");
-        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
-        password = (String) SPUtils.get(this, "password", "");
-        mConnection = new WebSocketConnection();
-        socketConnection();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("LDLTP");
+        intentFilter.addAction("LUTP");
+        intentFilter.addAction("LCTP");
+        intentFilter.addAction("LATP_T");
+        homeReceiver = new HomeReceiver();
+        registerReceiver(homeReceiver,intentFilter);
+        mConnection = SingleWebSocketConnection.getInstance();
+        mConnection.sendTextMessage("{\"pn\":\"LDLTP\",\"type\":0}");
+//        socketConnection();
 
         if (linkage != null) {
             deviceId = linkage.device.id;
@@ -193,7 +202,12 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
         });
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(homeReceiver);
+        SPUtils.remove(this,"isTrigger");
+    }
     @OnClick({R.id.iv_base_back, R.id.tv_base_title, R.id.ll_device_triggered, R.id.tv_device_trig_attr, R.id.tv_device_trig_condition, R.id.iv_base_right})
     public void onViewClicked(View view) {
         switch (view.getId()) {
@@ -309,50 +323,31 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
                 break;
         }
     }
-
-    class MyWebSocketHandler extends WebSocketHandler {
-        @Override
-        public void onOpen() {
-            Log.e(TAG, "open");
-//            mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
-            mConnection.sendTextMessage("{\"pn\":\"LDLTP\",\"type\":0}");
-        }
+    class HomeReceiver extends BroadcastReceiver {
 
         @Override
-        public void onTextMessage(String payload) {
-            Log.e(TAG, "onTextMessage" + payload);
-            if (payload.contains("{\"pn\":\"HRQP\"}")) {
-                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
-
-            }
-            if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                if (closeAll){
-                    MyApp.finishAllActivity();
-                    Intent intent = new Intent(DeviceTriggeredActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                }
-            }
-            if (payload.contains("\"pn\":\"LDLTP\"")) {
-                //设备列表
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String payload = intent.getStringExtra("message");
+            if (action.equals("LDLTP")){
                 parseDeviceData(payload);
             }
-            if (payload.contains("\"pn\":\"LUTP\"")) {
+            if (action.equals("LUTP")) {
                 //修改触发设备
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     if (status) {
-//                        mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
                         finish();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            if (payload.contains("\"pn\":\"LCTP\"")) {
+            if (action.equals("LCTP")) {
                 parseData(payload);
             }
-            if (payload.contains("\"pn\":\"LATP\"")) {
+            if (action.equals("LATP_T")) {
                 //LATP
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
@@ -360,7 +355,6 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
                     if (status) {
                         JSONObject linkage = jsonObject.getJSONObject("linkage");
                         String linkageID = linkage.getString("id");
-                        closeAll=false;
                         startActivity(new Intent(DeviceTriggeredActivity.this, LinkageSettingActivity.class).putExtra("linkageID", linkageID).putExtra("timingId", "null"));
                         finish();
                     }
@@ -369,12 +363,72 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
                 }
             }
         }
-
-        @Override
-        public void onClose(int code, String reason) {
-            Log.e(TAG, "onClose");
-        }
     }
+//    class MyWebSocketHandler extends WebSocketHandler {
+//        @Override
+//        public void onOpen() {
+//            Log.e(TAG, "open");
+////            mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
+//            mConnection.sendTextMessage("{\"pn\":\"LDLTP\",\"type\":0}");
+//        }
+//
+//        @Override
+//        public void onTextMessage(String payload) {
+//            Log.e(TAG, "onTextMessage" + payload);
+//            if (payload.contains("{\"pn\":\"HRQP\"}")) {
+//                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+//
+//            }
+//            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+//                if (closeAll){
+//                    MyApp.finishAllActivity();
+//                    Intent intent = new Intent(DeviceTriggeredActivity.this, LoginActivity.class);
+//                    startActivity(intent);
+//                }
+//            }
+//            if (payload.contains("\"pn\":\"LDLTP\"")) {
+//                //设备列表
+//                parseDeviceData(payload);
+//            }
+//            if (payload.contains("\"pn\":\"LUTP\"")) {
+//                //修改触发设备
+//                try {
+//                    JSONObject jsonObject = new JSONObject(payload);
+//                    boolean status = jsonObject.getBoolean("status");
+//                    if (status) {
+////                        mConnection.sendTextMessage("{\"pn\":\"LCTP\",\"linkageID\":\"" + linkageID + "\"}");
+//                        finish();
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            if (payload.contains("\"pn\":\"LCTP\"")) {
+//                parseData(payload);
+//            }
+//            if (payload.contains("\"pn\":\"LATP\"")) {
+//                //LATP
+//                try {
+//                    JSONObject jsonObject = new JSONObject(payload);
+//                    boolean status = jsonObject.getBoolean("status");
+//                    if (status) {
+//                        JSONObject linkage = jsonObject.getJSONObject("linkage");
+//                        String linkageID = linkage.getString("id");
+//                        closeAll=false;
+//                        startActivity(new Intent(DeviceTriggeredActivity.this, LinkageSettingActivity.class).putExtra("linkageID", linkageID).putExtra("timingId", "null"));
+//                        finish();
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//
+//        @Override
+//        public void onClose(int code, String reason) {
+//            Log.e(TAG, "onClose");
+//        }
+//    }
 
     private void parseData(String payload) {
 
@@ -425,36 +479,36 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
         }
     }
 
-    private void socketConnection() {
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+//    private void socketConnection() {
+//        try {
+//            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
+//
+//        } catch (WebSocketException e) {
+//            e.printStackTrace();
+//            SmartToast.show("网络连接错误");
+//        }
+//    }
 
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        Log.e(TAG, "onstop");
+//        mConnection.disconnect();
+//    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.e(TAG, "onstop");
-        mConnection.disconnect();
-    }
+//    @Override
+//    protected void onRestart() {
+//        super.onRestart();
+//        Log.e(TAG, "onrestart");
+//        if (mConnection != null) {
+//            socketConnection();
+//        }
+//    }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.e(TAG, "onrestart");
-        if (mConnection != null) {
-            socketConnection();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.e(TAG, "onstop");
-        mConnection.disconnect();
-    }
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        Log.e(TAG, "onstop");
+//        mConnection.disconnect();
+//    }
 }

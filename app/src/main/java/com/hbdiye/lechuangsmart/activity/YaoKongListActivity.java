@@ -1,6 +1,9 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +18,7 @@ import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.adapter.YaoKongQiListAdapter;
 import com.hbdiye.lechuangsmart.bean.YaoKongListBean;
 import com.hbdiye.lechuangsmart.util.Logger;
@@ -63,8 +67,7 @@ public class YaoKongListActivity extends BaseActivity {
     LinearLayout llRoot;
 
     private WebSocketConnection mConnection;
-    private String mobilephone;
-    private String password;
+    private HomeReceiver homeReceiver;
     private String deviceID = "";
     private String deviceName = "";
 
@@ -88,10 +91,14 @@ public class YaoKongListActivity extends BaseActivity {
         deviceID = getIntent().getStringExtra("deviceID");
         deviceName = getIntent().getStringExtra("deviceName");
         mac = getIntent().getStringExtra("mac");
-        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
-        password = (String) SPUtils.get(this, "password", "");
-        mConnection = new WebSocketConnection();
-        socketConnect();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction("IRLTP");
+        intentFilter.addAction("IRUTP");
+        intentFilter.addAction("IRDTP");
+        homeReceiver = new HomeReceiver();
+        registerReceiver(homeReceiver,intentFilter);
+        mConnection = SingleWebSocketConnection.getInstance();
+        mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + deviceID + "\"}");
 
         tvYaokongName.setText(deviceName);
 
@@ -363,6 +370,49 @@ public class YaoKongListActivity extends BaseActivity {
             }
         }
     };
+    class HomeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String payload = intent.getStringExtra("message");
+            if (action.equals("IRLTP")) {
+                parseData(payload);
+            }
+            if (action.equals("IRUTP")) {
+//                修改设备名称 IRUTP
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status) {
+                        sceneDialog.dismiss();
+                        SmartToast.show("修改成功");
+                        mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + deviceID + "\"}");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (action.equals("IRDTP")) {
+                //删除 IRDTP
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    boolean status = jsonObject.getBoolean("status");
+                    if (status) {
+                        mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + deviceID + "\"}");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + deviceID + "\"}");
+    }
 
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
@@ -374,22 +424,6 @@ public class YaoKongListActivity extends BaseActivity {
         @Override
         public void onTextMessage(String payload) {
 
-            Log.e("TAG", "onTextMessage" + payload);
-            if (payload.contains("{\"pn\":\"HRQP\"}")) {
-                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
-            }
-            if (payload.contains("\"pn\":\"DOSTP\"")) {
-
-            }
-            if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                if (closeAll){
-                    MyApp.finishAllActivity();
-                    Intent intent = new Intent(YaoKongListActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                }else {
-                    closeAll=true;
-                }
-            }
             if (payload.contains("\"pn\":\"IRLTP\"")) {
                 parseData(payload);
             }
@@ -462,29 +496,19 @@ public class YaoKongListActivity extends BaseActivity {
 //        }
 //    }
 
-    private void socketConnect() {
-        try {
-            mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, new MyWebSocketHandler());
-
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-            SmartToast.show("网络连接错误");
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        boolean yaokRe= (boolean) SPUtils.get(YaoKongListActivity.this,"yaokRe",false);
-        if (yaokRe){
-            mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + deviceID + "\"}");
-        }
-        SPUtils.remove(YaoKongListActivity.this,"yaokRe");
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        boolean yaokRe= (boolean) SPUtils.get(YaoKongListActivity.this,"yaokRe",false);
+//        if (yaokRe){
+//            mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + deviceID + "\"}");
+//        }
+//        SPUtils.remove(YaoKongListActivity.this,"yaokRe");
+//    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mConnection.disconnect();
+        unregisterReceiver(homeReceiver);
     }
 }
