@@ -50,7 +50,7 @@ import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
 
 public class SceneFragment extends Fragment implements View.OnClickListener {
-    private String TAG=SceneFragment.class.getSimpleName();
+    private String TAG = SceneFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private ImageView iv_status;
     private LinearLayout ll_add_scene;
@@ -64,9 +64,9 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
     private List<SceneBean.Scenes> mList = new ArrayList<>();
 
     private boolean editStatus = false;//编辑状态标志，默认false
-    private int flag=-1;//position
+    private int flag = -1;//position
     private String sceneName = "";//场景名称
-    private boolean isAddScene=true;//添加还是修改场景
+    private boolean isAddScene = true;//添加还是修改场景
 
     private SceneDialog sceneDialog;
 
@@ -81,14 +81,14 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
 //        adapter.expandAll();
         mConnection = SingleWebSocketConnection.getInstance();
         mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
-        IntentFilter intentFilter=new IntentFilter();
+        IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("SLTP");
         intentFilter.addAction("SSTP");
         intentFilter.addAction("SUTP");
         intentFilter.addAction("SDTP");
         intentFilter.addAction("SATP");
         homeReceiver = new HomeReceiver();
-        getActivity().registerReceiver(homeReceiver,intentFilter);
+        getActivity().registerReceiver(homeReceiver, intentFilter);
 //        mobilephone = (String) SPUtils.get(getActivity(), "mobilephone", "");
 //        password = (String) SPUtils.get(getActivity(), "password", "");
 
@@ -110,20 +110,20 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                flag=position;
+                flag = position;
                 switch (view.getId()) {
                     case R.id.ll_scene_item_del:
-                        mConnection.sendTextMessage("{\"pn\":\"SDTP\",\"sceneID\":\""+mList.get(position).id+"\"}");
+                        mConnection.sendTextMessage("{\"pn\":\"SDTP\",\"sceneID\":\"" + mList.get(position).id + "\"}");
                         break;
                     case R.id.ll_scene_item_edt:
-                        isAddScene=false;
-                        sceneDialog = new SceneDialog(getActivity(), R.style.MyDialogStyle, dailogClicer,"修改场景名称");
+                        isAddScene = false;
+                        sceneDialog = new SceneDialog(getActivity(), R.style.MyDialogStyle, dailogClicer, "修改场景名称");
                         sceneDialog.setCanceledOnTouchOutside(true);
                         sceneDialog.show();
                         break;
                     case R.id.ll_scene_item:
                         if (editStatus) {
-                            startActivity(new Intent(getActivity(), SceneSettingActivity.class).putExtra("sceneID",mList.get(position).id));
+                            startActivity(new Intent(getActivity(), SceneSettingActivity.class).putExtra("sceneID", mList.get(position).id));
                         } else {
                             String sceneId = mList.get(position).id;
                             sceneName = mList.get(position).name;
@@ -160,42 +160,43 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 }
                 break;
             case R.id.ll_add_scene:
-                isAddScene=true;
-                sceneDialog = new SceneDialog(getActivity(), R.style.MyDialogStyle, dailogClicer,"添加场景名称");
+                isAddScene = true;
+                sceneDialog = new SceneDialog(getActivity(), R.style.MyDialogStyle, dailogClicer, "添加场景名称");
                 sceneDialog.setCanceledOnTouchOutside(true);
                 sceneDialog.show();
 //                startActivity(new Intent(getActivity(),SceneSettingActivity.class));
                 break;
         }
     }
+
     class HomeReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             String message = intent.getStringExtra("message");
-            if (action.equals("SLTP")){
-                Log.e("bbb",message);
+            if (action.equals("SLTP")) {
+                Log.e("bbb", message);
                 parseData(message);
             }
-            if (action.equals("SSTP")){
+            if (action.equals("SSTP")) {
                 try {
                     JSONObject jsonObject = new JSONObject(message);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status){
+                    if (status) {
                         SmartToast.show("场景：" + sceneName + "已启用！");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            if (action.equals("SUTP")){
+            if (action.equals("SUTP")) {
                 //修改场景名称
                 try {
-                    JSONObject jsonObject=new JSONObject(message);
+                    JSONObject jsonObject = new JSONObject(message);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status){
-                        if (sceneDialog!=null){
+                    if (status) {
+                        if (sceneDialog != null) {
                             sceneDialog.dismiss();
                         }
                         SmartToast.show("修改成功");
@@ -205,10 +206,10 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                     e.printStackTrace();
                 }
             }
-            if (action.equals("SDTP")){
+            if (action.equals("SDTP")) {
                 //删除场景
                 try {
-                    JSONObject jsonObject=new JSONObject(message);
+                    JSONObject jsonObject = new JSONObject(message);
                     boolean status = jsonObject.getBoolean("status");
                     SmartToast.show("删除成功");
                     mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
@@ -216,15 +217,18 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                     e.printStackTrace();
                 }
             }
-            if (action.equals("SATP")){
+            if (action.equals("SATP")) {
                 //添加场景
                 try {
-                    JSONObject jsonObject=new JSONObject(message);
+                    JSONObject jsonObject = new JSONObject(message);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status){
+                    if (status) {
                         sceneDialog.dismiss();
                         SmartToast.show("添加场景成功");
                         mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                        JSONObject scene = jsonObject.getJSONObject("scene");
+                        String id = scene.getString("id");
+                        startActivity(new Intent(getActivity(), SceneSettingActivity.class).putExtra("sceneID", id));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -232,7 +236,9 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
             }
         }
     }
-    private List<String> mList_a= new ArrayList<>();
+
+    private List<String> mList_a = new ArrayList<>();
+
     class MySceneWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
@@ -254,19 +260,19 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status){
+                    if (status) {
                         SmartToast.show("场景：" + sceneName + "已启用！");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            if (payload.contains("\"pn\":\"SUTP\"")){
+            if (payload.contains("\"pn\":\"SUTP\"")) {
                 //修改场景名称
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status){
+                    if (status) {
                         sceneDialog.dismiss();
                         SmartToast.show("修改成功");
                         mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
@@ -275,10 +281,10 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                     e.printStackTrace();
                 }
             }
-            if (payload.contains("\"pn\":\"SDTP\"")){
+            if (payload.contains("\"pn\":\"SDTP\"")) {
                 //删除场景
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     SmartToast.show("删除成功");
                     mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
@@ -286,11 +292,11 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                     e.printStackTrace();
                 }
             }
-            if (payload.contains("\"pn\":\"SATP\"")){
+            if (payload.contains("\"pn\":\"SATP\"")) {
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status){
+                    if (status) {
                         sceneDialog.dismiss();
                         SmartToast.show("添加场景成功");
                         mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
@@ -302,20 +308,20 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
                 for (Activity activity : MyApp.mActivitys) {
                     String packageName = activity.getLocalClassName();
-                    Log.e("LLL",packageName);
+                    Log.e("LLL", packageName);
                     mList_a.add(packageName);
                 }
-                if (mList_a.contains("MainActivity")&&MyApp.mActivitys.size()==1){
-                    Log.e("LLL","只有MainActivity");
+                if (mList_a.contains("MainActivity") && MyApp.mActivitys.size() == 1) {
+                    Log.e("LLL", "只有MainActivity");
                     MyApp.finishAllActivity();
                     Intent intent = new Intent(getActivity(), LoginActivity.class);
                     startActivity(intent);
-                }else if (mList_a.contains("MainActivity")&&mList_a.contains("BetaActivity")&&MyApp.mActivitys.size()==2){
+                } else if (mList_a.contains("MainActivity") && mList_a.contains("BetaActivity") && MyApp.mActivitys.size() == 2) {
                     MyApp.finishAllActivity();
                     Intent intent = new Intent(getActivity(), LoginActivity.class);
                     startActivity(intent);
-                }else {
-                    Log.e("LLL","多个Activity");
+                } else {
+                    Log.e("LLL", "多个Activity");
                 }
             }
         }
@@ -342,7 +348,8 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
 
         }
     }
-//    @Override
+
+    //    @Override
 //    public void onStop() {
 //        super.onStop();
 //        Log.e("TAG", "onstop");
@@ -380,27 +387,28 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                     sceneDialog.dismiss();
                     break;
                 case R.id.app_sure_tv:
-                    if (isAddScene){
+                    if (isAddScene) {
                         //添加场景
                         String sceneName = sceneDialog.getSceneName();
-                        if (TextUtils.isEmpty(sceneName)){
+                        if (TextUtils.isEmpty(sceneName)) {
                             SmartToast.show("场景名称不能为空");
-                        }else {
-                            mConnection.sendTextMessage("{\"pn\":\"SATP\",\"icon\":\"changjing1\",\"name\":\""+sceneName+"\"}");
+                        } else {
+                            mConnection.sendTextMessage("{\"pn\":\"SATP\",\"icon\":\"changjing1\",\"name\":\"" + sceneName + "\"}");
                         }
-                    }else {
+                    } else {
                         //修改场景
                         String sceneName = sceneDialog.getSceneName();
-                        if (TextUtils.isEmpty(sceneName)){
+                        if (TextUtils.isEmpty(sceneName)) {
                             SmartToast.show("场景名称不能为空");
-                        }else {
-                            mConnection.sendTextMessage("{\"pn\":\"SUTP\",\"sceneID\":\""+mList.get(flag).id+"\",\"name\":\""+sceneName+"\"}");
+                        } else {
+                            mConnection.sendTextMessage("{\"pn\":\"SUTP\",\"sceneID\":\"" + mList.get(flag).id + "\",\"name\":\"" + sceneName + "\"}");
                         }
                     }
                     break;
             }
         }
     };
+
     @Override
     public void onDestroy() {
         super.onDestroy();

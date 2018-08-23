@@ -91,6 +91,10 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
 
     String[] items_fanwei = {"大于", "等于", "小于"};
     int[] items_value = {-1, 0, 1};
+
+    String[] items_switch={"开","关"};
+    int[] items_switch_value={1,0};
+
     private int type = -2;
     private int flag_type = -2;
     private String linkageID;
@@ -100,6 +104,8 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
 
     private int pos = -1;//如果大于0则是重新选择了设备，小于0则是没有修改设备
     private String icon="shebeia";
+    private String modelPath;
+    private int switch_value;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -114,6 +120,7 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
         SPUtils.put(this,"isTrigger",true);
         linkage = (LinkageSettingBean.Linkage) getIntent().getSerializableExtra("LinkageData");
         linkageID = getIntent().getStringExtra("linkageID");
+
         IntentFilter intentFilter=new IntentFilter();
         intentFilter.addAction("LDLTP");
         intentFilter.addAction("LUTP");
@@ -126,6 +133,10 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
 //        socketConnection();
 
         if (linkage != null) {
+            modelPath = linkage.device.product.modelPath;
+            if (modelPath.equals("pro_switch")){
+                etDeviceTrigValue.setVisibility(View.GONE);
+            }
             deviceId = linkage.device.id;
             proAttID = linkage.device.deviceAttributes.get(0).proAttID;
             String name = linkage.device.name;
@@ -134,16 +145,28 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
             String name1 = linkage.proAtt.name;
             tvDeviceTrigAttr.setText(name1);
             int value = linkage.value;
+            switch_value=linkage.value;
             type = linkage.type;
-            if (type == -1) {
-                tvDeviceTrigCondition.setText("大于");
-            } else if (type == 0) {
-                tvDeviceTrigCondition.setText("等于");
-            } else if (type == 1) {
-                tvDeviceTrigCondition.setText("小于");
+
+            if (modelPath.equals("pro_switch")){
+                if (value==0){
+                    tvDeviceTrigCondition.setText("关");
+                }else if (value==1){
+                    tvDeviceTrigCondition.setText("开");
+                }
+            }else {
+                if (type == -1) {
+                    tvDeviceTrigCondition.setText("大于");
+                } else if (type == 0) {
+                    tvDeviceTrigCondition.setText("等于");
+                } else if (type == 1) {
+                    tvDeviceTrigCondition.setText("小于");
+                }
+                etDeviceTrigValue.setText(value + "");
             }
-            etDeviceTrigValue.setText(value + "");
+
         } else {
+
             tvDeviceTrigCondition.setText("等于");
             type = 0;
         }
@@ -195,7 +218,16 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
                 tvDeviceTrigAttr.setText(mList.get(i).deviceAttributes.get(0).proAtt.name);
                 icon = mList.get(i).product.icon;
                 Glide.with(DeviceTriggeredActivity.this).load(ContentConfig.drawableByIcon(icon)).into(ivTriggeredIcon);
-
+                modelPath=mList.get(i).product.modelPath;
+                if (modelPath.equals("pro_switch")){
+                    etDeviceTrigValue.setVisibility(View.GONE);
+                    tvDeviceTrigCondition.setText("开");
+                    switch_value=1;
+                }else {
+                    etDeviceTrigValue.setVisibility(View.VISIBLE);
+                    tvDeviceTrigCondition.setText("等于");
+                    type = 0;
+                }
 //                mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\""+linkageID+"\",\"deviceID\":\""+mList.get(i).id+"\",\"proAttID\":\""+mList.get(i).deviceAttributes.get(0).proAttID+"\",\"type\":0,\"value\":0}");
                 drawerLayout.closeDrawers();
             }
@@ -221,17 +253,26 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
             case R.id.tv_base_title:
                 break;
             case R.id.iv_base_right:
-                String s = etDeviceTrigValue.getText().toString().trim();
-                if (TextUtils.isEmpty(s)) {
-                    SmartToast.show("联动条件值不能为空");
-                    return;
-                }
-                int value = Integer.parseInt(s);
+                if (modelPath.equals("pro_switch")){
 
-                if (linkage == null) {
-                    mConnection.sendTextMessage("{\"pn\":\"LATP\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + type + ",\"value\":" + value + ",\"name\":\"新联动\"}");
-                } else {
-                    mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\"" + linkageID + "\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + type + ",\"value\":" + value + "}");
+                    if (linkage == null) {
+                        mConnection.sendTextMessage("{\"pn\":\"LATP\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + 0 + ",\"value\":" + switch_value + ",\"name\":\"新联动\"}");
+                    } else {
+                        mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\"" + linkageID + "\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + 0 + ",\"value\":" + switch_value + "}");
+                    }
+                }else {
+                    String s = etDeviceTrigValue.getText().toString().trim();
+                    if (TextUtils.isEmpty(s)) {
+                        SmartToast.show("联动条件值不能为空");
+                        return;
+                    }
+                    int value = Integer.parseInt(s);
+
+                    if (linkage == null) {
+                        mConnection.sendTextMessage("{\"pn\":\"LATP\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + type + ",\"value\":" + value + ",\"name\":\"新联动\"}");
+                    } else {
+                        mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\"" + linkageID + "\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + type + ",\"value\":" + value + "}");
+                    }
                 }
 //                Log.e(TAG,"{\"pn\":\"LUTP\",\"linkageID\":\""+linkageID+"\",\"deviceID\":\""+deviceId+"\",\"proAttID\":\""+proAttID+"\",\"type\":"+type+",\"value\":"+value+"}");
                 break;
@@ -303,23 +344,43 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.tv_device_trig_condition:
-                //选择大于小于等于
-                for (int i = 0; i < items_value.length; i++) {
-                    if (items_value[i] == type) {
-                        flag_type = i;
+                if (modelPath.equals("pro_switch")){
+                    //选择开关
+                    for (int i = 0; i < items_switch_value.length; i++) {
+                        if (items_switch_value[i]==switch_value){
+                            flag_type=i;
+                        }
                     }
-                }
-                AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-                builder1.setSingleChoiceItems(items_fanwei, flag_type, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        type = items_value[i];
+                    AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+                    builder1.setSingleChoiceItems(items_switch, flag_type, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            switch_value = items_switch_value[i];
 
-                        tvDeviceTrigCondition.setText(items_fanwei[i]);
-                        dialogInterface.dismiss();
+                            tvDeviceTrigCondition.setText(items_switch[i]);
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    builder1.show();
+                }else {
+                    //选择大于小于等于
+                    for (int i = 0; i < items_value.length; i++) {
+                        if (items_value[i] == type) {
+                            flag_type = i;
+                        }
                     }
-                });
-                builder1.show();
+                    AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+                    builder1.setSingleChoiceItems(items_fanwei, flag_type, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            type = items_value[i];
+
+                            tvDeviceTrigCondition.setText(items_fanwei[i]);
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    builder1.show();
+                }
                 break;
         }
     }

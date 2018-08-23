@@ -47,7 +47,7 @@ public class KaiGuanAdapter extends BaseQuickAdapter<KaiGuanBean.Devices,BaseVie
             }else if (item.product.proatts.size()==2){//双路开关
 //                helper.setGone(R.id.checkbox_left,true);
 //                helper.setGone(R.id.checkbox_middle,true);
-
+                helper.setGone(R.id.iv_kg_right,false);
                 helper.setGone(R.id.iv_kg_left,true);
                 helper.setGone(R.id.iv_kg_middle,true);
                 if (item.deviceAttributes.get(0).value==0){

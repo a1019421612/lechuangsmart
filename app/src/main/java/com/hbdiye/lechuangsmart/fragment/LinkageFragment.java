@@ -115,10 +115,8 @@ public class LinkageFragment extends Fragment {
                 flag = position;
                 switch (view.getId()) {
                     case R.id.ll_linkage_item:
-                        if (editStatus) {
                             String timingID = mList.get(position).timingID + "";
                             startActivity(new Intent(getActivity(), LinkageSettingActivity.class).putExtra("linkageID", mList.get(position).id).putExtra("timingId", timingID));
-                        }
                         break;
                     case R.id.ll_linkage_item_del:
                         mConnection.sendTextMessage("{\"pn\":\"LDTP\",\"linkageID\":\"" + mList.get(position).id + "\"}");

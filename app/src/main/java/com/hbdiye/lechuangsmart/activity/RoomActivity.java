@@ -55,7 +55,7 @@ public class RoomActivity extends BaseActivity {
     private String TAG = RoomActivity.class.getSimpleName();
     private WebSocketConnection mConnection;
     private HomeReceiver homeReceiver;
-    private String roomId="";
+    private String roomId = "";
 
     private RoomDeviceByIDAdapter adapter;
     private List<RoomDeviceBean.Devices> mList = new ArrayList<>();
@@ -64,25 +64,25 @@ public class RoomActivity extends BaseActivity {
     private boolean editStatus = false;//编辑状态标志，默认false
 
     private SceneDialog sceneDialog;
-    private int flag=-1;
+    private int flag = -1;
 
-    private String erCode="";
+    private String erCode = "";
 
-    private boolean flag_code=false;
+    private boolean flag_code = false;
 
     @Override
     protected void initData() {
         roomId = getIntent().getStringExtra("roomId");
-        IntentFilter intentFilter=new IntentFilter();
+        IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("DGLTP");
         intentFilter.addAction("SDOSTP");
         intentFilter.addAction("DUTP");
         intentFilter.addAction("SDBTP");
         intentFilter.addAction("ATP");
         homeReceiver = new HomeReceiver();
-        registerReceiver(homeReceiver,intentFilter);
+        registerReceiver(homeReceiver, intentFilter);
         mConnection = SingleWebSocketConnection.getInstance();
-        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
+        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
     }
 
     @Override
@@ -118,10 +118,24 @@ public class RoomActivity extends BaseActivity {
                 }
             }
         });
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (!editStatus){
+                    if (mList.get(position).product.modelPath.equals("pro_dispatcher")){
+                        startActivity(new Intent(RoomActivity.this, YaoKongListActivity.class)
+                                .putExtra("deviceID", mList.get(position).id)
+                                .putExtra("deviceName", mList.get(position).name)
+                                .putExtra("mac", mList.get(position).mac));
+                    }
+                }
+            }
+        });
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 flag = position;
+                RoomDeviceBean.Devices devices = mList.get(position);
                 switch (view.getId()) {
                     case R.id.ll_scene_item_del:
 //                        mConnection.sendTextMessage("{\"pn\":\"RDTP\",\"roomID\":\""+mList.get(position).id+"\"}");
@@ -130,6 +144,44 @@ public class RoomActivity extends BaseActivity {
                         sceneDialog = new SceneDialog(RoomActivity.this, R.style.MyDialogStyle, dailogClicer, "修改设备名称");
                         sceneDialog.setCanceledOnTouchOutside(true);
                         sceneDialog.show();
+                        break;
+                    case R.id.iv_room_left:
+                        if (!editStatus) {
+                            int value_left = devices.deviceAttributes.get(0).value;
+                            if (value_left == 0) {
+                                //value=0 关
+                                String onId = devices.deviceAttributes.get(0).actions.get(0).id;//开id
+                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + onId + "\",\"param\":\"\"}");
+                            } else {
+                                //开
+                                String offId = devices.deviceAttributes.get(0).actions.get(1).id;//关id
+                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + offId + "\",\"param\":\"\"}");
+                            }
+                        }
+                        break;
+                    case R.id.iv_room_middle:
+                        if (!editStatus){
+                            int value_middle = devices.deviceAttributes.get(1).value;
+                            if (value_middle==0){
+                                String onId = devices.deviceAttributes.get(1).actions.get(0).id;//开id
+                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
+                            }else {
+                                String offId = devices.deviceAttributes.get(1).actions.get(1).id;//关id
+                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+                            }
+                        }
+                        break;
+                    case R.id.iv_room_right:
+                        if (!editStatus){
+                            int value_right = devices.deviceAttributes.get(2).value;
+                            if (value_right==0){
+                                String onId = devices.deviceAttributes.get(2).actions.get(0).id;//开id
+                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
+                            }else {
+                                String offId = devices.deviceAttributes.get(2).actions.get(1).id;//关id
+                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+                            }
+                        }
                         break;
 //                    case R.id.ll_scene_device:
 //                        if (!editStatus) {
@@ -141,7 +193,7 @@ public class RoomActivity extends BaseActivity {
         });
     }
 
-    private View.OnClickListener dailogClicer=new View.OnClickListener() {
+    private View.OnClickListener dailogClicer = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
@@ -154,7 +206,7 @@ public class RoomActivity extends BaseActivity {
                         SmartToast.show("设备名称不能为空");
                     } else {
                         String devicemac = mList.get(flag).mac;
-                        mConnection.sendTextMessage("{\"pn\":\"DUTP\",\"deviceMAC\":\""+devicemac+"\",\"newName\": \""+sceneName+"\"}");
+                        mConnection.sendTextMessage("{\"pn\":\"DUTP\",\"deviceMAC\":\"" + devicemac + "\",\"newName\": \"" + sceneName + "\"}");
                     }
                     break;
             }
@@ -168,19 +220,21 @@ public class RoomActivity extends BaseActivity {
 
     @OnClick(R.id.ll_add_roomdevice)
     public void onViewClicked() {
-        startActivityForResult(new Intent(this, CaptureActivity.class),123);
+        startActivityForResult(new Intent(this, CaptureActivity.class), 123);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 111 && resultCode == 4) {
-            flag_code=true;
+            flag_code = true;
             erCode = data.getStringExtra("erCode");
 
 //            textview.setText(s);
 //            SmartToast.show(erCode);
         }
     }
+
     class HomeReceiver extends BroadcastReceiver {
 
         @Override
@@ -206,29 +260,29 @@ public class RoomActivity extends BaseActivity {
                 }
                 adapter.notifyDataSetChanged();
             }
-            if (action.equals("DUTP")){
+            if (action.equals("DUTP")) {
                 //修改设备名称 DUTP
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status){
+                    if (status) {
                         sceneDialog.dismiss();
-                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
+                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            if (action.equals("SDBTP")){
+            if (action.equals("SDBTP")) {
                 //扫描加入家庭
-                flag_code=false;
+                flag_code = false;
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status){
+                    if (status) {
                         SmartToast.show("成功加入");
-                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
-                    }else {
+                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
+                    } else {
                         SmartToast.show("加入失败");
                     }
                 } catch (JSONException e) {
@@ -236,22 +290,22 @@ public class RoomActivity extends BaseActivity {
                 }
 //                SmartToast.showLong(payload);
             }
-            if (action.equals("ATP")){
+            if (action.equals("ATP")) {
 //                    mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + list_room.get(flagRoomPosition).id + "\"}");
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     String deviceID = jsonObject.getString("deviceID");
                     String proAttID = jsonObject.getString("proAttID");
-                    int value =Integer.parseInt(jsonObject.getString("value"));
+                    int value = Integer.parseInt(jsonObject.getString("value"));
                     for (int i = 0; i < mList.size(); i++) {
-                        if (mList.get(i).id.equals(deviceID)){
+                        if (mList.get(i).id.equals(deviceID)) {
                             RoomDeviceBean.Devices devices = mList.get(i);
                             List<RoomDeviceBean.Devices.DeviceAttributes> deviceAttributes = devices.deviceAttributes;
                             for (int j = 0; j < deviceAttributes.size(); j++) {
-                                if (deviceAttributes.get(j).proAttID.equals(proAttID)){
+                                if (deviceAttributes.get(j).proAttID.equals(proAttID)) {
 //                                    mList.get(i).deviceAttributes.get(j).value;
-                                    deviceAttributes.get(j).value=value;
-                                    mList.set(i,devices);
+                                    deviceAttributes.get(j).value = value;
+                                    mList.set(i, devices);
                                     adapter.notifyItemChanged(i);
                                 }
                             }
@@ -264,14 +318,15 @@ public class RoomActivity extends BaseActivity {
             }
         }
     }
+
     class MyWebSocketHandler extends WebSocketHandler {
         @Override
         public void onOpen() {
             Log.e(TAG, "open");
-            mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
-            if (flag_code){
+            mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
+            if (flag_code) {
 //                mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\""+ erCode +"\"} ");
-                mConnection.sendTextMessage("{{\"pn\":\"SDBTP\",\"roomID\":\""+roomId+"\",\"serialnumber\":\""+erCode+"\"}}");
+                mConnection.sendTextMessage("{{\"pn\":\"SDBTP\",\"roomID\":\"" + roomId + "\",\"serialnumber\":\"" + erCode + "\"}}");
             }
         }
 
@@ -285,7 +340,7 @@ public class RoomActivity extends BaseActivity {
             if (payload.contains("{\"pn\":\"PRTP\"}")) {
                 for (Activity activity : MyApp.mActivitys) {
                     String packageName = activity.getLocalClassName();
-                    Log.e("LLL",packageName);
+                    Log.e("LLL", packageName);
                 }
                 MyApp.finishAllActivity();
                 Intent intent = new Intent(RoomActivity.this, LoginActivity.class);
@@ -310,29 +365,29 @@ public class RoomActivity extends BaseActivity {
                 }
                 adapter.notifyDataSetChanged();
             }
-            if (payload.contains("\"pn\":\"DUTP\"")){
+            if (payload.contains("\"pn\":\"DUTP\"")) {
                 //修改设备名称 DUTP
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status){
+                    if (status) {
                         sceneDialog.dismiss();
-                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
+                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            if (payload.contains("\"pn\":\"SDBTP\"")){
+            if (payload.contains("\"pn\":\"SDBTP\"")) {
                 //扫描加入家庭
-                flag_code=false;
+                flag_code = false;
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status){
+                    if (status) {
                         SmartToast.show("成功加入");
-                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\""+roomId+"\"}");
-                    }else {
+                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
+                    } else {
                         SmartToast.show("加入失败");
                     }
                 } catch (JSONException e) {
@@ -340,22 +395,22 @@ public class RoomActivity extends BaseActivity {
                 }
 //                SmartToast.showLong(payload);
             }
-            if (payload.contains("\"pn\":\"ATP\"")){
+            if (payload.contains("\"pn\":\"ATP\"")) {
 //                    mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + list_room.get(flagRoomPosition).id + "\"}");
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     String deviceID = jsonObject.getString("deviceID");
                     String proAttID = jsonObject.getString("proAttID");
-                    int value =Integer.parseInt(jsonObject.getString("value"));
+                    int value = Integer.parseInt(jsonObject.getString("value"));
                     for (int i = 0; i < mList.size(); i++) {
-                        if (mList.get(i).id.equals(deviceID)){
+                        if (mList.get(i).id.equals(deviceID)) {
                             RoomDeviceBean.Devices devices = mList.get(i);
                             List<RoomDeviceBean.Devices.DeviceAttributes> deviceAttributes = devices.deviceAttributes;
                             for (int j = 0; j < deviceAttributes.size(); j++) {
-                                if (deviceAttributes.get(j).proAttID.equals(proAttID)){
+                                if (deviceAttributes.get(j).proAttID.equals(proAttID)) {
 //                                    mList.get(i).deviceAttributes.get(j).value;
-                                    deviceAttributes.get(j).value=value;
-                                    mList.set(i,devices);
+                                    deviceAttributes.get(j).value = value;
+                                    mList.set(i, devices);
                                     adapter.notifyItemChanged(i);
                                 }
                             }

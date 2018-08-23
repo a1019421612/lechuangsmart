@@ -20,6 +20,7 @@ import com.coder.zzq.smartshow.toast.SmartToast;
 import com.hbdiye.lechuangsmart.MainActivity;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.activity.AboutUsActivity;
 import com.hbdiye.lechuangsmart.activity.EditPswActivity;
 import com.hbdiye.lechuangsmart.activity.FamilyManagerActivity;
@@ -71,6 +72,8 @@ public class SettingFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_setting, container, false);
         unbinder = ButterKnife.bind(this, view);
+        mConnection = SingleWebSocketConnection.getInstance();
+//        mConnection.sendTextMessage("{\"pn\":\"DGLTP\", \"classify\":\"protype\", \"id\":\"PROTYPE07\"}");
 //        mConnection = new WebSocketConnection();
 //        mobilephone = (String) SPUtils.get(getActivity(), "mobilephone", "");
 //        password = (String) SPUtils.get(getActivity(), "password", "");
@@ -136,6 +139,7 @@ public class SettingFragment extends Fragment {
             switch (v.getId()) {
                 case R.id.item_popupwindows_camera:
                     //注销账号
+//                    mConnection.disconnect();
                     getPhotoPopwindow.dismiss();
                     SPUtils.clear(getActivity());
                     startActivity(new Intent(getActivity(), LoginActivity.class));
@@ -153,72 +157,72 @@ public class SettingFragment extends Fragment {
         }
     };
     private List<String> mList= new ArrayList<>();
-    class MyWebSocketHandler extends WebSocketHandler {
-        @Override
-        public void onOpen() {
-            Log.e(TAG, "open");
-            mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
-        }
-
-        @Override
-        public void onTextMessage(String payload) {
-            Log.e(TAG, "onTextMessage" + payload);
-            if (payload.contains("{\"pn\":\"HRQP\"}")) {
-                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
-            }
-
-            if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                for (Activity activity : MyApp.mActivitys) {
-                    String packageName = activity.getLocalClassName();
-                    Log.e("LLL",packageName);
-                    mList.add(packageName);
-                }
-                if (mList.contains("MainActivity")&&MyApp.mActivitys.size()==1){
-                    Log.e("LLL","只有MainActivity");
-                    MyApp.finishAllActivity();
-                    Intent intent = new Intent(getActivity(), LoginActivity.class);
-                    startActivity(intent);
-                }else if (mList.contains("MainActivity")&&mList.contains("BetaActivity")&&MyApp.mActivitys.size()==2){
-                    MyApp.finishAllActivity();
-                    Intent intent = new Intent(getActivity(), LoginActivity.class);
-                    startActivity(intent);
-                }if (mList.contains("WiFiActivity")){
-                    Log.e("LLL","多个Activity");
-                    MyApp.finishAllActivity();
-                    Intent intent = new Intent(getActivity(), LoginActivity.class);
-                    startActivity(intent);
-                }else if (mList.contains("AboutUsActivity")){
-                    MyApp.finishAllActivity();
-                    Intent intent = new Intent(getActivity(), LoginActivity.class);
-                    startActivity(intent);
-                }else {
-                    Log.e("LLL","多个Activity");
-                }
-            }
+//    class MyWebSocketHandler extends WebSocketHandler {
+//        @Override
+//        public void onOpen() {
+//            Log.e(TAG, "open");
+//            mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
+//        }
+//
+//        @Override
+//        public void onTextMessage(String payload) {
+//            Log.e(TAG, "onTextMessage" + payload);
+//            if (payload.contains("{\"pn\":\"HRQP\"}")) {
+//                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+//            }
+//
 //            if (payload.contains("{\"pn\":\"PRTP\"}")) {
-//                if (MyApp.mActivitys.contains(MainActivity.class)&&MyApp.mActivitys.size()==1){
+//                for (Activity activity : MyApp.mActivitys) {
+//                    String packageName = activity.getLocalClassName();
+//                    Log.e("LLL",packageName);
+//                    mList.add(packageName);
+//                }
+//                if (mList.contains("MainActivity")&&MyApp.mActivitys.size()==1){
 //                    Log.e("LLL","只有MainActivity");
 //                    MyApp.finishAllActivity();
 //                    Intent intent = new Intent(getActivity(), LoginActivity.class);
 //                    startActivity(intent);
-//                }else if (MyApp.mActivitys.contains(WiFiActivity.class)){
+//                }else if (mList.contains("MainActivity")&&mList.contains("BetaActivity")&&MyApp.mActivitys.size()==2){
+//                    MyApp.finishAllActivity();
+//                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+//                    startActivity(intent);
+//                }if (mList.contains("WiFiActivity")){
 //                    Log.e("LLL","多个Activity");
 //                    MyApp.finishAllActivity();
 //                    Intent intent = new Intent(getActivity(), LoginActivity.class);
 //                    startActivity(intent);
-//                }else if (MyApp.mActivitys.contains(AboutUsActivity.class)){
+//                }else if (mList.contains("AboutUsActivity")){
 //                    MyApp.finishAllActivity();
 //                    Intent intent = new Intent(getActivity(), LoginActivity.class);
 //                    startActivity(intent);
+//                }else {
+//                    Log.e("LLL","多个Activity");
 //                }
 //            }
-        }
-
-        @Override
-        public void onClose(int code, String reason) {
-            Log.e(TAG, "onClose");
-        }
-    }
+////            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+////                if (MyApp.mActivitys.contains(MainActivity.class)&&MyApp.mActivitys.size()==1){
+////                    Log.e("LLL","只有MainActivity");
+////                    MyApp.finishAllActivity();
+////                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+////                    startActivity(intent);
+////                }else if (MyApp.mActivitys.contains(WiFiActivity.class)){
+////                    Log.e("LLL","多个Activity");
+////                    MyApp.finishAllActivity();
+////                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+////                    startActivity(intent);
+////                }else if (MyApp.mActivitys.contains(AboutUsActivity.class)){
+////                    MyApp.finishAllActivity();
+////                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+////                    startActivity(intent);
+////                }
+////            }
+//        }
+//
+//        @Override
+//        public void onClose(int code, String reason) {
+//            Log.e(TAG, "onClose");
+//        }
+//    }
 //    @Override
 //    public void onHiddenChanged(boolean hidden) {
 //        if (hidden) {

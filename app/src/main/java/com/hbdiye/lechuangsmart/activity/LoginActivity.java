@@ -112,7 +112,7 @@ public class LoginActivity extends BaseActivity {
                                 startActivity(new Intent(LoginActivity.this,MainActivity.class));
                                 finish();
                             }else {
-                                String data = jsonObject.getString("data");
+                                String data = jsonObject.getString("errmsg");
                                 SmartToast.show(data);
                             }
                         } catch (JSONException e) {

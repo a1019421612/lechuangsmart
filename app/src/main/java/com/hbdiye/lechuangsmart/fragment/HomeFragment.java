@@ -152,7 +152,7 @@ public class HomeFragment extends Fragment {
             switch (msg.what) {
                 case 1:
                     long sysTime = System.currentTimeMillis();
-                    CharSequence sysTimeStr = DateFormat.format("hh:mm", sysTime);
+                    CharSequence sysTimeStr = DateFormat.format("HH:mm", sysTime);
                     try {
                         tvTime.setText(sysTimeStr); //更新时间
                     } catch (Exception e) {
@@ -173,6 +173,7 @@ public class HomeFragment extends Fragment {
         try {
             mConnection.connect("ws://39.104.119.0:18888/mobilephone=" + mobilephone + "&password=" + password, instance);
         } catch (WebSocketException e) {
+            Log.e("sss","异常："+e.toString());
             e.printStackTrace();
         }
         instance.SetSocketsendMessage(new SocketSendMessage() {
@@ -340,14 +341,26 @@ public class HomeFragment extends Fragment {
         Intent intent = new Intent();
         intent.setAction(param);
         intent.putExtra("message",message);
-        getActivity().sendBroadcast(intent);
+        try {
+            getActivity().sendBroadcast(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
         exit=true;
+
 //        getActivity().unregisterReceiver(homeReceiver);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //这是一条错误指令目的是为了立刻断开连接 如果用mConnection.disconnect()会等很长时间才会断开连接
+        mConnection.sendTextMessage("{\"pn\":\"DLLL\", \"classify\":\"protype\", \"id\":\"PROTYPE07\"}");
     }
 
     @OnClick({R.id.ll_anfang, R.id.ll_zhaoming, R.id.ll_chuanglian, R.id.ll_chuanganqi, R.id.ll_fangjian, R.id.ll_kaiguan, R.id.ll_yaokong})
