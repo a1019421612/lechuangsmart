@@ -187,7 +187,6 @@ public class SceneSettingActivity extends AppCompatActivity {
                 .build();
         pickerBuilder.setNPicker(ContentConfig.getTimeHours(), ContentConfig.getTimeMin(), ContentConfig.getTimeSeco());
     }
-
     private void handleClick() {
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
