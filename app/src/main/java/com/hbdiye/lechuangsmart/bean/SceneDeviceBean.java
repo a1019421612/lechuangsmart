@@ -201,5 +201,7 @@ public class SceneDeviceBean implements Serializable {
         public String id;
         public Object family;
         public Object sceneTasks;
+        public String groupNo;
+        public String sceneNo;
     }
 }

@@ -48,6 +48,8 @@ import com.hbdiye.lechuangsmart.bean.SceneDeviceBean;
 import com.hbdiye.lechuangsmart.bean.YaoKongListBean;
 import com.hbdiye.lechuangsmart.util.Logger;
 import com.hbdiye.lechuangsmart.util.SPUtils;
+import com.hbdiye.lechuangsmart.views.GetGatewayPopwindow;
+import com.hbdiye.lechuangsmart.views.GetScenePopwindow;
 import com.hbdiye.lechuangsmart.views.SceneDialog;
 import com.hzy.tvmao.KookongSDK;
 import com.hzy.tvmao.interf.IRequestResult;
@@ -60,13 +62,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.tavendo.autobahn.WebSocketConnection;
-import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
 
 import static com.hzy.tvmao.ir.Device.AC;
@@ -109,6 +111,8 @@ public class SceneSettingActivity extends AppCompatActivity {
     RecyclerView rvHongwaiDevice;
     @BindView(R.id.rv_device_menu)
     RecyclerView rvDeviceMenu;
+    @BindView(R.id.ll_parent)
+    LinearLayout llParent;
     private boolean isOpen = false;//默认侧边栏关闭
     private String sceneID = "";
 
@@ -128,7 +132,7 @@ public class SceneSettingActivity extends AppCompatActivity {
     private LinkageYaoKongQiListAdapter adapter_yk;
 
     //遥控按钮
-    private ArrayList<IrData.IrKey> mList_menu=new ArrayList<>();
+    private ArrayList<IrData.IrKey> mList_menu = new ArrayList<>();
     private LinkageDeviceMenuAdapter adapter_menu;
 
     private TimePickerView timePickerView;
@@ -146,7 +150,7 @@ public class SceneSettingActivity extends AppCompatActivity {
 
     private List<ImageBean> mList_image = new ArrayList<>();
 
-    private int level=0;
+    private int level = 0;
     private SceneDeviceBean.Devices devices;
     private YaoKongListBean.Irremotes irremotes;
     private String rcode;
@@ -227,9 +231,10 @@ public class SceneSettingActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 //                                SmartToast.show(proActs.get(which).name);
-                                if (which != dialogflag) {
-                                    mConnection.sendTextMessage("{\"pn\":\"STUTP\",\"stID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + mList.get(position).proActs.get(which).id + "\",\"delaytime\":\"" + mList.get(position).delaytime + "\"}");
-                                }
+//                                if (which != dialogflag) {
+//                                    mConnection.sendTextMessage("{\"pn\":\"STUTP\",\"stID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + mList.get(position).proActs.get(which).id + "\",\"delaytime\":\"" + mList.get(position).delaytime + "\"}");
+//                                }
+                                taskDeviceActionDialog(mList.get(position).id,mList.get(position).proActs.get(which).id);
                                 dialog.dismiss();
                             }
                         });
@@ -240,10 +245,10 @@ public class SceneSettingActivity extends AppCompatActivity {
         });
         mAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+            public void onItemClick(BaseQuickAdapter adapter, View view, final int position) {
                 devices = mList_device.get(position);
                 if (mList_device.get(position).product.modelPath.equals("pro_dispatcher")) {
-                    level=1;
+                    level = 1;
                     mList_yk.clear();
                     adapter_yk.notifyDataSetChanged();
                     rvSceneDevice.setVisibility(View.GONE);
@@ -251,7 +256,27 @@ public class SceneSettingActivity extends AppCompatActivity {
                     rvHongwaiDevice.setVisibility(View.VISIBLE);
                     mConnection.sendTextMessage("{\"pn\":\"IRLTP\",\"deviceID\":\"" + mList_device.get(position).id + "\"}");
                 } else {
-                    mConnection.sendTextMessage("{\"pn\":\"STATP\",\"sceneID\":\"" + sceneID + "\",\"deviceID\":\"" + sceneDeviceBean.devices.get(position).id + "\",\"proActID\":\"" + sceneDeviceBean.devices.get(position).product.proacts.get(0).id + "\",\"type\":\"0\",\"delaytime\":\"0\"}");
+//                    mConnection.sendTextMessage("{\"pn\":\"STATP\",\"sceneID\":\"" + sceneID + "\",\"deviceID\":\"" + sceneDeviceBean.devices.get(position).id + "\",\"proActID\":\"" + sceneDeviceBean.devices.get(position).product.proacts.get(0).id + "\",\"type\":\"0\",\"delaytime\":\"0\"}");
+                    final List<SceneDeviceBean.Devices.Product.Proacts> proActs = mList_device.get(position).product.proacts;
+//                        String[] proActs_id = new String[proActs.size()];
+//                    String proActID = mList_device.get(position).product.proacts;
+                    String[] proActs_name = new String[proActs.size()];
+                    final String[] proActs_id=new String[proActs.size()];
+                    for (int i = 0; i < proActs.size(); i++) {
+                        proActs_name[i] = proActs.get(i).name;
+                        proActs_id[i]=proActs.get(i).id;
+                    }
+                    final AlertDialog.Builder builder= new AlertDialog.Builder(SceneSettingActivity.this);
+                    builder.setSingleChoiceItems(proActs_name, -1, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList_device.get(position).id+"\",\"proActID\":\""+proActs_id[which]+"\",\"param\":\"\"}");
+                            dialog.dismiss();
+                            deviceActionDialog(mList_device.get(position).id,proActs_id[which]);
+                        }
+                    });
+                    builder.show();
+
                 }
             }
         });
@@ -259,7 +284,7 @@ public class SceneSettingActivity extends AppCompatActivity {
         adapter_yk.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                level=2;
+                level = 2;
                 mList_menu.clear();
                 adapter_menu.notifyDataSetChanged();
                 ivDeviceBack.setVisibility(View.VISIBLE);
@@ -270,43 +295,70 @@ public class SceneSettingActivity extends AppCompatActivity {
                 String rtype = mList_yk.get(position).rtype;
                 String rid = mList_yk.get(position).rid;
                 if (rtype.equals("TV")) {
-                    getIRDataById(rid,TV);
-                }else if (rtype.equals("BOX")){
-                    getIRDataById(rid,BOX);
-                }else if (rtype.equals("STB")){
-                    getIRDataById(rid,STB);
-                }else if (rtype.equals("DVD")){
-                    getIRDataById(rid,DVD);
-                }else if (rtype.equals("AC")){
-                    getNoStateIRDataById(rid,AC);
-                }else if (rtype.equals("PRO")){
-                    getIRDataById(rid,PRO);
-                }else if (rtype.equals("PA")){
-                    getIRDataById(rid,PA);
-                }else if (rtype.equals("FAN")){
-                    getIRDataById(rid,FAN);
-                }else if (rtype.equals("SLR")){
-                    getIRDataById(rid,SLR);
-                }else if (rtype.equals("AIR_CLEANER")){
-                    getIRDataById(rid,AIR_CLEANER);
+                    getIRDataById(rid, TV);
+                } else if (rtype.equals("BOX")) {
+                    getIRDataById(rid, BOX);
+                } else if (rtype.equals("STB")) {
+                    getIRDataById(rid, STB);
+                } else if (rtype.equals("DVD")) {
+                    getIRDataById(rid, DVD);
+                } else if (rtype.equals("AC")) {
+                    getNoStateIRDataById(rid, AC);
+                } else if (rtype.equals("PRO")) {
+                    getIRDataById(rid, PRO);
+                } else if (rtype.equals("PA")) {
+                    getIRDataById(rid, PA);
+                } else if (rtype.equals("FAN")) {
+                    getIRDataById(rid, FAN);
+                } else if (rtype.equals("SLR")) {
+                    getIRDataById(rid, SLR);
+                } else if (rtype.equals("AIR_CLEANER")) {
+                    getIRDataById(rid, AIR_CLEANER);
                 }
             }
         });
         adapter_menu.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                String data="{\"pn\":\"STATP\",\"sceneID\":\""+sceneID+"\",\"deviceID\":\""+devices.id+"\",\"proActID\":\""+devices.product.proacts.get(0).id+"\",\"param\":\""+irremotes.id+"\",\"type\":\"1\",\"delaytime\":null,\"rcode\":\""+rcode+"\",\"fpulse\":\""+mList_menu.get(position).pulse.replace(" ", "").replace(",", "")+"\",\"irremoteid\":\""+irremotes.id+"\",\"proname\":\""+mList_menu.get(position).fname+"\"}";
-                Log.e("TTT",data);
+                String data = "{\"pn\":\"STATP\",\"sceneID\":\"" + sceneID + "\",\"deviceID\":\"" + devices.id + "\",\"proActID\":\"" + devices.product.proacts.get(0).id + "\",\"param\":\"" + irremotes.id + "\",\"type\":\"1\",\"delaytime\":null,\"rcode\":\"" + rcode + "\",\"fpulse\":\"" + mList_menu.get(position).pulse.replace(" ", "").replace(",", "") + "\",\"irremoteid\":\"" + irremotes.id + "\",\"proname\":\"" + mList_menu.get(position).fname + "\"}";
+                Log.e("TTT", data);
                 mConnection.sendTextMessage(data);
 //                mConnection.sendTextMessage("{\"pn\":\"LTATP\",\"linkageID\":\""+linkageID+"\",\"deviceID\":\""+devices.id+"\",\"proActID\":\""+devices.product.proacts.get(0).id+"\",\"param\":\""+irremotes.id+"\",\"type\":\"1\",\"delaytime\":null,\"rcode\":\""+mList_menu.get(0).exts.get(99999)+"\",\"fpulse\":\""+mList_menu.get(position).pulse+"\",\"irremoteid\":\""+irremotes.id+"\",\"proname\":\"%@\"}");
                 drawerLayout.closeDrawers();
             }
         });
     }
+
+    private void taskDeviceActionDialog(final String stId, final String proactId) {
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setMessage("该设备是否响应成功？");
+        builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mConnection.sendTextMessage("{\"pn\":\"STUTP\",\"stID\":\""+stId+"\",\"proActID\":\""+proactId+"\",\"param\":\"\"}");
+            }
+        });
+        builder.setNegativeButton("否",null);
+        builder.show();
+    }
+
+    private void deviceActionDialog(final String deviceID, final String proActID) {
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setMessage("该设备是否响应成功？");
+        builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mConnection.sendTextMessage("{\"pn\":\"STATP\",\"sceneID\":\""+sceneID+"\",\"deviceID\":\""+deviceID+"\",\"proActID\":\""+proActID+"\",\"param\":\"\",\"type\":\"0\"}");
+            }
+        });
+        builder.setNegativeButton("否",null);
+        builder.show();
+    }
+
     /**
      * 电视
      */
-    private void getIRDataById(String rid,int type) {
+    private void getIRDataById(String rid, int type) {
         KookongSDK.getIRDataById(rid, type, true, new IRequestResult<IrDataList>() {
 
             @Override
@@ -338,7 +390,7 @@ public class SceneSettingActivity extends AppCompatActivity {
     /**
      * 空调
      */
-    public void getNoStateIRDataById(String rid,int type){
+    public void getNoStateIRDataById(String rid, int type) {
         KookongSDK.getNoStateIRDataById(rid + "", type, true, new IRequestResult<IrDataList>() {
 
             @Override
@@ -372,12 +424,12 @@ public class SceneSettingActivity extends AppCompatActivity {
                         String default_fpulse = irKey1.pulse.replace(" ", "").replace(",", "");
 //                        String data = "{\"pn\":\"IRTP\", \"sdMAC\":\"" + mac + "\", \"rcode\":\"" + rcode + "\",\"fpulse\":\"" + replace + "\"}}";
 //                        mConnection.sendTextMessage(data);
-                        IrData.IrKey irdata_irkey=new IrData.IrKey();
-                        irdata_irkey.fname="开";
-                        irdata_irkey.pulse=power_on;
-                        IrData.IrKey irdata_irkey1=new IrData.IrKey();
-                        irdata_irkey1.fname="关";
-                        irdata_irkey1.pulse=power_off;
+                        IrData.IrKey irdata_irkey = new IrData.IrKey();
+                        irdata_irkey.fname = "开";
+                        irdata_irkey.pulse = power_on;
+                        IrData.IrKey irdata_irkey1 = new IrData.IrKey();
+                        irdata_irkey1.fname = "关";
+                        irdata_irkey1.pulse = power_off;
                         mList_menu.add(irdata_irkey);
                         mList_menu.add(irdata_irkey1);
                     }
@@ -399,13 +451,14 @@ public class SceneSettingActivity extends AppCompatActivity {
 
         });
     }
+
     private void initData() {
         sceneID = getIntent().getStringExtra("sceneID");
 //        mobilephone = (String) SPUtils.get(this, "mobilephone", "");
 //        password = (String) SPUtils.get(this, "password", "");
         mConnection = SingleWebSocketConnection.getInstance();
         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
-        IntentFilter intentFilter=new IntentFilter();
+        IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("STLTP");
         intentFilter.addAction("IRLTP");
         intentFilter.addAction("SUTP");
@@ -413,7 +466,7 @@ public class SceneSettingActivity extends AppCompatActivity {
         intentFilter.addAction("STUTP");
         intentFilter.addAction("STDTP");
         homeReceiver = new HomeReceiver();
-        registerReceiver(homeReceiver,intentFilter);
+        registerReceiver(homeReceiver, intentFilter);
 //        socketConnection();
 
         initImageData();
@@ -525,14 +578,16 @@ public class SceneSettingActivity extends AppCompatActivity {
         rvHongwaiDevice.setAdapter(adapter_yk);
 
 
-        LinearLayoutManager manager_menu=new LinearLayoutManager(this);
+        LinearLayoutManager manager_menu = new LinearLayoutManager(this);
         manager_menu.setOrientation(LinearLayoutManager.VERTICAL);
         rvDeviceMenu.setLayoutManager(manager_menu);
-        adapter_menu=new LinkageDeviceMenuAdapter(mList_menu);
+        adapter_menu = new LinkageDeviceMenuAdapter(mList_menu);
         rvDeviceMenu.setAdapter(adapter_menu);
     }
 
-    @OnClick({R.id.iv_base_back, R.id.iv_base_right, R.id.iv_scene_edit, R.id.ll_add_device, R.id.iv_scene_setting_icon,R.id.iv_device_back})
+    private GetScenePopwindow getPhotoPopwindow;
+
+    @OnClick({R.id.iv_base_back, R.id.iv_base_right, R.id.iv_scene_edit, R.id.ll_add_device, R.id.iv_scene_setting_icon, R.id.iv_device_back})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_scene_edit:
@@ -545,7 +600,7 @@ public class SceneSettingActivity extends AppCompatActivity {
                     drawerLayout.closeDrawers();
                 } else {
                     drawerLayout.openDrawer(GravityCompat.END);
-                    level=0;
+                    level = 0;
                     ivDeviceBack.setVisibility(View.INVISIBLE);
                     rvSceneDevice.setVisibility(View.VISIBLE);
                     rvHongwaiDevice.setVisibility(View.GONE);
@@ -563,20 +618,44 @@ public class SceneSettingActivity extends AppCompatActivity {
                 showPopWindow(getView());
                 break;
             case R.id.iv_device_back:
-                if (level==2){
+                if (level == 2) {
                     rvDeviceMenu.setVisibility(View.GONE);
                     rvHongwaiDevice.setVisibility(View.VISIBLE);
-                    level=1;
-                }else if (level==1){
+                    level = 1;
+                } else if (level == 1) {
                     rvHongwaiDevice.setVisibility(View.GONE);
                     rvSceneDevice.setVisibility(View.VISIBLE);
                     ivDeviceBack.setVisibility(View.INVISIBLE);
-                    level=0;
+                    level = 0;
                 }
+                break;
+            case R.id.iv_base_right:
+                String groupNo = sceneDeviceBean.scene.groupNo;
+                String sceneNo = sceneDeviceBean.scene.sceneNo;
+                String info="信息：场景号："+sceneNo+",分组号："+groupNo;
+                getPhotoPopwindow = new GetScenePopwindow(SceneSettingActivity.this, photoclicer,info);
+                getPhotoPopwindow.showPopupWindowBottom(llParent);
                 break;
         }
     }
-
+    public View.OnClickListener photoclicer = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.item_popupwindows_Photo:
+                    //信息
+                    SmartToast.show("信息");
+                    break;
+                case R.id.item_popupwindows_stop:
+                    //情景面板
+                    SmartToast.show("情景面板");
+                    break;
+                case R.id.item_popupwindows_cancel:
+                    getPhotoPopwindow.dismiss();
+                    break;
+            }
+        }
+    };
     private void showPopWindow(View view) {
         popupWindow = new PopupWindow(view, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         popupWindow.setFocusable(true);
@@ -650,18 +729,21 @@ public class SceneSettingActivity extends AppCompatActivity {
             drawerLayout.closeDrawers();
         }
     }
+
     class HomeReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             String payload = intent.getStringExtra("message");
-            if (action.equals("STLTP")){
-                Log.e("bbb",payload);
+            if (action.equals("STLTP")) {
+                Log.e("bbb", payload);
                 parseData(payload);
-            }if (action.equals("IRLTP")) {
+            }
+            if (action.equals("IRLTP")) {
                 parseDataHW(payload);
-            }if (action.equals("SUTP")) {
+            }
+            if (action.equals("SUTP")) {
                 //修改场景名称
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
@@ -683,9 +765,24 @@ public class SceneSettingActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status) {
+                    String stCode = jsonObject.getString("stCode");
+                    if (stCode.equals("200")){
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
                         drawerLayout.closeDrawers();
+                    }else if (stCode.equals("304")){
+                        SmartToast.show("网关不在线");
+                    }else if (stCode.equals("404")){
+                        SmartToast.show("设备不存在");
+                    }else if (stCode.equals("421")){
+                        SmartToast.show("设备动作不存在");
+                    }else if (stCode.equals("481")){
+                        SmartToast.show("组号设置失败");
+                    }else if (stCode.equals("482")){
+                        SmartToast.show("场景号设置失败");
+                    }else if (stCode.equals("483")){
+                        SmartToast.show("场景不存在");
+                    }else {
+                        SmartToast.show("添加设备失败");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -696,9 +793,30 @@ public class SceneSettingActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status) {
+                    String stCode = jsonObject.getString("stCode");
+                    if (stCode.equals("200")){
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
+                    }else if (stCode.equals("304")){
+                        SmartToast.show("网关不在线");
+                    }else if (stCode.equals("404")){
+                        SmartToast.show("设备不存在");
+                    }else if (stCode.equals("421")){
+                        SmartToast.show("设备动作不存在");
+                    }else if (stCode.equals("481")){
+                        SmartToast.show("组号设置失败");
+                    }else if (stCode.equals("482")){
+                        SmartToast.show("场景号设置失败");
+                    }else if (stCode.equals("483")){
+                        SmartToast.show("场景不存在");
+                    }else if (stCode.equals("486")){
+                        SmartToast.show("场景任务不存在");
                     }
+                    else {
+                        SmartToast.show("修改失败");
+                    }
+//                    if (status) {
+//                        mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
+//                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -717,91 +835,108 @@ public class SceneSettingActivity extends AppCompatActivity {
             }
         }
     }
-    class MyWebSocketHandler extends WebSocketHandler {
-        @Override
-        public void onOpen() {
-            Log.e("TAG", "open");
-            mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
-        }
 
-        @Override
-        public void onTextMessage(String payload) {
-            Log.e("TAG", "onTextMessage" + payload);
-            if (payload.contains("{\"pn\":\"HRQP\"}")) {
-                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
-            }
-            if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                MyApp.finishAllActivity();
-                Intent intent = new Intent(SceneSettingActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
-            if (payload.contains("\"pn\":\"STLTP\"")) {
-                parseData(payload);
-            }
-            if (payload.contains("\"pn\":\"IRLTP\"")) {
-                parseDataHW(payload);
-            }
-            if (payload.contains("\"pn\":\"SUTP\"")) {
-                //修改场景名称
-                try {
-                    JSONObject jsonObject = new JSONObject(payload);
-                    boolean status = jsonObject.getBoolean("status");
-                    if (status) {
-                        if (sceneDialog != null) {
-                            sceneDialog.dismiss();
-                        }
-                        SmartToast.show("修改成功");
-                        SPUtils.put(SceneSettingActivity.this, "editSceneName", true);
-                        mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (payload.contains("\"pn\":\"STATP\"")) {
-                //添加设备
-                try {
-                    JSONObject jsonObject = new JSONObject(payload);
-                    boolean status = jsonObject.getBoolean("status");
-                    if (status) {
-                        mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
-                        drawerLayout.closeDrawers();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (payload.contains("\"pn\":\"STUTP\"")) {
-                //设置延时STUTP
-                try {
-                    JSONObject jsonObject = new JSONObject(payload);
-                    boolean status = jsonObject.getBoolean("status");
-                    if (status) {
-                        mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (payload.contains("\"pn\":\"STDTP\"")) {
-                //删除设备STDTP
-                try {
-                    JSONObject jsonObject = new JSONObject(payload);
-                    boolean status = jsonObject.getBoolean("status");
-                    if (status) {
-                        mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+//    class MyWebSocketHandler extends WebSocketHandler {
+//        @Override
+//        public void onOpen() {
+//            Log.e("TAG", "open");
+//            mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
+//        }
+//
+//        @Override
+//        public void onTextMessage(String payload) {
+//            Log.e("TAG", "onTextMessage" + payload);
+//            if (payload.contains("{\"pn\":\"HRQP\"}")) {
+//                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+//            }
+//            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+//                MyApp.finishAllActivity();
+//                Intent intent = new Intent(SceneSettingActivity.this, LoginActivity.class);
+//                startActivity(intent);
+//            }
+//            if (payload.contains("\"pn\":\"STLTP\"")) {
+//                parseData(payload);
+//            }
+//            if (payload.contains("\"pn\":\"IRLTP\"")) {
+//                parseDataHW(payload);
+//            }
+//            if (payload.contains("\"pn\":\"SUTP\"")) {
+//                //修改场景名称
+//                try {
+//                    JSONObject jsonObject = new JSONObject(payload);
+//                    boolean status = jsonObject.getBoolean("status");
+//                    if (status) {
+//                        if (sceneDialog != null) {
+//                            sceneDialog.dismiss();
+//                        }
+//                        SmartToast.show("修改成功");
+//                        SPUtils.put(SceneSettingActivity.this, "editSceneName", true);
+//                        mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            if (payload.contains("\"pn\":\"STATP\"")) {
+//                //添加设备
+//                try {
+//                    JSONObject jsonObject = new JSONObject(payload);
+//                    boolean status = jsonObject.getBoolean("status");
+//                    String stCode = jsonObject.getString("stCode");
+//                    if (stCode.equals("200")){
+//                        mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
+//                        drawerLayout.closeDrawers();
+//                    }else if (stCode.equals("304")){
+//                        SmartToast.show("网关不在线");
+//                    }else if (stCode.equals("404")){
+//                        SmartToast.show("设备不存在");
+//                    }else if (stCode.equals("421")){
+//                        SmartToast.show("设备动作不存在");
+//                    }else if (stCode.equals("481")){
+//                        SmartToast.show("组号设置失败");
+//                    }else if (stCode.equals("482")){
+//                        SmartToast.show("场景号设置失败");
+//                    }else if (stCode.equals("483")){
+//                        SmartToast.show("场景不存在");
+//                    }else {
+//                        SmartToast.show("添加设备失败");
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            if (payload.contains("\"pn\":\"STUTP\"")) {
+//                //设置延时STUTP
+//                try {
+//                    JSONObject jsonObject = new JSONObject(payload);
+//                    boolean status = jsonObject.getBoolean("status");
+//                    if (status) {
+//                        mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            if (payload.contains("\"pn\":\"STDTP\"")) {
+//                //删除设备STDTP
+//                try {
+//                    JSONObject jsonObject = new JSONObject(payload);
+//                    boolean status = jsonObject.getBoolean("status");
+//                    if (status) {
+//                        mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//
+//        @Override
+//        public void onClose(int code, String reason) {
+//            Log.e("TAG", "onClose");
+//        }
+//    }
 
-        @Override
-        public void onClose(int code, String reason) {
-            Log.e("TAG", "onClose");
-        }
-    }
     private void parseDataHW(String payload) {
         YaoKongListBean yaoKongListBean = new Gson().fromJson(payload, YaoKongListBean.class);
         List<YaoKongListBean.Irremotes> irremotes = yaoKongListBean.irremotes;
@@ -811,6 +946,7 @@ public class SceneSettingActivity extends AppCompatActivity {
         mList_yk.addAll(irremotes);
         adapter_yk.notifyDataSetChanged();
     }
+
     private void parseData(String payload) {
         try {
             sceneDeviceBean = new Gson().fromJson(payload, SceneDeviceBean.class);
@@ -826,6 +962,14 @@ public class SceneSettingActivity extends AppCompatActivity {
             }
             mList.addAll(sceneTasks);
             mList_device.addAll(devices);
+            Iterator<SceneDeviceBean.Devices> it = mList_device.iterator();
+            while(it.hasNext()){
+                SceneDeviceBean.Devices x = it.next();
+                if(x.product.modelPath.equals("pro_dispatcher")){
+                    it.remove();
+                }
+            }
+
             adapter.notifyDataSetChanged();
             mAdapter.notifyDataSetChanged();
         } catch (JsonSyntaxException e) {
@@ -833,6 +977,7 @@ public class SceneSettingActivity extends AppCompatActivity {
         }
 
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

@@ -373,6 +373,9 @@ class HomeReceiver extends BroadcastReceiver {
 
             List<LinkageBean.Linkages> linkages = linkageBean.linkages;
 
+            if (linkages==null){
+                return;
+            }
             mList.addAll(linkages);
             adapter.notifyDataSetChanged();
         } catch (JsonSyntaxException e) {

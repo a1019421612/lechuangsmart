@@ -159,7 +159,8 @@
         <activity android:name=".activity.FSActivity" />
         <activity android:name=".activity.DFActivity" />
         <activity android:name=".activity.DVDActivity" />
-        <activity android:name=".activity.KQjhqActivity"></activity>
+        <activity android:name=".activity.KQjhqActivity" />
+        <activity android:name=".activity.AddSceneActivity"></activity>
     </application>
 
 </manifest>

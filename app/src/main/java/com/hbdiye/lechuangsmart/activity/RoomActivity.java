@@ -1,8 +1,10 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -70,6 +72,12 @@ public class RoomActivity extends BaseActivity {
 
     private boolean flag_code = false;
 
+    String[] array_place;
+    int intoRoomPositon=0;
+    private List<RoomBean.Rooms> rooms=new ArrayList<>();
+
+    private int device_position=-1;
+
     @Override
     protected void initData() {
         roomId = getIntent().getStringExtra("roomId");
@@ -79,6 +87,9 @@ public class RoomActivity extends BaseActivity {
         intentFilter.addAction("DUTP");
         intentFilter.addAction("SDBTP");
         intentFilter.addAction("ATP");
+        intentFilter.addAction("DDUTP");
+        intentFilter.addAction("RGLTP");
+        intentFilter.addAction("DDUTP");
         homeReceiver = new HomeReceiver();
         registerReceiver(homeReceiver, intentFilter);
         mConnection = SingleWebSocketConnection.getInstance();
@@ -118,11 +129,24 @@ public class RoomActivity extends BaseActivity {
                 }
             }
         });
+
+
+        adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
+
+//                SPUtils.put(RoomActivity.this,"RoomRgltp",true);
+                device_position=position;
+                mConnection.sendTextMessage("{\"pn\":\"RGLTP\"}");
+
+                return false;
+            }
+        });
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                if (!editStatus){
-                    if (mList.get(position).product.modelPath.equals("pro_dispatcher")){
+                if (!editStatus) {
+                    if (mList.get(position).product.modelPath.equals("pro_dispatcher")) {
                         startActivity(new Intent(RoomActivity.this, YaoKongListActivity.class)
                                 .putExtra("deviceID", mList.get(position).id)
                                 .putExtra("deviceName", mList.get(position).name)
@@ -138,7 +162,8 @@ public class RoomActivity extends BaseActivity {
                 RoomDeviceBean.Devices devices = mList.get(position);
                 switch (view.getId()) {
                     case R.id.ll_scene_item_del:
-//                        mConnection.sendTextMessage("{\"pn\":\"RDTP\",\"roomID\":\""+mList.get(position).id+"\"}");
+                        String mess="{\"pn\":\"DDUTP\",\"deviMAC\":\""+mList.get(position).mac+"\",\"method\":\"Q\"}";
+                        mConnection.sendTextMessage("{\"pn\":\"DDUTP\",\"deviMAC\":\""+mList.get(position).mac+"\",\"method\":\"Q\"}");
                         break;
                     case R.id.ll_scene_item_edt:
                         sceneDialog = new SceneDialog(RoomActivity.this, R.style.MyDialogStyle, dailogClicer, "修改设备名称");
@@ -160,26 +185,26 @@ public class RoomActivity extends BaseActivity {
                         }
                         break;
                     case R.id.iv_room_middle:
-                        if (!editStatus){
+                        if (!editStatus) {
                             int value_middle = devices.deviceAttributes.get(1).value;
-                            if (value_middle==0){
+                            if (value_middle == 0) {
                                 String onId = devices.deviceAttributes.get(1).actions.get(0).id;//开id
-                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
-                            }else {
+                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + onId + "\",\"param\":\"\"}");
+                            } else {
                                 String offId = devices.deviceAttributes.get(1).actions.get(1).id;//关id
-                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + offId + "\",\"param\":\"\"}");
                             }
                         }
                         break;
                     case R.id.iv_room_right:
-                        if (!editStatus){
+                        if (!editStatus) {
                             int value_right = devices.deviceAttributes.get(2).value;
-                            if (value_right==0){
+                            if (value_right == 0) {
                                 String onId = devices.deviceAttributes.get(2).actions.get(0).id;//开id
-                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+onId+"\",\"param\":\"\"}");
-                            }else {
+                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + onId + "\",\"param\":\"\"}");
+                            } else {
                                 String offId = devices.deviceAttributes.get(2).actions.get(1).id;//关id
-                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList.get(position).id+"\",\"proActID\":\""+offId+"\",\"param\":\"\"}");
+                                mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + offId + "\",\"param\":\"\"}");
                             }
                         }
                         break;
@@ -212,15 +237,63 @@ public class RoomActivity extends BaseActivity {
             }
         }
     };
+    private View.OnClickListener dialogDeviceCode = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.app_cancle_tv:
+                    sceneDialog.dismiss();
+                    break;
+                case R.id.app_sure_tv:
+                    String sceneName = sceneDialog.getSceneName().trim();
+                    if (TextUtils.isEmpty(sceneName)) {
+                        SmartToast.show("设备标识不能为空");
+                    } else {
+                        mConnection.sendTextMessage("{\"pn\":\"SDBTP\",\"roomID\":\"" + roomId + "\",\"serialnumber\":\"" + sceneName + "\"}");
+                    }
+                    break;
+            }
+        }
+    };
 
     @Override
     protected int getLayoutID() {
         return R.layout.activity_room;
     }
 
+    String[] array_type = {"扫码添加", "手动添加"};
+    int type_position;
+
     @OnClick(R.id.ll_add_roomdevice)
     public void onViewClicked() {
-        startActivityForResult(new Intent(this, CaptureActivity.class), 123);
+        type_position = 0;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("请选择添加方式");
+        builder.setSingleChoiceItems(array_type, 0, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                type_position = which;
+            }
+        });
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                if (type_position == 0) {
+                    //扫码添加
+                    startActivityForResult(new Intent(RoomActivity.this, CaptureActivity.class), 123);
+                } else if (type_position == 1) {
+                    //手动添加
+                    sceneDialog = new SceneDialog(RoomActivity.this, R.style.MyDialogStyle, dialogDeviceCode, "请输入设备标识");
+                    sceneDialog.setCanceledOnTouchOutside(true);
+                    sceneDialog.show();
+                }
+            }
+        });
+        builder.setNegativeButton("取消", null);
+        builder.show();
+
+
     }
 
     @Override
@@ -316,117 +389,194 @@ public class RoomActivity extends BaseActivity {
                     e.printStackTrace();
                 }
             }
+            if (action.contains("RGLTP")) {
+                roomListData(payload);
+            }
+            if (action.contains("DDUTP")){
+                try {
+                    JSONObject jsonObject = new JSONObject(payload);
+                    String stCode = jsonObject.getString("stCode");
+                    if (stCode.equals("200")){
+                        SmartToast.show("添加成功");
+                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
+                    }else if (stCode.equals("404")){
+                        SmartToast.show("设备不存在");
+                    }else if (stCode.equals("531")){
+                        SmartToast.show("房间不存在");
+                    }else if (stCode.equals("801")){
+                        SmartToast.show("非法数据");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
-    class MyWebSocketHandler extends WebSocketHandler {
-        @Override
-        public void onOpen() {
-            Log.e(TAG, "open");
-            mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
-            if (flag_code) {
-//                mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\""+ erCode +"\"} ");
-                mConnection.sendTextMessage("{{\"pn\":\"SDBTP\",\"roomID\":\"" + roomId + "\",\"serialnumber\":\"" + erCode + "\"}}");
-            }
-        }
+//    class MyWebSocketHandler extends WebSocketHandler {
+//        @Override
+//        public void onOpen() {
+//            Log.e(TAG, "open");
+//            mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
+//            if (flag_code) {
+////                mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\""+ erCode +"\"} ");
+//                mConnection.sendTextMessage("{\"pn\":\"SDBTP\",\"roomID\":\"" + roomId + "\",\"serialnumber\":\"" + erCode + "\"}");
+//            }
+//        }
+//
+//        @Override
+//        public void onTextMessage(String payload) {
+//
+//            Log.e(TAG, "onTextMessage" + payload);
+//            if (payload.contains("{\"pn\":\"HRQP\"}")) {
+//                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+//            }
+//            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+//                for (Activity activity : MyApp.mActivitys) {
+//                    String packageName = activity.getLocalClassName();
+//                    Log.e("LLL", packageName);
+//                }
+//                MyApp.finishAllActivity();
+//                Intent intent = new Intent(RoomActivity.this, LoginActivity.class);
+//                startActivity(intent);
+//            }
+//            if (payload.contains("\"pn\":\"DGLTP\"")) {
+//                parseData(payload);
+//            }
+//            if (payload.contains("\"pn\":\"DDUTP\"")){
+//                //删除设备
+//                try {
+//                    JSONObject jsonObject=new JSONObject(payload);
+//                    String stCode = jsonObject.getString("stCode");
+//                    if (stCode.equals("200")){
+//                        SmartToast.show("删除成功");
+//                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
+//                    }else if (stCode.equals("304")){
+//                        SmartToast.show("网关未在线");
+//                    }else if (stCode.equals("402")){
+//                        SmartToast.show("设备删除失败");
+//                    }else if (stCode.equals("404")){
+//                        SmartToast.show("设备不存在");
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            if (payload.contains("\"pn\":\"SDOSTP\"")) {
+//                try {
+//                    JSONObject jsonObject = new JSONObject(payload);
+//                    boolean status = jsonObject.getBoolean("status");
+//                    String sdMAC = jsonObject.getString("sdMAC");
+//                    //子设备在线
+//                    for (int i = 0; i < mList.size(); i++) {
+//                        if (mList.get(i).mac.equals(sdMAC)) {
+//                            mList_status.set(i, status);
+//                        }
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//                adapter.notifyDataSetChanged();
+//            }
+//            if (payload.contains("\"pn\":\"DUTP\"")) {
+//                //修改设备名称 DUTP
+//                try {
+//                    JSONObject jsonObject = new JSONObject(payload);
+//                    boolean status = jsonObject.getBoolean("status");
+//                    if (status) {
+//                        sceneDialog.dismiss();
+//                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            if (payload.contains("\"pn\":\"SDBTP\"")) {
+//                //扫描加入家庭
+//                flag_code = false;
+//                try {
+//                    JSONObject jsonObject = new JSONObject(payload);
+//                    boolean status = jsonObject.getBoolean("status");
+//                    if (status) {
+//                        SmartToast.show("成功加入");
+//                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
+//                    } else {
+//                        SmartToast.show("加入失败");
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+////                SmartToast.showLong(payload);
+//            }
+//            if (payload.contains("\"pn\":\"ATP\"")) {
+////                    mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + list_room.get(flagRoomPosition).id + "\"}");
+//                try {
+//                    JSONObject jsonObject = new JSONObject(payload);
+//                    String deviceID = jsonObject.getString("deviceID");
+//                    String proAttID = jsonObject.getString("proAttID");
+//                    int value = Integer.parseInt(jsonObject.getString("value"));
+//                    for (int i = 0; i < mList.size(); i++) {
+//                        if (mList.get(i).id.equals(deviceID)) {
+//                            RoomDeviceBean.Devices devices = mList.get(i);
+//                            List<RoomDeviceBean.Devices.DeviceAttributes> deviceAttributes = devices.deviceAttributes;
+//                            for (int j = 0; j < deviceAttributes.size(); j++) {
+//                                if (deviceAttributes.get(j).proAttID.equals(proAttID)) {
+////                                    mList.get(i).deviceAttributes.get(j).value;
+//                                    deviceAttributes.get(j).value = value;
+//                                    mList.set(i, devices);
+//                                    adapter.notifyItemChanged(i);
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            if (payload.contains("\"pn\":\"RGLTP\"")) {
+//                roomListData(payload);
+//            }
+//
+//        }
+//
+//        @Override
+//        public void onClose(int code, String reason) {
+//            Log.e(TAG, "onClose");
+//        }
+//    }
 
-        @Override
-        public void onTextMessage(String payload) {
+    private void roomListData(String payload) {
+        rooms.clear();
+        Log.e("ssss",payload);
+        RoomBean roomBean = new Gson().fromJson(payload, RoomBean.class);
+        rooms = roomBean.rooms;
+        if (rooms.size()>0){
 
-            Log.e(TAG, "onTextMessage" + payload);
-            if (payload.contains("{\"pn\":\"HRQP\"}")) {
-                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
-            }
-            if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                for (Activity activity : MyApp.mActivitys) {
-                    String packageName = activity.getLocalClassName();
-                    Log.e("LLL", packageName);
-                }
-                MyApp.finishAllActivity();
-                Intent intent = new Intent(RoomActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
-            if (payload.contains("\"pn\":\"DGLTP\"")) {
-                parseData(payload);
-            }
-            if (payload.contains("\"pn\":\"SDOSTP\"")) {
-                try {
-                    JSONObject jsonObject = new JSONObject(payload);
-                    boolean status = jsonObject.getBoolean("status");
-                    String sdMAC = jsonObject.getString("sdMAC");
-                    //子设备在线
-                    for (int i = 0; i < mList.size(); i++) {
-                        if (mList.get(i).mac.equals(sdMAC)) {
-                            mList_status.set(i, status);
-                        }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                adapter.notifyDataSetChanged();
-            }
-            if (payload.contains("\"pn\":\"DUTP\"")) {
-                //修改设备名称 DUTP
-                try {
-                    JSONObject jsonObject = new JSONObject(payload);
-                    boolean status = jsonObject.getBoolean("status");
-                    if (status) {
-                        sceneDialog.dismiss();
-                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (payload.contains("\"pn\":\"SDBTP\"")) {
-                //扫描加入家庭
-                flag_code = false;
-                try {
-                    JSONObject jsonObject = new JSONObject(payload);
-                    boolean status = jsonObject.getBoolean("status");
-                    if (status) {
-                        SmartToast.show("成功加入");
-                        mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
-                    } else {
-                        SmartToast.show("加入失败");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-//                SmartToast.showLong(payload);
-            }
-            if (payload.contains("\"pn\":\"ATP\"")) {
-//                    mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + list_room.get(flagRoomPosition).id + "\"}");
-                try {
-                    JSONObject jsonObject = new JSONObject(payload);
-                    String deviceID = jsonObject.getString("deviceID");
-                    String proAttID = jsonObject.getString("proAttID");
-                    int value = Integer.parseInt(jsonObject.getString("value"));
-                    for (int i = 0; i < mList.size(); i++) {
-                        if (mList.get(i).id.equals(deviceID)) {
-                            RoomDeviceBean.Devices devices = mList.get(i);
-                            List<RoomDeviceBean.Devices.DeviceAttributes> deviceAttributes = devices.deviceAttributes;
-                            for (int j = 0; j < deviceAttributes.size(); j++) {
-                                if (deviceAttributes.get(j).proAttID.equals(proAttID)) {
-//                                    mList.get(i).deviceAttributes.get(j).value;
-                                    deviceAttributes.get(j).value = value;
-                                    mList.set(i, devices);
-                                    adapter.notifyItemChanged(i);
-                                }
-                            }
-                        }
-                    }
+            array_place=new String[rooms.size()];
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            for (int i = 0; i < rooms.size(); i++) {
+                array_place[i]=rooms.get(i).name;
             }
 
-        }
-
-        @Override
-        public void onClose(int code, String reason) {
-            Log.e(TAG, "onClose");
+            AlertDialog.Builder builder=new AlertDialog.Builder(RoomActivity.this);
+            builder.setTitle("放置地点");
+            builder.setSingleChoiceItems(array_place, 0, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    intoRoomPositon=which;
+                }
+            });
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+//                    SmartToast.show(array_place[intoRoomPositon]);
+                    mConnection.sendTextMessage("{\"pn\":\"DDUTP\",\"deviMAC\":\""+mList.get(device_position).mac+"\",\"method\":\"M\",\"deviName\": \"\",\"roomID\": \""+rooms.get(intoRoomPositon).id+"\",\"orderNo\":\"\"}");
+                }
+            });
+            builder.setNegativeButton("取消",null);
+            builder.show();
         }
     }
 

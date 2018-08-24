@@ -30,6 +30,7 @@ import com.hbdiye.lechuangsmart.MainActivity;
 import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
+import com.hbdiye.lechuangsmart.activity.AddSceneActivity;
 import com.hbdiye.lechuangsmart.activity.LoginActivity;
 import com.hbdiye.lechuangsmart.activity.SceneSettingActivity;
 import com.hbdiye.lechuangsmart.adapter.SceneAdapter;
@@ -160,10 +161,11 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 }
                 break;
             case R.id.ll_add_scene:
-                isAddScene = true;
-                sceneDialog = new SceneDialog(getActivity(), R.style.MyDialogStyle, dailogClicer, "添加场景名称");
-                sceneDialog.setCanceledOnTouchOutside(true);
-                sceneDialog.show();
+                    startActivity(new Intent(getActivity(), AddSceneActivity.class));
+//                isAddScene = true;
+//                sceneDialog = new SceneDialog(getActivity(), R.style.MyDialogStyle, dailogClicer, "添加场景名称");
+//                sceneDialog.setCanceledOnTouchOutside(true);
+//                sceneDialog.show();
 //                startActivity(new Intent(getActivity(),SceneSettingActivity.class));
                 break;
         }
@@ -217,23 +219,23 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                     e.printStackTrace();
                 }
             }
-            if (action.equals("SATP")) {
-                //添加场景
-                try {
-                    JSONObject jsonObject = new JSONObject(message);
-                    boolean status = jsonObject.getBoolean("status");
-                    if (status) {
-                        sceneDialog.dismiss();
-                        SmartToast.show("添加场景成功");
-                        mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
-                        JSONObject scene = jsonObject.getJSONObject("scene");
-                        String id = scene.getString("id");
-                        startActivity(new Intent(getActivity(), SceneSettingActivity.class).putExtra("sceneID", id));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+//            if (action.equals("SATP")) {
+//                //添加场景
+//                try {
+//                    JSONObject jsonObject = new JSONObject(message);
+//                    boolean status = jsonObject.getBoolean("status");
+//                    if (status) {
+//                        sceneDialog.dismiss();
+//                        SmartToast.show("添加场景成功");
+//                        mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+//                        JSONObject scene = jsonObject.getJSONObject("scene");
+//                        String id = scene.getString("id");
+//                        startActivity(new Intent(getActivity(), SceneSettingActivity.class).putExtra("sceneID", id));
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
         }
     }
 
@@ -286,8 +288,15 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    SmartToast.show("删除成功");
-                    mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                    String stCode = jsonObject.getString("stCode");
+                    if (stCode.equals("200")){
+                        SmartToast.show("删除成功");
+                        mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                    }else if (stCode.equals("401")){
+                        SmartToast.show("数据库错误");
+                    }else if (stCode.equals("485")){
+                        SmartToast.show("不能删除有任务的场景");
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

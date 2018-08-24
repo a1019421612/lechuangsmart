@@ -239,6 +239,11 @@ public class HomeFragment extends Fragment {
                     //删除设备
                     websocketSendBroadcase(message,"STDTP");
                 }
+//                ============================FangjianActivity========================
+                if (message.contains("\"pn\":\"GSTP\"")){
+//                    GSTP设备 调试 停止入网
+                    websocketSendBroadcase(message,"GSTP");
+                }
 //========================LinkageSettingActivity=====================
                 if (message.contains("\"pn\":\"LCTP\"")) {
                     //
@@ -292,8 +297,18 @@ public class HomeFragment extends Fragment {
 //======================FamilyManagerActivity===================
                 if (message.contains("\"pn\":\"RGLTP\"")) {
                     //房间管理
-                    websocketSendBroadcase(message,"RGLTP");
-                }if (message.contains("\"pn\":\"RUTP\"")) {
+//                    boolean isRoom= (boolean) SPUtils.get(getActivity(),"RoomRgltp",false);
+//                    if (isRoom){
+//                        websocketSendBroadcase(message,"RGLTP_R");
+//                    }else {
+                        websocketSendBroadcase(message,"RGLTP");
+//                    }
+//                    SPUtils.remove(getActivity(),"RoomRgltp");
+                }if (message.contains("\"pn\":\"DDUTP\"")){
+//                    DDUTP 将设备放置到对应房间
+                    websocketSendBroadcase(message,"DDUTP");
+                }
+                if (message.contains("\"pn\":\"RUTP\"")) {
                     //修改房间名
                     websocketSendBroadcase(message,"RUTP");
                 }if (message.contains("\"pn\":\"RATP\"")) {
@@ -302,6 +317,9 @@ public class HomeFragment extends Fragment {
                 }if (message.contains("\"pn\":\"RDTP\"")) {
                     //删除房间
                     websocketSendBroadcase(message,"RDTP");
+                }if (message.contains("\"pn\":\"RDTP\"")){
+                    //删除房间中的设备
+                    websocketSendBroadcase(message,"DDUTP");
                 }
 //=========================RoomActivity========================
                 if (message.contains("\"pn\":\"SDOSTP\"")) {

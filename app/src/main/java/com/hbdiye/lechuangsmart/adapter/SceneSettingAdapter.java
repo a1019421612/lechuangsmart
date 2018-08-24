@@ -23,7 +23,7 @@ public class SceneSettingAdapter extends BaseQuickAdapter<SceneDeviceBean.SceneT
         }else {
             helper.setText(R.id.tv_scene_setting_switch,item.proAct.name);
         }
-        helper.setText(R.id.tv_scene_setting_time, ContentConfig.secToTime(item.delaytime));
+//        helper.setText(R.id.tv_scene_setting_time, ContentConfig.secToTime(item.delaytime));
         helper.addOnClickListener(R.id.iv_scene_setting_del);
         helper.addOnClickListener(R.id.tv_scene_setting_time);
         helper.addOnClickListener(R.id.tv_scene_setting_switch);
