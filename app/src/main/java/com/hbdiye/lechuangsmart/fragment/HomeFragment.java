@@ -188,6 +188,7 @@ public class HomeFragment extends Fragment {
                 }if (message.contains("\"pn\":\"SLTP\"")){
                     websocketSendBroadcase(message,"SLTP");
                 }if (message.contains("\"pn\":\"UITP\"")){
+
                     websocketSendBroadcase(message,"UITP");
                 }if (message.contains("\"pn\":\"SSTP\"")) {
                     //开启场景
@@ -238,6 +239,9 @@ public class HomeFragment extends Fragment {
                 }if (message.contains("\"pn\":\"STDTP\"")) {
                     //删除设备
                     websocketSendBroadcase(message,"STDTP");
+                }if (message.contains("\"pn\":\"SDRTP\"")){
+                    //情景面板设备
+                    websocketSendBroadcase(message,"SDRTP");
                 }
 //                ============================FangjianActivity========================
                 if (message.contains("\"pn\":\"GSTP\"")){

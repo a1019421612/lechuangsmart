@@ -187,7 +187,9 @@ public class SceneSettingActivity extends AppCompatActivity {
                 .build();
         pickerBuilder.setNPicker(ContentConfig.getTimeHours(), ContentConfig.getTimeMin(), ContentConfig.getTimeSeco());
     }
+
     private void handleClick() {
+//        =============================8.26注释 修改开关============================================
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, final int position) {
@@ -211,33 +213,35 @@ public class SceneSettingActivity extends AppCompatActivity {
                         builder.setNegativeButton("取消", null);
                         builder.show();
                         break;
-                    case R.id.tv_scene_setting_switch:
-                        dialogflag = -1;
-                        final List<SceneDeviceBean.SceneTasks.ProActs> proActs = mList.get(position).proActs;
-//                        String[] proActs_id = new String[proActs.size()];
-                        String proActID = mList.get(position).proActID;
-                        String[] proActs_name = new String[proActs.size()];
-
-                        for (int i = 0; i < proActs.size(); i++) {
-                            proActs_name[i] = proActs.get(i).name;
-                            if (proActID.equals(proActs.get(i).id)) {
-                                dialogflag = i;
-                            }
-                        }
-
-                        AlertDialog.Builder proActs_list = new AlertDialog.Builder(SceneSettingActivity.this);
-                        proActs_list.setSingleChoiceItems(proActs_name, dialogflag, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-//                                SmartToast.show(proActs.get(which).name);
-//                                if (which != dialogflag) {
-//                                    mConnection.sendTextMessage("{\"pn\":\"STUTP\",\"stID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + mList.get(position).proActs.get(which).id + "\",\"delaytime\":\"" + mList.get(position).delaytime + "\"}");
-//                                }
-                                taskDeviceActionDialog(mList.get(position).id,mList.get(position).proActs.get(which).id);
-                                dialog.dismiss();
-                            }
-                        });
-                        proActs_list.show();
+//                    case R.id.tv_scene_setting_switch:
+//                        dialogflag = -1;
+//                        final List<SceneDeviceBean.SceneTasks.ProActs> proActs = mList.get(position).proActs;
+////                        String[] proActs_id = new String[proActs.size()];
+//                        String proActID = mList.get(position).proActID;
+//                        String[] proActs_name = new String[proActs.size()];
+//
+//                        for (int i = 0; i < proActs.size(); i++) {
+//                            proActs_name[i] = proActs.get(i).name;
+//                            if (proActID.equals(proActs.get(i).id)) {
+//                                dialogflag = i;
+//                            }
+//                        }
+//
+//                        AlertDialog.Builder proActs_list = new AlertDialog.Builder(SceneSettingActivity.this);
+//                        proActs_list.setSingleChoiceItems(proActs_name, dialogflag, new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+////                                SmartToast.show(proActs.get(which).name);
+////                                if (which != dialogflag) {
+////                                    mConnection.sendTextMessage("{\"pn\":\"STUTP\",\"stID\":\"" + mList.get(position).id + "\",\"proActID\":\"" + mList.get(position).proActs.get(which).id + "\",\"delaytime\":\"" + mList.get(position).delaytime + "\"}");
+////                                }
+//                                taskDeviceActionDialog(mList.get(position).id, mList.get(position).proActs.get(which).id);
+//                                dialog.dismiss();
+//                            }
+//                        });
+//                        proActs_list.show();
+//                        break;
+                    default:
                         break;
                 }
             }
@@ -260,18 +264,18 @@ public class SceneSettingActivity extends AppCompatActivity {
 //                        String[] proActs_id = new String[proActs.size()];
 //                    String proActID = mList_device.get(position).product.proacts;
                     String[] proActs_name = new String[proActs.size()];
-                    final String[] proActs_id=new String[proActs.size()];
+                    final String[] proActs_id = new String[proActs.size()];
                     for (int i = 0; i < proActs.size(); i++) {
                         proActs_name[i] = proActs.get(i).name;
-                        proActs_id[i]=proActs.get(i).id;
+                        proActs_id[i] = proActs.get(i).id;
                     }
-                    final AlertDialog.Builder builder= new AlertDialog.Builder(SceneSettingActivity.this);
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(SceneSettingActivity.this);
                     builder.setSingleChoiceItems(proActs_name, -1, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\""+mList_device.get(position).id+"\",\"proActID\":\""+proActs_id[which]+"\",\"param\":\"\"}");
+                            mConnection.sendTextMessage("{\"pn\":\"CTP\",\"deviceID\":\"" + mList_device.get(position).id + "\",\"proActID\":\"" + proActs_id[which] + "\",\"param\":\"\"}");
                             dialog.dismiss();
-                            deviceActionDialog(mList_device.get(position).id,proActs_id[which]);
+                            deviceActionDialog(mList_device.get(position).id, proActs_id[which]);
                         }
                     });
                     builder.show();
@@ -329,28 +333,28 @@ public class SceneSettingActivity extends AppCompatActivity {
     }
 
     private void taskDeviceActionDialog(final String stId, final String proactId) {
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("该设备是否响应成功？");
         builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mConnection.sendTextMessage("{\"pn\":\"STUTP\",\"stID\":\""+stId+"\",\"proActID\":\""+proactId+"\",\"param\":\"\"}");
+                mConnection.sendTextMessage("{\"pn\":\"STUTP\",\"stID\":\"" + stId + "\",\"proActID\":\"" + proactId + "\",\"param\":\"\"}");
             }
         });
-        builder.setNegativeButton("否",null);
+        builder.setNegativeButton("否", null);
         builder.show();
     }
 
     private void deviceActionDialog(final String deviceID, final String proActID) {
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("该设备是否响应成功？");
         builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mConnection.sendTextMessage("{\"pn\":\"STATP\",\"sceneID\":\""+sceneID+"\",\"deviceID\":\""+deviceID+"\",\"proActID\":\""+proActID+"\",\"param\":\"\",\"type\":\"0\"}");
+                mConnection.sendTextMessage("{\"pn\":\"STATP\",\"sceneID\":\"" + sceneID + "\",\"deviceID\":\"" + deviceID + "\",\"proActID\":\"" + proActID + "\",\"param\":\"\",\"type\":\"0\"}");
             }
         });
-        builder.setNegativeButton("否",null);
+        builder.setNegativeButton("否", null);
         builder.show();
     }
 
@@ -631,30 +635,34 @@ public class SceneSettingActivity extends AppCompatActivity {
             case R.id.iv_base_right:
                 String groupNo = sceneDeviceBean.scene.groupNo;
                 String sceneNo = sceneDeviceBean.scene.sceneNo;
-                String info="信息：场景号："+sceneNo+",分组号："+groupNo;
-                getPhotoPopwindow = new GetScenePopwindow(SceneSettingActivity.this, photoclicer,info);
+                String info = "信息：场景号：" + sceneNo + ",分组号：" + groupNo;
+                getPhotoPopwindow = new GetScenePopwindow(SceneSettingActivity.this, photoclicer, info);
                 getPhotoPopwindow.showPopupWindowBottom(llParent);
                 break;
         }
     }
+
     public View.OnClickListener photoclicer = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.item_popupwindows_Photo:
                     //信息
-                    SmartToast.show("信息");
                     break;
                 case R.id.item_popupwindows_stop:
                     //情景面板
-                    SmartToast.show("情景面板");
+                    startActivity(new Intent(SceneSettingActivity.this, ScenePanelActivity.class)
+                            .putExtra("sceneID", sceneID));
                     break;
                 case R.id.item_popupwindows_cancel:
                     getPhotoPopwindow.dismiss();
                     break;
+                default:
+                    break;
             }
         }
     };
+
     private void showPopWindow(View view) {
         popupWindow = new PopupWindow(view, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         popupWindow.setFocusable(true);
@@ -747,13 +755,18 @@ public class SceneSettingActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status) {
+                    String stCode = jsonObject.getString("stCode");
+                    if (stCode.equals("200")) {
                         if (sceneDialog != null) {
                             sceneDialog.dismiss();
                         }
                         SmartToast.show("修改成功");
 //                        SPUtils.put(SceneSettingActivity.this, "editSceneName", true);
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
+                    } else if (stCode.equals("401")) {
+                        SmartToast.show("数据异常");
+                    } else if (stCode.equals("484")) {
+                        SmartToast.show("场景设置冲突");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -765,22 +778,24 @@ public class SceneSettingActivity extends AppCompatActivity {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     String stCode = jsonObject.getString("stCode");
-                    if (stCode.equals("200")){
+                    if (stCode.equals("200")) {
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
                         drawerLayout.closeDrawers();
-                    }else if (stCode.equals("304")){
+                    } else if (stCode.equals("304")) {
                         SmartToast.show("网关不在线");
-                    }else if (stCode.equals("404")){
+                    } else if (stCode.equals("404")) {
                         SmartToast.show("设备不存在");
-                    }else if (stCode.equals("421")){
+                    } else if (stCode.equals("421")) {
                         SmartToast.show("设备动作不存在");
-                    }else if (stCode.equals("481")){
+                    } else if (stCode.equals("481")) {
                         SmartToast.show("组号设置失败");
-                    }else if (stCode.equals("482")){
+                    } else if (stCode.equals("482")) {
                         SmartToast.show("场景号设置失败");
-                    }else if (stCode.equals("483")){
+                    } else if (stCode.equals("483")) {
                         SmartToast.show("场景不存在");
-                    }else {
+                    } else if (stCode.equals("484")) {
+                        SmartToast.show("场景设置冲突");
+                    } else {
                         SmartToast.show("添加设备失败");
                     }
                 } catch (JSONException e) {
@@ -793,24 +808,23 @@ public class SceneSettingActivity extends AppCompatActivity {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
                     String stCode = jsonObject.getString("stCode");
-                    if (stCode.equals("200")){
+                    if (stCode.equals("200")) {
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
-                    }else if (stCode.equals("304")){
+                    } else if (stCode.equals("304")) {
                         SmartToast.show("网关不在线");
-                    }else if (stCode.equals("404")){
+                    } else if (stCode.equals("404")) {
                         SmartToast.show("设备不存在");
-                    }else if (stCode.equals("421")){
+                    } else if (stCode.equals("421")) {
                         SmartToast.show("设备动作不存在");
-                    }else if (stCode.equals("481")){
+                    } else if (stCode.equals("481")) {
                         SmartToast.show("组号设置失败");
-                    }else if (stCode.equals("482")){
+                    } else if (stCode.equals("482")) {
                         SmartToast.show("场景号设置失败");
-                    }else if (stCode.equals("483")){
+                    } else if (stCode.equals("483")) {
                         SmartToast.show("场景不存在");
-                    }else if (stCode.equals("486")){
+                    } else if (stCode.equals("486")) {
                         SmartToast.show("场景任务不存在");
-                    }
-                    else {
+                    } else {
                         SmartToast.show("修改失败");
                     }
 //                    if (status) {
@@ -825,8 +839,25 @@ public class SceneSettingActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status) {
+                    String stCode = jsonObject.getString("stCode");
+                    if (stCode.equals("200")) {
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
+                    } else if (stCode.equals("304")) {
+                        SmartToast.show("网关不在线");
+                    } else if (stCode.equals("404")) {
+                        SmartToast.show("设备不存在");
+                    } else if (stCode.equals("421")) {
+                        SmartToast.show("设备动作不存在");
+                    } else if (stCode.equals("481")) {
+                        SmartToast.show("组号设置失败");
+                    } else if (stCode.equals("482")) {
+                        SmartToast.show("场景号设置失败");
+                    } else if (stCode.equals("483")) {
+                        SmartToast.show("场景不存在");
+                    } else if (stCode.equals("486")) {
+                        SmartToast.show("场景任务不存在");
+                    } else {
+                        SmartToast.show("修改失败");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -962,9 +993,9 @@ public class SceneSettingActivity extends AppCompatActivity {
             mList.addAll(sceneTasks);
             mList_device.addAll(devices);
             Iterator<SceneDeviceBean.Devices> it = mList_device.iterator();
-            while(it.hasNext()){
+            while (it.hasNext()) {
                 SceneDeviceBean.Devices x = it.next();
-                if(x.product.modelPath.equals("pro_dispatcher")){
+                if (x.product.modelPath.equals("pro_dispatcher")) {
                     it.remove();
                 }
             }

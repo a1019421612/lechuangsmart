@@ -352,10 +352,23 @@ public class RoomActivity extends BaseActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    if (status) {
+                    String stCode = jsonObject.getString("stCode");
+                    if (stCode.equals("200")){
+                        if (sceneDialog!=null){
+                            sceneDialog.dismiss();
+                        }
                         SmartToast.show("成功加入");
                         mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
-                    } else {
+                    }else if (stCode.equals("401")){
+                        SmartToast.show("绑定异常");
+                    }else if (stCode.equals("435")){
+                        SmartToast.show("设备已绑定");
+                    }else if (stCode.equals("6001")){
+                        SmartToast.show("设备不存在");
+                    }else if (stCode.equals("9999")){
+                        SmartToast.show("找不到在线网管");
+                    }
+                    else {
                         SmartToast.show("加入失败");
                     }
                 } catch (JSONException e) {
@@ -397,7 +410,7 @@ public class RoomActivity extends BaseActivity {
                     JSONObject jsonObject = new JSONObject(payload);
                     String stCode = jsonObject.getString("stCode");
                     if (stCode.equals("200")){
-                        SmartToast.show("添加成功");
+                        SmartToast.show("删除成功");
                         mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
                     }else if (stCode.equals("404")){
                         SmartToast.show("设备不存在");

@@ -106,7 +106,7 @@ public class FangjianActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
                 if (mList.get(position).product.modelPath.equals("pro_gateway")) {
-                    getPhotoPopwindow = new GetGatewayPopwindow(FangjianActivity.this, photoclicer,position);
+                    getPhotoPopwindow = new GetGatewayPopwindow(FangjianActivity.this, photoclicer, position);
                     getPhotoPopwindow.showPopupWindowBottom(llParent);
                 }
                 return false;
@@ -205,14 +205,14 @@ public class FangjianActivity extends AppCompatActivity {
             switch (v.getId()) {
                 case R.id.item_popupwindows_camera:
                     //设备入网
-                    String message="{\"pn\":\"GSTP\",\"gatewayMAC\":\""+mList.get(position).mac+"\",\"time\":\"120\"}";
-                    mConnection.sendTextMessage("message");
+                    String message = "{\"pn\":\"GSTP\",\"gatewayMAC\":\"" + mList.get(position).mac + "\",\"time\":\"120\"}";
+                    mConnection.sendTextMessage(message);
 //                    mConnection.disconnect();
 //                    getPhotoPopwindow.dismiss();
                     break;
                 case R.id.item_popupwindows_Photo:
                     //调试入网
-                    mConnection.sendTextMessage("{\"pn\":\"GSTP\",\"gatewayMAC\":\""+mList.get(position).mac+"\",\"time\":\"255\"}");
+                    mConnection.sendTextMessage("{\"pn\":\"GSTP\",\"gatewayMAC\":\"" + mList.get(position).mac + "\",\"time\":\"255\"}");
 //                    getPhotoPopwindow.dismiss();
                     break;
                 case R.id.item_popupwindows_stop:
@@ -222,6 +222,8 @@ public class FangjianActivity extends AppCompatActivity {
                     break;
                 case R.id.item_popupwindows_cancel:
                     getPhotoPopwindow.dismiss();
+                    break;
+                default:
                     break;
             }
         }
@@ -293,16 +295,16 @@ public class FangjianActivity extends AppCompatActivity {
             if (action.equals("RGLTP")) {
                 parseRoomData(payload);
             }
-            if (action.equals("GSTP")){
+            if (action.equals("GSTP")) {
                 try {
-                    JSONObject jsonObject=new JSONObject(payload);
+                    JSONObject jsonObject = new JSONObject(payload);
                     String stCode = jsonObject.getString("stCode");
-                    if (stCode.equals("200")){
+                    if (stCode.equals("200")) {
                         SmartToast.show("成功");
-                        if (getPhotoPopwindow!=null){
+                        if (getPhotoPopwindow != null) {
                             getPhotoPopwindow.dismiss();
                         }
-                    }else if (stCode.equals("304")){
+                    } else if (stCode.equals("304")) {
                         SmartToast.show("网关未在线");
                     }
                 } catch (JSONException e) {

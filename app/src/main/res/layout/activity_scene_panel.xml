@@ -1,0 +1,106 @@
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bgindex"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/toolbar_ll"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center_vertical"
+            android:background="@color/white"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/iv_base_back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:src="@mipmap/back" />
+
+                <TextView
+                    android:id="@+id/tv_base_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:gravity="center_vertical"
+                    android:text="---"
+                    android:textSize="@dimen/size_20" />
+
+                <ImageView
+                    android:id="@+id/iv_base_right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:src="@mipmap/edit"
+                    android:visibility="invisible" />
+            </RelativeLayout>
+        </LinearLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_panel"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/dp_20"
+            android:layout_weight="1"></android.support.v7.widget.RecyclerView>
+        <LinearLayout
+            android:id="@+id/ll_add_panel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/tianjia"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="添加情景面板"
+                android:gravity="center_horizontal"
+                android:textColor="#fff"
+                android:padding="10dp"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:orientation="vertical"
+        android:background="#fff">
+
+        <TextView
+            android:id="@+id/tv_drawer"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="#455A64"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp"
+            android:text="设备列表"
+            android:textColor="#fff"
+            android:textSize="30sp" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_panel_device"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+
+</android.support.v4.widget.DrawerLayout>

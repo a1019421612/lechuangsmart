@@ -26,7 +26,8 @@ public class MyWebSocketHandler extends WebSocketHandler {
     @Override
     public void onOpen() {
         Log.e("websocket", "onOpen");
-//        mConnection.sendTextMessage(message);
+        mConnection.sendTextMessage(message);
+
     }
 
     @Override

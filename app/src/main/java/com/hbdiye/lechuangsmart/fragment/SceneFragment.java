@@ -184,9 +184,15 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
             if (action.equals("SSTP")) {
                 try {
                     JSONObject jsonObject = new JSONObject(message);
-                    boolean status = jsonObject.getBoolean("status");
-                    if (status) {
+                    String stCode = jsonObject.getString("stCode");
+                    if (stCode.equals("200")){
                         SmartToast.show("场景：" + sceneName + "已启用！");
+                    }else if (stCode.equals("304")) {
+                        SmartToast.show("网关不在线");
+                    } else if (stCode.equals("483")) {
+                        SmartToast.show("场景不存在");
+                    }else {
+
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -197,12 +203,17 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 try {
                     JSONObject jsonObject = new JSONObject(message);
                     boolean status = jsonObject.getBoolean("status");
+                    String stCode = jsonObject.getString("stCode");
                     if (status) {
                         if (sceneDialog != null) {
                             sceneDialog.dismiss();
                         }
                         SmartToast.show("修改成功");
                         mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                    }else if (stCode.equals("401")){
+                        SmartToast.show("数据异常");
+                    }else if (stCode.equals("484")){
+                        SmartToast.show("场景设置冲突");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -213,8 +224,15 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
                 try {
                     JSONObject jsonObject = new JSONObject(message);
                     boolean status = jsonObject.getBoolean("status");
-                    SmartToast.show("删除成功");
-                    mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                    String stCode = jsonObject.getString("stCode");
+                    if (stCode.equals("200")){
+                        SmartToast.show("删除成功");
+                        mConnection.sendTextMessage("{\"pn\":\"SLTP\"}");
+                    }else if (stCode.equals("401")){
+                        SmartToast.show("数据库错误");
+                    }else if (stCode.equals("485")){
+                        SmartToast.show("不能删除有任务的场景");
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

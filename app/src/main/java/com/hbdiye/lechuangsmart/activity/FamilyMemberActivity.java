@@ -46,7 +46,7 @@ public class FamilyMemberActivity extends BaseActivity {
         homeReceiver = new HomeReceiver();
         registerReceiver(homeReceiver,intentFilter);
         mConnection = SingleWebSocketConnection.getInstance();
-        mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
+//        mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
     }
 
     @Override

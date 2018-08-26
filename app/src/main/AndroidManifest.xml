@@ -160,7 +160,8 @@
         <activity android:name=".activity.DFActivity" />
         <activity android:name=".activity.DVDActivity" />
         <activity android:name=".activity.KQjhqActivity" />
-        <activity android:name=".activity.AddSceneActivity"></activity>
+        <activity android:name=".activity.AddSceneActivity" />
+        <activity android:name=".activity.ScenePanelActivity"></activity>
     </application>
 
 </manifest>

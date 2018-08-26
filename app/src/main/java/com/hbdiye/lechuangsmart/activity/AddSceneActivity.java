@@ -279,6 +279,8 @@ public class AddSceneActivity extends BaseActivity {
                         SmartToast.show("场景添加失败");
                     }else if (stCode.equals("801")){
                         SmartToast.show("非法数据");
+                    }else if (stCode.equals("484")){
+                        SmartToast.show("场景设置冲突");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
