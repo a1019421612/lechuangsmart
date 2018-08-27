@@ -53,6 +53,19 @@
                 android:background="#00000000"
                 android:textSize="18sp"
                 android:text="停止入网" />
+            <TextView
+                android:id="@+id/tv_abc"
+                android:layout_width="match_parent"
+                android:layout_height="10.0dp"
+                android:background="#e8e8e8" />
+            <Button
+                android:id="@+id/item_popupwindows_remove"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:background="#00000000"
+                android:textSize="18sp"
+                android:text="移动设备" />
         </LinearLayout>
         <TextView
             android:layout_width="match_parent"
