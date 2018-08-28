@@ -104,7 +104,7 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
 
     private int pos = -1;//如果大于0则是重新选择了设备，小于0则是没有修改设备
     private String icon="shebeia";
-    private String modelPath;
+    private String modelPath="";
     private int switch_value;
 
     @Override
@@ -138,7 +138,9 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
                 etDeviceTrigValue.setVisibility(View.GONE);
             }
             deviceId = linkage.device.id;
-            proAttID = linkage.device.deviceAttributes.get(0).proAttID;
+//            String name2 = linkageSettingBean.linkage.proAtt.name;
+//            proAttID = linkage.device.deviceAttributes.get(0).proAttID;
+            proAttID = linkage.proAtt.id;
             String name = linkage.device.name;
             tvDeviceTrigName.setText(name);
             Glide.with(this).load(ContentConfig.drawableByIcon(linkage.device.product.icon)).into(ivTriggeredIcon);
@@ -261,6 +263,11 @@ public class DeviceTriggeredActivity extends AppCompatActivity {
                         mConnection.sendTextMessage("{\"pn\":\"LUTP\",\"linkageID\":\"" + linkageID + "\",\"deviceID\":\"" + deviceId + "\",\"proAttID\":\"" + proAttID + "\",\"type\":" + 0 + ",\"value\":" + switch_value + "}");
                     }
                 }else {
+                    String s1 = tvDeviceTrigAttr.getText().toString();
+                    if (TextUtils.isEmpty(s1)) {
+                        SmartToast.show("请选择设备");
+                        return;
+                    }
                     String s = etDeviceTrigValue.getText().toString().trim();
                     if (TextUtils.isEmpty(s)) {
                         SmartToast.show("联动条件值不能为空");

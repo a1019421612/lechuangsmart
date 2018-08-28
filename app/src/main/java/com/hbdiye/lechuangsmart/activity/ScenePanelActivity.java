@@ -280,20 +280,20 @@ public class ScenePanelActivity extends AppCompatActivity {
                 } else if (payload.contains("\"method\":\"A\"")) {
                     try {
                         JSONObject jsonObject = new JSONObject(payload);
-                        String stCode = jsonObject.getString("stCode");
-                        if (stCode.equals("200")) {
+                        String ecode = jsonObject.getString("ecode");
+                        if (ecode.equals("200")) {
                             SmartToast.show("添加成功");
                             drawerLayout.closeDrawers();
                             mConnection.sendTextMessage("{\"pn\":\"SDRTP\",\"method\":\"LIST\",\"sceneID\":\"" + sceneID + "\"}");
-                        } else if (stCode.equals("304")) {
+                        } else if (ecode.equals("304")) {
                             SmartToast.show("网关不在线");
-                        } else if (stCode.equals("404")) {
+                        } else if (ecode.equals("404")) {
                             SmartToast.show("设备不在线");
-                        } else if (stCode.equals("481")) {
+                        } else if (ecode.equals("481")) {
                             SmartToast.show("组号设置失败");
-                        } else if (stCode.equals("483")) {
+                        } else if (ecode.equals("483")) {
                             SmartToast.show("场景不存在");
-                        } else if (stCode.equals("487")) {
+                        } else if (ecode.equals("487")) {
                             SmartToast.show("情景面板不支持绑定该场景");
                         } else {
                             SmartToast.show("添加失败");
@@ -304,16 +304,16 @@ public class ScenePanelActivity extends AppCompatActivity {
                 }else if (payload.contains("\"method\":\"D\"")) {
                     try {
                         JSONObject jsonObject = new JSONObject(payload);
-                        String stCode = jsonObject.getString("stCode");
-                        if (stCode.equals("200")) {
+                        String ecode = jsonObject.getString("ecode");
+                        if (ecode.equals("200")) {
                             SmartToast.show("删除成功");
                             drawerLayout.closeDrawers();
                             mConnection.sendTextMessage("{\"pn\":\"SDRTP\",\"method\":\"LIST\",\"sceneID\":\"" + sceneID + "\"}");
-                        } else if (stCode.equals("304")) {
+                        } else if (ecode.equals("304")) {
                             SmartToast.show("网关不在线");
-                        }else if (stCode.equals("481")) {
+                        }else if (ecode.equals("481")) {
                             SmartToast.show("组号设置失败");
-                        } else if (stCode.equals("999")) {
+                        } else if (ecode.equals("999")) {
                             SmartToast.show("协议非法");
                         } else {
                             SmartToast.show("添加失败");

@@ -424,20 +424,20 @@ public class RoomActivity extends BaseActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    String stCode = jsonObject.getString("stCode");
-                    if (stCode.equals("200")){
+                    String ecode = jsonObject.getString("ecode");
+                    if (ecode.equals("200")){
                         if (sceneDialog!=null){
                             sceneDialog.dismiss();
                         }
                         SmartToast.show("成功加入");
                         mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
-                    }else if (stCode.equals("401")){
+                    }else if (ecode.equals("401")){
                         SmartToast.show("绑定异常");
-                    }else if (stCode.equals("435")){
+                    }else if (ecode.equals("435")){
                         SmartToast.show("设备已绑定");
-                    }else if (stCode.equals("6001")){
+                    }else if (ecode.equals("6001")){
                         SmartToast.show("设备不存在");
-                    }else if (stCode.equals("9999")){
+                    }else if (ecode.equals("9999")){
                         SmartToast.show("找不到在线网管");
                     }
                     else {
@@ -451,13 +451,13 @@ public class RoomActivity extends BaseActivity {
             if (action.equals("GSTP")) {
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
-                    String stCode = jsonObject.getString("stCode");
-                    if (stCode.equals("200")) {
+                    String ecode = jsonObject.getString("ecode");
+                    if (ecode.equals("200")) {
                         SmartToast.show("成功");
                         if (getPhotoPopwindow != null) {
                             getPhotoPopwindow.dismiss();
                         }
-                    } else if (stCode.equals("304")) {
+                    } else if (ecode.equals("304")) {
                         SmartToast.show("网关未在线");
                     }
                 } catch (JSONException e) {
@@ -498,18 +498,18 @@ public class RoomActivity extends BaseActivity {
                     //设备移动
                     try {
                         JSONObject jsonObject = new JSONObject(payload);
-                        String stCode = jsonObject.getString("stCode");
-                        if (stCode.equals("200")){
+                        String ecode = jsonObject.getString("ecode");
+                        if (ecode.equals("200")){
                             SmartToast.show("操作成功");
                             if (getPhotoPopwindow!=null){
                                 getPhotoPopwindow.dismiss();
                             }
                             mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
-                        }else if (stCode.equals("404")){
+                        }else if (ecode.equals("404")){
                             SmartToast.show("设备不存在");
-                        }else if (stCode.equals("531")){
+                        }else if (ecode.equals("531")){
                             SmartToast.show("房间不存在");
-                        }else if (stCode.equals("801")){
+                        }else if (ecode.equals("801")){
                             SmartToast.show("非法数据");
                         }
                     } catch (JSONException e) {
@@ -518,15 +518,15 @@ public class RoomActivity extends BaseActivity {
                 }else {
                     try {
                         JSONObject jsonObject = new JSONObject(payload);
-                        String stCode = jsonObject.getString("stCode");
-                        if (stCode.equals("200")){
+                        String ecode = jsonObject.getString("ecode");
+                        if (ecode.equals("200")){
                             SmartToast.show("删除成功");
                             mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
-                        }else if (stCode.equals("404")){
+                        }else if (ecode.equals("404")){
                             SmartToast.show("设备不存在");
-                        }else if (stCode.equals("304")){
+                        }else if (ecode.equals("304")){
                             SmartToast.show("网关未在线");
-                        }else if (stCode.equals("402")){
+                        }else if (ecode.equals("402")){
                             SmartToast.show("设备删除失败");
                         }
                     } catch (JSONException e) {

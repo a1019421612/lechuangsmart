@@ -67,18 +67,18 @@ public class MyApp extends Application {
                     websocketSendBroadcase(message,"SLTP");
                 }if (message.contains("\"pn\":\"UITP\"")){
                     websocketSendBroadcase(message,"UITP");
-                }if (message.contains("\"pn\":\"SSTP\"")) {
+                }if (message.contains("\"pn\":\"NSSTP\"")) {
                     //开启场景
-                    websocketSendBroadcase(message,"SSTP");
+                    websocketSendBroadcase(message,"NSSTP");
                 }if (message.contains("\"pn\":\"SUTP\"")){
                     //修改场景名称
                     websocketSendBroadcase(message,"SUTP");
-                }if (message.contains("\"pn\":\"SDTP\"")){
+                }if (message.contains("\"pn\":\"NSDTP\"")){
                     //删除场景
-                    websocketSendBroadcase(message,"SDTP");
-                }if (message.contains("\"pn\":\"SATP\"")){
+                    websocketSendBroadcase(message,"NSDTP");
+                }if (message.contains("\"pn\":\"NSATP\"")){
                     //添加场景
-                    websocketSendBroadcase(message,"SATP");
+                    websocketSendBroadcase(message,"NSATP");
                 }if (message.contains("\"pn\":\"LLTP\"")){
                     //联动
                     websocketSendBroadcase(message,"LLTP");
@@ -107,15 +107,15 @@ public class MyApp extends Application {
                 }if (message.contains("\"pn\":\"SUTP\"")) {
                     //修改场景名称
                     websocketSendBroadcase(message,"SUTP");
-                }if (message.contains("\"pn\":\"STATP\"")) {
+                }if (message.contains("\"pn\":\"NSTATP\"")) {
                     //添加设备
-                    websocketSendBroadcase(message,"STATP");
-                }if (message.contains("\"pn\":\"STUTP\"")) {
+                    websocketSendBroadcase(message,"NSTATP");
+                }if (message.contains("\"pn\":\"NSTUTP\"")) {
                     //设置延时
-                    websocketSendBroadcase(message,"STUTP");
-                }if (message.contains("\"pn\":\"STDTP\"")) {
+                    websocketSendBroadcase(message,"NSTUTP");
+                }if (message.contains("\"pn\":\"NSTDTP\"")) {
                     //删除设备
-                    websocketSendBroadcase(message,"STDTP");
+                    websocketSendBroadcase(message,"NSTDTP");
                 }
 //========================LinkageSettingActivity=====================
                 if (message.contains("\"pn\":\"LCTP\"")) {

@@ -74,7 +74,7 @@ public class AddSceneActivity extends BaseActivity {
         mConnection = SingleWebSocketConnection.getInstance();
 //        mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("SATP");
+        intentFilter.addAction("NSATP");
         homeReceiver = new HomeReceiver();
         registerReceiver(homeReceiver, intentFilter);
 //        socketConnection();
@@ -148,7 +148,7 @@ public class AddSceneActivity extends BaseActivity {
                     SmartToast.show("请选择场景");
                     return;
                 }
-                mConnection.sendTextMessage("{\"pn\":\"SATP\",\"icon\":\"" + default_image + "\",\"name\":\"" + sceneName + "\",\"groupNo\":\"" + sceneGroup + "\",\"sceneNo\":\"" + scene_num + "\"}");
+                mConnection.sendTextMessage("{\"pn\":\"NSATP\",\"icon\":\"" + default_image + "\",\"name\":\"" + sceneName + "\",\"groupNo\":\"" + sceneGroup + "\",\"sceneNo\":\"" + scene_num + "\"}");
                 break;
         }
     }
@@ -264,22 +264,22 @@ public class AddSceneActivity extends BaseActivity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             String payload = intent.getStringExtra("message");
-            if (action.equals("SATP")) {
+            if (action.equals("NSATP")) {
                 Log.e("bbb",payload);
 //                parseData(payload);
                 try {
                     JSONObject jsonObject=new JSONObject(payload);
-                    String stCode = jsonObject.getString("stCode");
-                    if (stCode.equals("200")){
+                    String ecode = jsonObject.getString("ecode");
+                    if (ecode.equals("200")){
                         SmartToast.show("添加成功");
                         finish();
-                    }else if (stCode.equals("481")){
+                    }else if (ecode.equals("481")){
                         SmartToast.show("相同组号超出9次");
-                    }else if (stCode.equals("482")){
+                    }else if (ecode.equals("482")){
                         SmartToast.show("场景添加失败");
-                    }else if (stCode.equals("801")){
+                    }else if (ecode.equals("801")){
                         SmartToast.show("非法数据");
-                    }else if (stCode.equals("484")){
+                    }else if (ecode.equals("484")){
                         SmartToast.show("场景设置冲突");
                     }
                 } catch (JSONException e) {

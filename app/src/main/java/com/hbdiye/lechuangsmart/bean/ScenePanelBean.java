@@ -10,7 +10,7 @@ public class ScenePanelBean implements Serializable {
     public String deviID;
     public String sceneID;
     public String pn;
-    public String stCode;
+    public String stCode;public String ecode;
     public String sdrID;
     public List<Devices> devices;
 

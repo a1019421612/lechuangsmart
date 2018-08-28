@@ -111,7 +111,7 @@ public class LinkageFragment extends Fragment {
     private void handleClick() {
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
-            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, final int position) {
                 flag = position;
                 switch (view.getId()) {
                     case R.id.ll_linkage_item:
@@ -119,7 +119,16 @@ public class LinkageFragment extends Fragment {
                             startActivity(new Intent(getActivity(), LinkageSettingActivity.class).putExtra("linkageID", mList.get(position).id).putExtra("timingId", timingID));
                         break;
                     case R.id.ll_linkage_item_del:
-                        mConnection.sendTextMessage("{\"pn\":\"LDTP\",\"linkageID\":\"" + mList.get(position).id + "\"}");
+                        AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
+                        builder.setTitle("确认删除联动？");
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mConnection.sendTextMessage("{\"pn\":\"LDTP\",\"linkageID\":\"" + mList.get(position).id + "\"}");
+                            }
+                        });
+                        builder.setNegativeButton("取消",null);
+                        builder.show();
                         break;
                     case R.id.ll_linkage_item_edt:
                         sceneDialog = new SceneDialog(getActivity(), R.style.MyDialogStyle, dailogClicer, "修改联动名称");

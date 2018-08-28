@@ -15,7 +15,7 @@ import java.util.List;
 
 public class LinkageSettingAdapter extends BaseQuickAdapter<LinkageSettingBean.Lts,BaseViewHolder>{
     public LinkageSettingAdapter(@Nullable List<LinkageSettingBean.Lts> data) {
-        super(R.layout.scene_setting_item, data);
+        super(R.layout.linkage_setting_item, data);
     }
 
     @Override

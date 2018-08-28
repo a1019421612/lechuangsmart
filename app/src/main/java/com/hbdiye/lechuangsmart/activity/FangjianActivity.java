@@ -342,13 +342,13 @@ public class FangjianActivity extends AppCompatActivity {
             if (action.equals("GSTP")) {
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
-                    String stCode = jsonObject.getString("stCode");
-                    if (stCode.equals("200")) {
+                    String ecode = jsonObject.getString("ecode");
+                    if (ecode.equals("200")) {
                         SmartToast.show("成功");
                         if (getPhotoPopwindow != null) {
                             getPhotoPopwindow.dismiss();
                         }
-                    } else if (stCode.equals("304")) {
+                    } else if (ecode.equals("304")) {
                         SmartToast.show("网关未在线");
                     }
                 } catch (JSONException e) {
@@ -360,18 +360,18 @@ public class FangjianActivity extends AppCompatActivity {
                     //设备移动
                     try {
                         JSONObject jsonObject = new JSONObject(payload);
-                        String stCode = jsonObject.getString("stCode");
-                        if (stCode.equals("200")){
+                        String ecode = jsonObject.getString("ecode");
+                        if (ecode.equals("200")){
                             SmartToast.show("操作成功");
                             if (getPhotoPopwindow!=null){
                                 getPhotoPopwindow.dismiss();
                             }
                             mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
-                        }else if (stCode.equals("404")){
+                        }else if (ecode.equals("404")){
                             SmartToast.show("设备不存在");
-                        }else if (stCode.equals("531")){
+                        }else if (ecode.equals("531")){
                             SmartToast.show("房间不存在");
-                        }else if (stCode.equals("801")){
+                        }else if (ecode.equals("801")){
                             SmartToast.show("非法数据");
                         }
                     } catch (JSONException e) {
@@ -380,15 +380,15 @@ public class FangjianActivity extends AppCompatActivity {
                 }else {
                     try {
                         JSONObject jsonObject = new JSONObject(payload);
-                        String stCode = jsonObject.getString("stCode");
-                        if (stCode.equals("200")){
+                        String ecode = jsonObject.getString("ecode");
+                        if (ecode.equals("200")){
                             SmartToast.show("删除成功");
                             mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
-                        }else if (stCode.equals("404")){
+                        }else if (ecode.equals("404")){
                             SmartToast.show("设备不存在");
-                        }else if (stCode.equals("304")){
+                        }else if (ecode.equals("304")){
                             SmartToast.show("网关未在线");
-                        }else if (stCode.equals("402")){
+                        }else if (ecode.equals("402")){
                             SmartToast.show("设备删除失败");
                         }
                     } catch (JSONException e) {

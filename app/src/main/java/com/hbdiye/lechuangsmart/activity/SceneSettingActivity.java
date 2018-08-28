@@ -179,7 +179,7 @@ public class SceneSettingActivity extends AppCompatActivity {
 //                tvBaseTitle.setText(options1+"时"+options2+"分"+options3+"秒");
                 int i = options1 * 3600 + options2 * 60 + options3;
 //                tvBaseTitle.setText(ContentConfig.secToTime(options1*3600+options2*60+options3));
-                mConnection.sendTextMessage("{\"pn\":\"STUTP\",\"stID\":\"" + mList.get(timeFlag).id + "\",\"proActID\":\"" + mList.get(timeFlag).proActID + "\",\"delaytime\":\"" + i + "\"}");
+                mConnection.sendTextMessage("{\"pn\":\"NSTUTP\",\"stID\":\"" + mList.get(timeFlag).id + "\",\"proActID\":\"" + mList.get(timeFlag).proActID + "\",\"delaytime\":\"" + i + "\"}");
             }
         }).setLabels("时", "分", "秒")
                 .isCenterLabel(true)
@@ -207,7 +207,7 @@ public class SceneSettingActivity extends AppCompatActivity {
                         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                mConnection.sendTextMessage("{\"pn\":\"STDTP\",\"stID\":\"" + mList.get(position).id + "\"}");
+                                mConnection.sendTextMessage("{\"pn\":\"NSTDTP\",\"stID\":\"" + mList.get(position).id + "\"}");
                             }
                         });
                         builder.setNegativeButton("取消", null);
@@ -338,7 +338,7 @@ public class SceneSettingActivity extends AppCompatActivity {
         builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mConnection.sendTextMessage("{\"pn\":\"STUTP\",\"stID\":\"" + stId + "\",\"proActID\":\"" + proactId + "\",\"param\":\"\"}");
+                mConnection.sendTextMessage("{\"pn\":\"NSTUTP\",\"stID\":\"" + stId + "\",\"proActID\":\"" + proactId + "\",\"param\":\"\"}");
             }
         });
         builder.setNegativeButton("否", null);
@@ -351,7 +351,7 @@ public class SceneSettingActivity extends AppCompatActivity {
         builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mConnection.sendTextMessage("{\"pn\":\"STATP\",\"sceneID\":\"" + sceneID + "\",\"deviceID\":\"" + deviceID + "\",\"proActID\":\"" + proActID + "\",\"param\":\"\",\"type\":\"0\"}");
+                mConnection.sendTextMessage("{\"pn\":\"NSTATP\",\"sceneID\":\"" + sceneID + "\",\"deviceID\":\"" + deviceID + "\",\"proActID\":\"" + proActID + "\",\"param\":\"\",\"type\":\"0\"}");
             }
         });
         builder.setNegativeButton("否", null);
@@ -465,9 +465,9 @@ public class SceneSettingActivity extends AppCompatActivity {
         intentFilter.addAction("STLTP");
         intentFilter.addAction("IRLTP");
         intentFilter.addAction("SUTP");
-        intentFilter.addAction("STATP");
-        intentFilter.addAction("STUTP");
-        intentFilter.addAction("STDTP");
+        intentFilter.addAction("NSTATP");
+        intentFilter.addAction("NSTUTP");
+        intentFilter.addAction("NSTDTP");
         homeReceiver = new HomeReceiver();
         registerReceiver(homeReceiver, intentFilter);
 //        socketConnection();
@@ -755,45 +755,45 @@ public class SceneSettingActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    String stCode = jsonObject.getString("stCode");
-                    if (stCode.equals("200")) {
+                    String ecode = jsonObject.getString("ecode");
+                    if (ecode.equals("200")) {
                         if (sceneDialog != null) {
                             sceneDialog.dismiss();
                         }
                         SmartToast.show("修改成功");
 //                        SPUtils.put(SceneSettingActivity.this, "editSceneName", true);
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
-                    } else if (stCode.equals("401")) {
+                    } else if (ecode.equals("401")) {
                         SmartToast.show("数据异常");
-                    } else if (stCode.equals("484")) {
+                    } else if (ecode.equals("484")) {
                         SmartToast.show("场景设置冲突");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            if (action.equals("STATP")) {
+            if (action.equals("NSTATP")) {
                 //添加设备
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    String stCode = jsonObject.getString("stCode");
-                    if (stCode.equals("200")) {
+                    String ecode = jsonObject.getString("ecode");
+                    if (ecode.equals("200")) {
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
                         drawerLayout.closeDrawers();
-                    } else if (stCode.equals("304")) {
+                    } else if (ecode.equals("304")) {
                         SmartToast.show("网关不在线");
-                    } else if (stCode.equals("404")) {
+                    } else if (ecode.equals("404")) {
                         SmartToast.show("设备不存在");
-                    } else if (stCode.equals("421")) {
+                    } else if (ecode.equals("421")) {
                         SmartToast.show("设备动作不存在");
-                    } else if (stCode.equals("481")) {
+                    } else if (ecode.equals("481")) {
                         SmartToast.show("组号设置失败");
-                    } else if (stCode.equals("482")) {
+                    } else if (ecode.equals("482")) {
                         SmartToast.show("场景号设置失败");
-                    } else if (stCode.equals("483")) {
+                    } else if (ecode.equals("483")) {
                         SmartToast.show("场景不存在");
-                    } else if (stCode.equals("484")) {
+                    } else if (ecode.equals("484")) {
                         SmartToast.show("场景设置冲突");
                     } else {
                         SmartToast.show("添加设备失败");
@@ -802,27 +802,27 @@ public class SceneSettingActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-            if (action.equals("STUTP")) {
+            if (action.equals("NSTUTP")) {
                 //设置延时STUTP
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    String stCode = jsonObject.getString("stCode");
-                    if (stCode.equals("200")) {
+                    String ecode = jsonObject.getString("ecode");
+                    if (ecode.equals("200")) {
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
-                    } else if (stCode.equals("304")) {
+                    } else if (ecode.equals("304")) {
                         SmartToast.show("网关不在线");
-                    } else if (stCode.equals("404")) {
+                    } else if (ecode.equals("404")) {
                         SmartToast.show("设备不存在");
-                    } else if (stCode.equals("421")) {
+                    } else if (ecode.equals("421")) {
                         SmartToast.show("设备动作不存在");
-                    } else if (stCode.equals("481")) {
+                    } else if (ecode.equals("481")) {
                         SmartToast.show("组号设置失败");
-                    } else if (stCode.equals("482")) {
+                    } else if (ecode.equals("482")) {
                         SmartToast.show("场景号设置失败");
-                    } else if (stCode.equals("483")) {
+                    } else if (ecode.equals("483")) {
                         SmartToast.show("场景不存在");
-                    } else if (stCode.equals("486")) {
+                    } else if (ecode.equals("486")) {
                         SmartToast.show("场景任务不存在");
                     } else {
                         SmartToast.show("修改失败");
@@ -834,27 +834,27 @@ public class SceneSettingActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-            if (action.equals("STDTP")) {
+            if (action.equals("NSTDTP")) {
                 //删除设备STDTP
                 try {
                     JSONObject jsonObject = new JSONObject(payload);
                     boolean status = jsonObject.getBoolean("status");
-                    String stCode = jsonObject.getString("stCode");
-                    if (stCode.equals("200")) {
+                    String ecode = jsonObject.getString("ecode");
+                    if (ecode.equals("200")) {
                         mConnection.sendTextMessage("{\"pn\":\"STLTP\",\"sceneID\":\"" + sceneID + "\"}");
-                    } else if (stCode.equals("304")) {
+                    } else if (ecode.equals("304")) {
                         SmartToast.show("网关不在线");
-                    } else if (stCode.equals("404")) {
+                    } else if (ecode.equals("404")) {
                         SmartToast.show("设备不存在");
-                    } else if (stCode.equals("421")) {
+                    } else if (ecode.equals("421")) {
                         SmartToast.show("设备动作不存在");
-                    } else if (stCode.equals("481")) {
+                    } else if (ecode.equals("481")) {
                         SmartToast.show("组号设置失败");
-                    } else if (stCode.equals("482")) {
+                    } else if (ecode.equals("482")) {
                         SmartToast.show("场景号设置失败");
-                    } else if (stCode.equals("483")) {
+                    } else if (ecode.equals("483")) {
                         SmartToast.show("场景不存在");
-                    } else if (stCode.equals("486")) {
+                    } else if (ecode.equals("486")) {
                         SmartToast.show("场景任务不存在");
                     } else {
                         SmartToast.show("修改失败");
