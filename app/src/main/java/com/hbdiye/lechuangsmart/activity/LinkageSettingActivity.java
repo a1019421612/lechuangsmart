@@ -175,7 +175,17 @@ public class LinkageSettingActivity extends AppCompatActivity {
                         }
                         break;
                     case R.id.iv_scene_setting_del:
-                        mConnection.sendTextMessage("{\"pn\":\"LTDTP\",\"ltID\":\"" + mList.get(position).id + "\"}");
+                        AlertDialog.Builder builder=new AlertDialog.Builder(LinkageSettingActivity.this);
+                        builder.setMessage("确认删除联动设备？");
+
+                        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mConnection.sendTextMessage("{\"pn\":\"LTDTP\",\"ltID\":\"" + mList.get(position).id + "\"}");
+                            }
+                        });
+                        builder.setNegativeButton("取消",null);
+                        builder.show();
                         //删除
                         break;
                     case R.id.tv_scene_setting_switch:

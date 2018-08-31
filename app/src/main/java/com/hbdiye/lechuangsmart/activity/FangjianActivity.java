@@ -1,7 +1,6 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -80,9 +80,10 @@ public class FangjianActivity extends AppCompatActivity {
 
     private int flagRoomPosition = -1;
     String[] array_place;
-    int intoRoomPositon=0;
-    private int device_position=-1;
+    int intoRoomPositon = 0;
+    private int device_position = -1;
     private String roomId = "";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,8 +103,8 @@ public class FangjianActivity extends AppCompatActivity {
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 flagRoomPosition = position;
                 tvFangjianName.setText(list_room.get(position).name);
-                roomId=list_room.get(position).id;
-                mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" +roomId + "\"}");
+                roomId = list_room.get(position).id;
+                mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
                 drawerLayout.closeDrawers();
             }
         });
@@ -112,12 +113,12 @@ public class FangjianActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
                 if (mList.get(position).product.modelPath.equals("pro_gateway")) {
-                    device_position=position;
-                    getPhotoPopwindow = new GetGatewayPopwindow(FangjianActivity.this, photoclicer, position,true);
+                    device_position = position;
+                    getPhotoPopwindow = new GetGatewayPopwindow(FangjianActivity.this, photoclicer, position, true);
                     getPhotoPopwindow.showPopupWindowBottom(llParent);
-                }else {
-                    device_position=position;
-                    getPhotoPopwindow = new GetGatewayPopwindow(FangjianActivity.this, photoclicer, position,false);
+                } else {
+                    device_position = position;
+                    getPhotoPopwindow = new GetGatewayPopwindow(FangjianActivity.this, photoclicer, position, false);
                     getPhotoPopwindow.showPopupWindowBottom(llParent);
                 }
                 return false;
@@ -228,7 +229,7 @@ public class FangjianActivity extends AppCompatActivity {
                     break;
                 case R.id.item_popupwindows_stop:
                     //停止入网
-                    mConnection.sendTextMessage("{\"pn\":\"GSTP\",\"time\":\"0\"}");
+                    mConnection.sendTextMessage("{\"pn\":\"GSTP\",\"gatewayMAC\":\"" + mList.get(position).mac + "\",\"time\":\"0\"}");
 //                    getPhotoPopwindow.dismiss();
                     break;
                 case R.id.item_popupwindows_remove:
@@ -236,30 +237,30 @@ public class FangjianActivity extends AppCompatActivity {
 //                    RoomBean roomBean = new Gson().fromJson(payload, RoomBean.class);
 //                    rooms = roomBean.rooms;
 //                    list_room
-                    if (list_room.size()>0){
+                    if (list_room.size() > 0) {
 
-                        array_place=new String[list_room.size()];
+                        array_place = new String[list_room.size()];
 
                         for (int i = 0; i < list_room.size(); i++) {
-                            array_place[i]=list_room.get(i).name;
+                            array_place[i] = list_room.get(i).name;
                         }
 
-                        AlertDialog.Builder builder=new AlertDialog.Builder(FangjianActivity.this);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(FangjianActivity.this);
                         builder.setTitle("放置地点");
                         builder.setSingleChoiceItems(array_place, 0, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                intoRoomPositon=which;
+                                intoRoomPositon = which;
                             }
                         });
                         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 //                    SmartToast.show(array_place[intoRoomPositon]);
-                                mConnection.sendTextMessage("{\"pn\":\"DDUTP\",\"deviMAC\":\""+mList.get(device_position).mac+"\",\"method\":\"M\",\"deviName\": \"\",\"roomID\": \""+list_room.get(intoRoomPositon).id+"\",\"orderNo\":\"\"}");
+                                mConnection.sendTextMessage("{\"pn\":\"DDUTP\",\"deviMAC\":\"" + mList.get(device_position).mac + "\",\"method\":\"M\",\"deviName\": \"\",\"roomID\": \"" + list_room.get(intoRoomPositon).id + "\",\"orderNo\":\"\"}");
                             }
                         });
-                        builder.setNegativeButton("取消",null);
+                        builder.setNegativeButton("取消", null);
                         builder.show();
                     }
                     break;
@@ -355,29 +356,29 @@ public class FangjianActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-            if (action.contains("DDUTP")){
-                if (payload.contains("\"method\":\"M\"")){
+            if (action.contains("DDUTP")) {
+                if (payload.contains("\"method\":\"M\"")) {
                     //设备移动
                     try {
                         JSONObject jsonObject = new JSONObject(payload);
                         String ecode = jsonObject.getString("ecode");
-                        if (ecode.equals("200")){
+                        if (ecode.equals("200")) {
                             SmartToast.show("操作成功");
-                            if (getPhotoPopwindow!=null){
+                            if (getPhotoPopwindow != null) {
                                 getPhotoPopwindow.dismiss();
                             }
                             mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
-                        }else if (ecode.equals("404")){
+                        } else if (ecode.equals("404")) {
                             SmartToast.show("设备不存在");
-                        }else if (ecode.equals("531")){
+                        } else if (ecode.equals("531")) {
                             SmartToast.show("房间不存在");
-                        }else if (ecode.equals("801")){
+                        } else if (ecode.equals("801")) {
                             SmartToast.show("非法数据");
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }else {
+                } else if (payload.contains("\"method\":\"Q\"")){
                     try {
                         JSONObject jsonObject = new JSONObject(payload);
                         String ecode = jsonObject.getString("ecode");
@@ -390,6 +391,19 @@ public class FangjianActivity extends AppCompatActivity {
                             SmartToast.show("网关未在线");
                         }else if (ecode.equals("402")){
                             SmartToast.show("设备删除失败");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }else if (payload.contains("\"method\":\"R\"")) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(payload);
+                        String ecode = jsonObject.getString("ecode");
+                        if (ecode.equals("200")) {
+                            SmartToast.show("新设备入网成功");
+                            mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
+                        } else{
+                            SmartToast.show("新设备入网失败");
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -497,8 +511,8 @@ public class FangjianActivity extends AppCompatActivity {
         roomAdapter.notifyDataSetChanged();
         if (list_room.size() > 0) {
             tvFangjianName.setText(list_room.get(0).name);
-            roomId=list_room.get(0).id;
-            mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId+ "\"}");
+            roomId = list_room.get(0).id;
+            mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
         }
     }
 

@@ -3,9 +3,11 @@ package com.hbdiye.lechuangsmart.activity;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -104,11 +106,21 @@ public class FamilyManagerActivity extends BaseActivity {
         });
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
-            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, final int position) {
                 flag = position;
                 switch (view.getId()) {
                     case R.id.ll_scene_item_del:
-                        mConnection.sendTextMessage("{\"pn\":\"RDTP\",\"roomID\":\""+mList.get(position).id+"\"}");
+                        AlertDialog.Builder builder =new AlertDialog.Builder(FamilyManagerActivity.this);
+                        builder.setMessage("确认删除房间");
+                        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mConnection.sendTextMessage("{\"pn\":\"RDTP\",\"roomID\":\""+mList.get(position).id+"\"}");
+                            }
+                        });
+                        builder.setNegativeButton("取消",null);
+                        builder.show();
+
                         break;
                     case R.id.ll_scene_item_edt:
                         sceneDialog = new SceneDialog(FamilyManagerActivity.this, R.style.MyDialogStyle, dailogClicer, "修改房间名称");

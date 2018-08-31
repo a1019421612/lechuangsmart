@@ -1,7 +1,6 @@
 package com.hbdiye.lechuangsmart.fragment;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -121,7 +121,7 @@ public class LinkageFragment extends Fragment {
                     case R.id.ll_linkage_item_del:
                         AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
                         builder.setTitle("确认删除联动？");
-                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mConnection.sendTextMessage("{\"pn\":\"LDTP\",\"linkageID\":\"" + mList.get(position).id + "\"}");

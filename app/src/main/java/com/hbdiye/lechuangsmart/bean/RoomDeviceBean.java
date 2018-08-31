@@ -46,7 +46,8 @@ public class RoomDeviceBean implements Serializable {
             public List<Proatts> proatts;
 
             public class Proatts {
-
+                public String id;
+                public String attributeID;
             }
 
             public List<ProductTypes> productTypes;

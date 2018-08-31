@@ -38,31 +38,71 @@ public class RoomDeviceAdapter extends BaseQuickAdapter<RoomDeviceBean.Devices,B
             if (modelPath.equals("pro_sensor_realtime")){
                 helper.setGone(R.id.ll_device_attr,true);
                 helper.setGone(R.id.ll_checkbox,false);
-
                 List<RoomDeviceBean.Devices.DeviceAttributes> deviceAttributes = item.deviceAttributes;
-                if (deviceAttributes!=null){
-                    for (int i = 0; i < deviceAttributes.size(); i++) {
-                        String proAttID = deviceAttributes.get(i).proAttID;
-                        if (proAttID.equals("12")){
+                List<RoomDeviceBean.Devices.Product.Proatts> proatts = item.product.proatts;
+                if (proatts!=null){
+                    for (int i = 0; i < proatts.size(); i++) {
+                        String attributeID = proatts.get(i).attributeID;
+                        String id = proatts.get(i).id;
+                        if (attributeID.equals("ATT0011")){
                             //温度
-                            int value = deviceAttributes.get(i).value;
-                            String wd = String.format("%.1f", (float)value / 100);
-                            helper.setText(R.id.tv_wd,wd+"℃");
-                        }
-                        if (proAttID.equals("11")){
+                            for (int j = 0; j < deviceAttributes.size(); j++) {
+                                String proAttID = deviceAttributes.get(j).proAttID;
+                                if (proAttID.equals(id)){
+                                    int value = deviceAttributes.get(i).value;
+                                    String wd = String.format("%.1f", (float)value / 100);
+                                    helper.setText(R.id.tv_wd,wd+"℃");
+                                }
+                            }
+                        }else if (attributeID.equals("ATT0010")){
                             //湿度
-                            int value = deviceAttributes.get(i).value;
+                            for (int j = 0; j < deviceAttributes.size(); j++) {
+                                String proAttID = deviceAttributes.get(j).proAttID;
+                                if (proAttID.equals(id)){
+                                    int value = deviceAttributes.get(i).value;
 //                                int round = Math.round(value / 100);
-                            String sd = String.format("%.1f", (float)value / 100);
-                            helper.setText(R.id.tv_sd,sd+"%");
-                        }
-                        if (proAttID.equals("13")){
+                                    String sd = String.format("%.1f", (float)value / 100);
+                                    helper.setText(R.id.tv_sd,sd+"%");
+                                }
+                            }
+
+                        }else if (attributeID.equals("ATT00121")){
                             //pm2.5
-                            int value = deviceAttributes.get(i).value;
-                            helper.setText(R.id.tv_pm,value+"PPM");
+                            for (int j = 0; j < deviceAttributes.size(); j++) {
+                                String proAttID = deviceAttributes.get(j).proAttID;
+                                if (proAttID.equals(id)){
+                                    int value = deviceAttributes.get(i).value;
+                                    helper.setText(R.id.tv_pm,value+"PPM");
+                                }
+                            }
+
                         }
                     }
                 }
+//                List<RoomDeviceBean.Devices.DeviceAttributes> deviceAttributes = item.deviceAttributes;
+//                if (deviceAttributes!=null){
+//                    for (int i = 0; i < deviceAttributes.size(); i++) {
+//                        String proAttID = deviceAttributes.get(i).proAttID;
+//                        if (proAttID.equals("12")){
+//                            //温度
+//                            int value = deviceAttributes.get(i).value;
+//                            String wd = String.format("%.1f", (float)value / 100);
+//                            helper.setText(R.id.tv_wd,wd+"℃");
+//                        }
+//                        if (proAttID.equals("11")){
+//                            //湿度
+//                            int value = deviceAttributes.get(i).value;
+////                                int round = Math.round(value / 100);
+//                            String sd = String.format("%.1f", (float)value / 100);
+//                            helper.setText(R.id.tv_sd,sd+"%");
+//                        }
+//                        if (proAttID.equals("13")){
+//                            //pm2.5
+//                            int value = deviceAttributes.get(i).value;
+//                            helper.setText(R.id.tv_pm,value+"PPM");
+//                        }
+//                    }
+//                }
             }else if (modelPath.equals("pro_switch")){
                 helper.setGone(R.id.ll_device_attr,false);
                 checkboxUserIdList.add(adapterPosition);

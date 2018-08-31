@@ -1,14 +1,17 @@
 package com.hbdiye.lechuangsmart.fragment;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -110,11 +113,20 @@ public class SceneFragment extends Fragment implements View.OnClickListener {
         ll_add_scene.setOnClickListener(this);
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
-            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, final int position) {
                 flag = position;
                 switch (view.getId()) {
                     case R.id.ll_scene_item_del:
-                        mConnection.sendTextMessage("{\"pn\":\"NSDTP\",\"sceneID\":\"" + mList.get(position).id + "\"}");
+                        AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
+                        builder.setMessage("确认删除场景？");
+                        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mConnection.sendTextMessage("{\"pn\":\"NSDTP\",\"sceneID\":\"" + mList.get(position).id + "\"}");
+                            }
+                        });
+                        builder.setNegativeButton("取消",null);
+                        builder.show();
                         break;
                     case R.id.ll_scene_item_edt:
                         isAddScene = false;

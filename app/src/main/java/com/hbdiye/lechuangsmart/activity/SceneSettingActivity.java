@@ -653,6 +653,9 @@ public class SceneSettingActivity extends AppCompatActivity {
                     //情景面板
                     startActivity(new Intent(SceneSettingActivity.this, ScenePanelActivity.class)
                             .putExtra("sceneID", sceneID));
+                    if (getPhotoPopwindow != null) {
+                        getPhotoPopwindow.dismiss();
+                    }
                     break;
                 case R.id.item_popupwindows_cancel:
                     getPhotoPopwindow.dismiss();

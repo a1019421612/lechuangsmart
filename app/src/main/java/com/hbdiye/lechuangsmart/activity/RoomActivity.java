@@ -1,13 +1,13 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -168,13 +168,22 @@ public class RoomActivity extends BaseActivity {
         });
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
-            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, final int position) {
                 flag = position;
                 RoomDeviceBean.Devices devices = mList.get(position);
                 switch (view.getId()) {
                     case R.id.ll_scene_item_del:
-                        String mess="{\"pn\":\"DDUTP\",\"deviMAC\":\""+mList.get(position).mac+"\",\"method\":\"Q\"}";
-                        mConnection.sendTextMessage("{\"pn\":\"DDUTP\",\"deviMAC\":\""+mList.get(position).mac+"\",\"method\":\"Q\"}");
+                        AlertDialog.Builder builder=new AlertDialog.Builder(RoomActivity.this);
+                        builder.setMessage("确认删除设备？");
+                        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String mess="{\"pn\":\"DDUTP\",\"deviMAC\":\""+mList.get(position).mac+"\",\"method\":\"Q\"}";
+                                mConnection.sendTextMessage("{\"pn\":\"DDUTP\",\"deviMAC\":\""+mList.get(position).mac+"\",\"method\":\"Q\"}");
+                            }
+                        });
+                        builder.setNegativeButton("取消",null);
+                        builder.show();
                         break;
                     case R.id.ll_scene_item_edt:
                         sceneDialog = new SceneDialog(RoomActivity.this, R.style.MyDialogStyle, dailogClicer, "修改设备名称");
@@ -247,7 +256,7 @@ public class RoomActivity extends BaseActivity {
                     break;
                 case R.id.item_popupwindows_stop:
                     //停止入网
-                    mConnection.sendTextMessage("{\"pn\":\"GSTP\",\"time\":\"0\"}");
+                    mConnection.sendTextMessage("{\"pn\":\"GSTP\",\"gatewayMAC\":\"" + mList.get(position).mac + "\",\"time\":\"0\"}");
 //                    getPhotoPopwindow.dismiss();
                     break;
                 case R.id.item_popupwindows_remove:
@@ -515,7 +524,7 @@ public class RoomActivity extends BaseActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }else {
+                }else if (payload.contains("\"method\":\"Q\"")){
                     try {
                         JSONObject jsonObject = new JSONObject(payload);
                         String ecode = jsonObject.getString("ecode");
@@ -528,6 +537,19 @@ public class RoomActivity extends BaseActivity {
                             SmartToast.show("网关未在线");
                         }else if (ecode.equals("402")){
                             SmartToast.show("设备删除失败");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }else if (payload.contains("\"method\":\"R\"")) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(payload);
+                        String ecode = jsonObject.getString("ecode");
+                        if (ecode.equals("200")) {
+                            SmartToast.show("新设备入网成功");
+                            mConnection.sendTextMessage("{\"pn\":\"DGLTP\",\"classify\":\"room\",\"id\":\"" + roomId + "\"}");
+                        } else{
+                            SmartToast.show("新设备入网失败");
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
