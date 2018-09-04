@@ -65,7 +65,7 @@ public class AutoWifiNetConfigActivityActivity extends BaseActivity {
             SmartToast.show("密码不能为空");
             return;
         }
-
+        configWifi();
     }
 
     /**
@@ -141,5 +141,19 @@ public class AutoWifiNetConfigActivityActivity extends BaseActivity {
 
             }
         }.start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                long startTime = System.currentTimeMillis();
+                EZOpenSDK.getInstance().stopConfigWiFi();
+                LogUtil.debugLog(TAG, "stopBonjourOnThread .cost time = "
+                        + (System.currentTimeMillis() - startTime) + "ms");
+            }
+        }).start();
     }
 }
