@@ -179,7 +179,8 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".activity.CameraListActivity" />
+        <activity android:name=".activity.CameraListActivity"
+            android:launchMode="singleTask"/>
         <activity android:name=".activity.AddCameraActivity" />
         <activity
             android:name=".activity.EZRealPlayActivity"

@@ -48,7 +48,7 @@ public class AddCameraActivity extends BaseActivity {
 
     private String mSerialNoStr;
     private String mSerialVeryCodeStr;
-    private String deviceType="";
+    private String deviceType = "";
 
     private String TAG = "AddDeviceActivity";
     private EZProbeDeviceInfoResult mEZProbeDeviceInfo = null;
@@ -80,11 +80,11 @@ public class AddCameraActivity extends BaseActivity {
         mSerialNoStr = etSerialNoStr.getText().toString();
         mSerialVeryCodeStr = etSerialVeryCodeStr.getText().toString();
 
-        if (TextUtils.isEmpty(mSerialNoStr)){
+        if (TextUtils.isEmpty(mSerialNoStr)) {
             SmartToast.show("设备编号不能为空");
             return;
         }
-        if (TextUtils.isEmpty(mSerialVeryCodeStr)){
+        if (TextUtils.isEmpty(mSerialVeryCodeStr)) {
             SmartToast.show("设备验证码不能为空");
             return;
         }
@@ -96,12 +96,12 @@ public class AddCameraActivity extends BaseActivity {
         new Thread() {
             public void run() {
 
-                mEZProbeDeviceInfo = EZOpenSDK.getInstance().probeDeviceInfo(mSerialNoStr,deviceType);
-                if (mEZProbeDeviceInfo.getBaseException() == null){
+                mEZProbeDeviceInfo = EZOpenSDK.getInstance().probeDeviceInfo(mSerialNoStr, deviceType);
+                if (mEZProbeDeviceInfo.getBaseException() == null) {
                     // TODO: 2018/6/25 添加设备
                     sendMessage(MSG_QUERY_CAMERA_SUCCESS);
-                }else{
-                    switch (mEZProbeDeviceInfo.getBaseException().getErrorCode()){
+                } else {
+                    switch (mEZProbeDeviceInfo.getBaseException().getErrorCode()) {
                         case 120023:
                             // TODO: 2018/6/25  设备不在线，未被用户添加 （这里需要网络配置）
                         case 120002:
@@ -138,6 +138,7 @@ public class AddCameraActivity extends BaseActivity {
             }
         }.start();
     }
+
     /**
      * 在此对类做相应的描述
      *
@@ -177,7 +178,7 @@ public class AddCameraActivity extends BaseActivity {
     }
 
     private void handleAddCameraSuccess() {
-        startActivity(new Intent(this,AutoWifiNetConfigActivityActivity.class));
+        startActivity(new Intent(this, AutoWifiNetConfigActivityActivity.class));
     }
 
     private void handleQueryCameraFail(final int errCode) {
@@ -233,7 +234,8 @@ public class AddCameraActivity extends BaseActivity {
     }
 
     private void showWifiConfig() {
-        startActivity(new Intent(this,AutoWifiPrepareStepOneActivity.class));
+        startActivity(new Intent(this, AutoWifiPrepareStepOneActivity.class)
+                .putExtra("SerialNoStr", mSerialNoStr).putExtra("SerialVeryCodeStr", mSerialVeryCodeStr));
     }
 
     private void showUnbind() {
@@ -246,7 +248,7 @@ public class AddCameraActivity extends BaseActivity {
 
     private void handleQueryCameraSuccess() {
         if (mEZProbeDeviceInfo != null) {
-            LogUtil.infoLog(TAG, "handleQueryCameraSuccess, msg:" );
+            LogUtil.infoLog(TAG, "handleQueryCameraSuccess, msg:");
 
         }
 
@@ -255,6 +257,7 @@ public class AddCameraActivity extends BaseActivity {
 //        mDeviceName.setText(mEZProbeDeviceInfo.getSubSerial());
 //        mDeviceIcon.setImageResource(getDeviceIcon(""));
     }
+
     private void sendMessage(int msgCode, int errorCode) {
         if (mMsgHandler != null) {
             Message msg = Message.obtain();
@@ -264,7 +267,10 @@ public class AddCameraActivity extends BaseActivity {
         } else {
             LogUtil.errorLog(TAG, "sendMessage-> mMsgHandler object is null");
         }
-    };
+    }
+
+    ;
+
     private void sendMessage(int msgCode) {
         if (mMsgHandler != null) {
             Message msg = Message.obtain();
@@ -274,6 +280,7 @@ public class AddCameraActivity extends BaseActivity {
             LogUtil.errorLog(TAG, "sendMessage-> mMsgHandler object is null");
         }
     }
+
     private void handleLocalValidateSerialNoFail(int errCode) {
         switch (errCode) {
             case ExtraException.SERIALNO_IS_NULL:
@@ -288,6 +295,7 @@ public class AddCameraActivity extends BaseActivity {
                 break;
         }
     }
+
     private void handleLocalValidateCameraPswFail(int errCode) {
         switch (errCode) {
             case ExtraException.CAMERA_PASSWORD_IS_NULL:

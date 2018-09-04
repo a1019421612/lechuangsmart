@@ -18,10 +18,13 @@ public class AutoWifiPrepareStepOneActivity extends BaseActivity {
     ImageView imageBg;
     @BindView(R.id.btnNext)
     Button btnNext;
+    private String mSerialNoStr="";
+    private String mSerialVeryCodeStr="";
 
     @Override
     protected void initData() {
-
+        mSerialNoStr = getIntent().getStringExtra("SerialNoStr");
+        mSerialVeryCodeStr = getIntent().getStringExtra("SerialVeryCodeStr");
     }
 
     @Override
@@ -42,6 +45,7 @@ public class AutoWifiPrepareStepOneActivity extends BaseActivity {
 
     @OnClick(R.id.btnNext)
     public void onViewClicked() {
-        startActivity(new Intent(this,AutoWifiNetConfigActivityActivity.class));
+        startActivity(new Intent(this,AutoWifiNetConfigActivityActivity.class)
+                .putExtra("SerialNoStr", mSerialNoStr).putExtra("SerialVeryCodeStr", mSerialVeryCodeStr));
     }
 }
