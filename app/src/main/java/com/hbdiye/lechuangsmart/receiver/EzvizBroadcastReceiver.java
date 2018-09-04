@@ -25,7 +25,7 @@ public class EzvizBroadcastReceiver extends BroadcastReceiver {
         if (action.equals(Constant.OAUTH_SUCCESS_ACTION)) {
             Log.i(TAG, "onReceive: OAUTH_SUCCESS_ACTION");
             Intent toIntent = new Intent(context, CameraListActivity.class);
-            toIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            toIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             /*******   获取登录成功之后的EZAccessToken对象   *****/
             EZAccessToken token = EZOpenSDK.getInstance().getEZAccessToken();
             context.startActivity(toIntent);

@@ -125,6 +125,28 @@ public class CameraListActivity extends BaseActivity {
                 }
             }
         });
+        adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
+
+            private boolean aBoolean;
+
+            @Override
+            public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            aBoolean = EZOpenSDK.getInstance().deleteDevice(mSerialNoStr);
+                            if (aBoolean){
+                                cameraListData();
+                            }
+                        } catch (BaseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+                return false;
+            }
+        });
     }
 
     @Override
@@ -215,4 +237,9 @@ public class CameraListActivity extends BaseActivity {
         return null;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cameraListData();
+    }
 }
