@@ -1,6 +1,5 @@
 package com.hbdiye.lechuangsmart.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -9,19 +8,16 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.coder.zzq.smartshow.toast.SmartToast;
-import com.hbdiye.lechuangsmart.MainActivity;
-import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
 import com.hbdiye.lechuangsmart.activity.AboutUsActivity;
+import com.hbdiye.lechuangsmart.activity.CameraListActivity;
 import com.hbdiye.lechuangsmart.activity.EditPswActivity;
 import com.hbdiye.lechuangsmart.activity.FamilyManagerActivity;
 import com.hbdiye.lechuangsmart.activity.FamilyNameActivity;
@@ -39,8 +35,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import de.tavendo.autobahn.WebSocketConnection;
-import de.tavendo.autobahn.WebSocketException;
-import de.tavendo.autobahn.WebSocketHandler;
 
 public class SettingFragment extends Fragment {
     @BindView(R.id.tv_setting_family_name)
@@ -59,6 +53,8 @@ public class SettingFragment extends Fragment {
     TextView tvSetttingLogout;
     @BindView(R.id.ll_parent)
     LinearLayout parent_ll;
+    @BindView(R.id.tv_setting_camera)
+    TextView tvSettingCamera;
     private Unbinder unbinder;
 
     private GetPhotoPopwindow getPhotoPopwindow;
@@ -84,28 +80,31 @@ public class SettingFragment extends Fragment {
 //            e.printStackTrace();
 //            SmartToast.show("网络连接错误");
 //        }
-        tvSettingVersion.setText("版本号V"+getVersionName(getActivity()));
+        tvSettingVersion.setText("版本号V" + getVersionName(getActivity()));
         return view;
     }
-    public String getVersionName(Context context){
-        PackageManager packageManager=context.getPackageManager();
+
+    public String getVersionName(Context context) {
+        PackageManager packageManager = context.getPackageManager();
         PackageInfo packageInfo;
-        String versionName="";
+        String versionName = "";
         try {
-            packageInfo=packageManager.getPackageInfo(context.getPackageName(),0);
-            versionName=packageInfo.versionName;
+            packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+            versionName = packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
         return versionName;
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
     }
 
-    @OnClick({R.id.tv_setting_family_name, R.id.tv_setting_editpsw, R.id.tv_family_manager, R.id.tv_setting_wifi, R.id.tv_setting_about_us, R.id.tv_setting_version,R.id.tv_settting_logout})
+    @OnClick({R.id.tv_setting_family_name, R.id.tv_setting_editpsw, R.id.tv_family_manager, R.id.tv_setting_wifi,
+            R.id.tv_setting_about_us, R.id.tv_setting_version, R.id.tv_settting_logout, R.id.tv_setting_camera})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_setting_family_name:
@@ -119,6 +118,9 @@ public class SettingFragment extends Fragment {
                 break;
             case R.id.tv_setting_wifi:
                 startActivity(new Intent(getActivity(), WiFiActivity.class));
+                break;
+            case R.id.tv_setting_camera:
+                startActivity(new Intent(getActivity(), CameraListActivity.class));
                 break;
             case R.id.tv_setting_about_us:
                 startActivity(new Intent(getActivity(), AboutUsActivity.class));
@@ -156,7 +158,7 @@ public class SettingFragment extends Fragment {
             }
         }
     };
-    private List<String> mList= new ArrayList<>();
+    private List<String> mList = new ArrayList<>();
 //    class MyWebSocketHandler extends WebSocketHandler {
 //        @Override
 //        public void onOpen() {
