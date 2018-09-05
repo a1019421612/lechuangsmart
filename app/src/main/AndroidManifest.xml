@@ -179,15 +179,27 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".activity.CameraListActivity"
-            android:launchMode="singleTask"/>
+        <activity
+            android:name=".activity.CameraListActivity"
+            android:launchMode="singleTask" />
         <activity android:name=".activity.AddCameraActivity" />
         <activity
             android:name=".activity.EZRealPlayActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" />
         <activity android:name=".activity.AutoWifiPrepareStepOneActivity" />
-        <activity android:name=".activity.AutoWifiNetConfigActivityActivity"></activity>
+        <activity android:name=".activity.AutoWifiNetConfigActivityActivity" />
+        <activity android:name=".activity.SeriesNumSearchActivity"></activity>
+        <activity android:name=".devicelist.AutoWifiConnectingActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".devicelist.AutoWifiPrepareStepOneActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".devicelist.AutoWifiNetConfigActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".devicelist.AutoWifiResetActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".devicelist.APWifiConfigActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
