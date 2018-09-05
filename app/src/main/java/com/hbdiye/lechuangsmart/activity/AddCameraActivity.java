@@ -54,10 +54,16 @@ public class AddCameraActivity extends BaseActivity {
     private EZProbeDeviceInfoResult mEZProbeDeviceInfo = null;
 
     private MessageHandler mMsgHandler = null;
+    private String deviceInfo="";
 
     @Override
     protected void initData() {
-
+        deviceInfo = getIntent().getStringExtra("deviceInfo");
+        if (!TextUtils.isEmpty(deviceInfo)){
+            handleString(deviceInfo);
+            etSerialNoStr.setText(mSerialNoStr);
+            etSerialVeryCodeStr.setText(mSerialVeryCodeStr);
+        }
     }
 
     @Override
@@ -91,7 +97,80 @@ public class AddCameraActivity extends BaseActivity {
 
         probeDeviceInfo();
     }
+    private void handleString(String resultString) {
+        // 初始化数据
+        mSerialNoStr = "";
+        mSerialVeryCodeStr = "";
+        deviceType = "";
+        LogUtil.errorLog(TAG, resultString);
+        String[] newlineCharacterSet = {
+                "\n\r", "\r\n", "\r", "\n"};
+        String stringOrigin = resultString;
+        // 寻找第一次出现的位置
+        int a = -1;
+        int firstLength = 1;
+        for (String string : newlineCharacterSet) {
+            if (a == -1) {
+                a = resultString.indexOf(string);
+                if (a > stringOrigin.length() - 3) {
+                    a = -1;
+                }
+                if (a != -1) {
+                    firstLength = string.length();
+                }
+            }
+        }
 
+        // 扣去第一次出现回车的字符串后，剩余的是第二行以及以后的
+        if (a != -1) {
+            resultString = resultString.substring(a + firstLength);
+        }
+        // 寻找最后一次出现的位置
+        int b = -1;
+        for (String string : newlineCharacterSet) {
+            if (b == -1) {
+                b = resultString.indexOf(string);
+                if (b != -1) {
+                    mSerialNoStr = resultString.substring(0, b);
+                    firstLength = string.length();
+                }
+            }
+        }
+
+        // 寻找遗失的验证码阶段
+        if (mSerialNoStr != null && b != -1 && (b + firstLength) <= resultString.length()) {
+            resultString = resultString.substring(b + firstLength);
+        }
+
+        // 再次寻找回车键最后一次出现的位置
+        int c = -1;
+        for (String string : newlineCharacterSet) {
+            if (c == -1) {
+                c = resultString.indexOf(string);
+                if (c != -1) {
+                    mSerialVeryCodeStr = resultString.substring(0, c);
+                }
+            }
+        }
+
+        // 寻找CS-C2-21WPFR 判断是否支持wifi
+        if (mSerialNoStr != null && c != -1 && (c + firstLength) <= resultString.length()) {
+            resultString = resultString.substring(c + firstLength);
+        }
+        if (resultString != null && resultString.length() > 0) {
+            deviceType = resultString;
+        }
+
+        if (b == -1) {
+            mSerialNoStr = resultString;
+        }
+
+        if (mSerialNoStr == null) {
+            mSerialNoStr = stringOrigin;
+        }
+        LogUtil.debugLog(TAG, "mSerialNoStr = " + mSerialNoStr + ",mSerialVeryCodeStr = " + mSerialVeryCodeStr
+                + ",deviceType = " + deviceType);
+    }
     private void probeDeviceInfo() {
         new Thread() {
             public void run() {

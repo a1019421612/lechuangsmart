@@ -10,11 +10,14 @@ import android.widget.TextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.adapter.CameraAdapter;
+import com.hbdiye.lechuangsmart.google.zxing.activity.CaptureActivity;
+import com.hbdiye.lechuangsmart.utils.EZUtils;
 import com.videogo.constant.IntentConsts;
 import com.videogo.exception.BaseException;
 import com.videogo.openapi.EZOpenSDK;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
+import com.videogo.util.DateTimeUtil;
 import com.videogo.util.LogUtil;
 
 import java.util.ArrayList;
@@ -50,14 +53,14 @@ public class CameraListActivity extends BaseActivity {
     }
 
     private void cameraListData() {
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 try {
                     List<EZDeviceInfo> deviceList = EZOpenSDK.getInstance().getDeviceList(0, 10);
                     if (deviceList != null && deviceList.size() > 0) {
                         //设备存在
-                        if (mList.size()>0){
+                        if (mList.size() > 0) {
                             mList.clear();
                         }
                         mList.addAll(deviceList);
@@ -67,7 +70,7 @@ public class CameraListActivity extends BaseActivity {
                                 adapter.notifyDataSetChanged();
                             }
                         });
-                    }else {
+                    } else {
                         //设备不存在，添加设备
                         mList.clear();
                         CameraListActivity.this.runOnUiThread(new Runnable() {
@@ -108,7 +111,9 @@ public class CameraListActivity extends BaseActivity {
         ivBaseEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(CameraListActivity.this,AddCameraActivity.class));
+//                startActivity(new Intent(CameraListActivity.this,AddCameraActivity.class));
+                startActivity(new Intent(CameraListActivity.this, CaptureActivity.class)
+                        .putExtra("camera", true));
             }
         });
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
@@ -118,13 +123,46 @@ public class CameraListActivity extends BaseActivity {
                 EZCameraInfo cameraInfo = getCameraInfoFromDevice(deviceInfo, 0);
 //                            intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
 //                            intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
-                if (mList.get(position).getStatus()==1){
+                if (mList.get(position).getStatus() == 1) {
                     startActivity(new Intent(CameraListActivity.this, EZRealPlayActivity.class)
                             .putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo)
                             .putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo));
                 }
             }
         });
+        adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                switch (view.getId()) {
+                    case R.id.tab_remoteplayback_btn:
+                        //回放
+                        EZDeviceInfo deviceInfo = mList.get(position);
+                        if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
+                            LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
+                            return;
+                        }
+                        if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
+                            LogUtil.d(TAG, "cameralist have one camera");
+                            EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, 0);
+                            if (cameraInfo == null) {
+                                return;
+                            }
+//                            Intent intent = new Intent(CameraListActivity.this, PlayBackListActivity.class);
+//                            intent.putExtra(RemoteListContant.QUERY_DATE_INTENT_KEY, DateTimeUtil.getNow());
+//                            intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
+//                            startActivity(intent);
+                        }
+                        break;
+                    case R.id.tab_alarmlist_btn:
+                        //消息列表
+                        break;
+                    case R.id.tab_setdevice_btn:
+                        //设置
+                        break;
+                }
+            }
+        });
+
         adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
 
             private boolean aBoolean;
@@ -136,7 +174,7 @@ public class CameraListActivity extends BaseActivity {
                     public void run() {
                         try {
                             aBoolean = EZOpenSDK.getInstance().deleteDevice(mSerialNoStr);
-                            if (aBoolean){
+                            if (aBoolean) {
                                 cameraListData();
                             }
                         } catch (BaseException e) {
@@ -153,6 +191,7 @@ public class CameraListActivity extends BaseActivity {
     protected int getLayoutID() {
         return R.layout.activity_camera_list;
     }
+
     private void handleString() {
         // 初始化数据
         mSerialNoStr = "";
@@ -227,7 +266,8 @@ public class CameraListActivity extends BaseActivity {
         LogUtil.debugLog(TAG, "mSerialNoStr = " + mSerialNoStr + ",mSerialVeryCodeStr = " + mSerialVeryCodeStr
                 + ",deviceType = " + deviceType);
     }
-    public  EZCameraInfo getCameraInfoFromDevice(EZDeviceInfo deviceInfo, int camera_index) {
+
+    public EZCameraInfo getCameraInfoFromDevice(EZDeviceInfo deviceInfo, int camera_index) {
         if (deviceInfo == null) {
             return null;
         }

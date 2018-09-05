@@ -1,7 +1,10 @@
 package com.hbdiye.lechuangsmart.adapter;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.hbdiye.lechuangsmart.R;
@@ -16,16 +19,23 @@ public class CameraAdapter extends BaseQuickAdapter<EZDeviceInfo,BaseViewHolder>
 
     @Override
     protected void convert(BaseViewHolder helper, EZDeviceInfo item) {
-        helper.setText(R.id.tv_name,item.getDeviceName());
-        int status = item.getStatus();
-        if (status==1){
-            //在线
-            helper.setTextColor(R.id.tv_status,mContext.getResources().getColor(R.color.state_normal_text));
-            helper.setText(R.id.tv_status,"设备在线");
-        }else {
-            //不在线
-            helper.setTextColor(R.id.tv_status,mContext.getResources().getColor(R.color.common_hint_text));
-            helper.setText(R.id.tv_status,"设备离线");
+        if (item!=null){
+            if (item.getStatus()==2){
+                helper.setGone(R.id.item_offline,true);
+                helper.setGone(R.id.offline_bg,true);
+            }else {
+                helper.setGone(R.id.item_offline,false);
+                helper.setGone(R.id.offline_bg,false);
+            }
+            helper.setText(R.id.camera_name_tv,item.getDeviceName());
+            helper.setVisible(R.id.item_icon,true);
+            String imageUrl = item.getDeviceCover();
+            if(!TextUtils.isEmpty(imageUrl)) {
+                Glide.with(mContext).load(imageUrl).into((ImageView)helper.getView(R.id.item_icon));
+            }
         }
+        helper.addOnClickListener(R.id.tab_remoteplayback_btn);
+        helper.addOnClickListener(R.id.tab_alarmlist_btn);
+        helper.addOnClickListener(R.id.tab_setdevice_btn);
     }
 }

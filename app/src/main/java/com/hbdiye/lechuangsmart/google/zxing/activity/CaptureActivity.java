@@ -37,6 +37,7 @@ import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 import com.hbdiye.lechuangsmart.R;
+import com.hbdiye.lechuangsmart.activity.AddCameraActivity;
 import com.hbdiye.lechuangsmart.google.zxing.camera.CameraManager;
 import com.hbdiye.lechuangsmart.google.zxing.decoding.CaptureActivityHandler;
 import com.hbdiye.lechuangsmart.google.zxing.decoding.InactivityTimer;
@@ -59,7 +60,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
 
     private CaptureActivityHandler handler;
     private ViewfinderView viewfinderView;
-    private ImageView back;
+    private ImageView iv_base_back,iv_base_right;
     private boolean hasSurface;
     private Vector<BarcodeFormat> decodeFormats;
     private String characterSet;
@@ -74,6 +75,9 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
     //	private Button cancelScanButton;
     public static final int RESULT_CODE_QR_SCAN = 0xA1;
     public static final String INTENT_EXTRA_KEY_QR_SCAN = "qr_scan_result";
+
+    private boolean isCamera;
+
     /**
      * Called when the activity is first created.
      */
@@ -82,10 +86,21 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scanner);
         //ViewUtil.addTopView(getApplicationContext(), this, R.string.scan_card);
+        isCamera = getIntent().getBooleanExtra("camera", false);
         CameraManager.init(getApplication());
         viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_content);
-        back = (ImageView) findViewById(R.id.scanner_toolbar_back);
-        back.setOnClickListener(new View.OnClickListener() {
+        iv_base_back=findViewById(R.id.iv_base_back);
+        iv_base_right=findViewById(R.id.iv_base_right);
+        if (isCamera){
+            iv_base_right.setVisibility(View.VISIBLE);
+            iv_base_right.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(CaptureActivity.this, AddCameraActivity.class));
+                }
+            });
+        }
+        iv_base_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
@@ -279,15 +294,21 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
             Toast.makeText(CaptureActivity.this, "扫码失败!", Toast.LENGTH_SHORT).show();
             CaptureActivity.this.finish();
         } else {
-            Intent resultIntent = new Intent();
-            Bundle bundle = new Bundle();
-            bundle.putString(INTENT_EXTRA_KEY_QR_SCAN, resultString);
-            System.out.println("sssssssssssssssss scan 0 = " + resultString);
+            System.out.println("CaputreActivity= " + resultString);
+            if (isCamera){
+                startActivity(new Intent(CaptureActivity.this,AddCameraActivity.class)
+                .putExtra("deviceInfo",resultString));
+            }else {
+                Intent resultIntent = new Intent();
+                Bundle bundle = new Bundle();
+                bundle.putString(INTENT_EXTRA_KEY_QR_SCAN, resultString);
+
 //            SmartToast.show(resultString);
-            Intent intent=new Intent();
-            intent.putExtra("erCode",resultString);
-            setResult(4,intent);
-            finish();
+                Intent intent=new Intent();
+                intent.putExtra("erCode",resultString);
+                setResult(4,intent);
+                finish();
+            }
 //            startActivity(new Intent(this, ScanCodeResultActivity.class).putExtra("result",resultString));
 
 //            ToastUtils.showShort(this,resultString);
