@@ -27,4 +27,11 @@
     <item name="android:textColor">@color/common_sub_text</item>
     <item name="android:textSize">@dimen/loading_text_size</item>
   </style>
+  <style name="CommonGroupLayout">
+    <item name="dividerHeight">0.5dp</item>
+    <item name="dividerColor">@color/c8</item>
+    <item name="itemSelector">@drawable/grouplayout_item_bg_selector</item>
+    <item name="dividerPadding">@dimen/device_set_padding</item>
+    <item name="android:background">@android:color/white</item>
+  </style>
 </resources>

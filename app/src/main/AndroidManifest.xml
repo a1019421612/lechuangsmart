@@ -203,6 +203,10 @@
         <activity android:name=".remoteplayback.list.PlayBackListActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="nosensor"/>
+        <activity android:name=".devicemgt.EZDeviceSettingActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".devicemgt.ModifyDeviceNameActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

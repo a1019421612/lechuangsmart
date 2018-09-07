@@ -1,6 +1,7 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -10,6 +11,7 @@ import android.view.View;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.adapter.CameraAdapter;
+import com.hbdiye.lechuangsmart.devicemgt.EZDeviceSettingActivity;
 import com.hbdiye.lechuangsmart.google.zxing.activity.CaptureActivity;
 import com.hbdiye.lechuangsmart.remoteplayback.list.PlayBackListActivity;
 import com.hbdiye.lechuangsmart.remoteplayback.list.RemoteListContant;
@@ -175,6 +177,12 @@ public class CameraListActivity extends BaseActivity {
                         break;
                     case R.id.tab_setdevice_btn:
                         //设置
+                        EZDeviceInfo deviceInfo_setting = mList.get(position);
+                        Intent intent = new Intent(CameraListActivity.this, EZDeviceSettingActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable(IntentConsts.EXTRA_DEVICE_INFO,deviceInfo_setting);
+                        intent.putExtra("Bundle",bundle);
+                        startActivity(intent);
                         break;
                 }
             }
