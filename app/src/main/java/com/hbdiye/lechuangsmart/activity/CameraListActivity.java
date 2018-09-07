@@ -1,17 +1,22 @@
 package com.hbdiye.lechuangsmart.activity;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.adapter.CameraAdapter;
 import com.hbdiye.lechuangsmart.google.zxing.activity.CaptureActivity;
+import com.hbdiye.lechuangsmart.remoteplayback.list.PlayBackListActivity;
+import com.hbdiye.lechuangsmart.remoteplayback.list.RemoteListContant;
+import com.hbdiye.lechuangsmart.util.SPUtils;
+import com.hbdiye.lechuangsmart.util.TimeUtil;
 import com.hbdiye.lechuangsmart.utils.EZUtils;
+import com.hbdiye.lechuangsmart.utils.TimeUtils;
 import com.videogo.constant.IntentConsts;
 import com.videogo.exception.BaseException;
 import com.videogo.openapi.EZOpenSDK;
@@ -24,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class CameraListActivity extends BaseActivity {
 
@@ -49,6 +53,19 @@ public class CameraListActivity extends BaseActivity {
         handleString();
 
         cameraListData();
+
+        String firstToken = (String) SPUtils.get(getApplicationContext(), "firstToken", "");
+        if (TextUtils.isEmpty(firstToken)){
+            SPUtils.put(getApplicationContext(),"firstToken", TimeUtils.getNowTimeNoWeek());
+        }else {
+            boolean b = TimeUtils.DateCompare(TimeUtils.getNowTimeNoWeek(), firstToken);
+            if (b){
+                Log.e("sss","大于7天");
+            }else {
+                Log.e("sss","小于7天");
+            }
+        }
+
 
     }
 
@@ -147,10 +164,10 @@ public class CameraListActivity extends BaseActivity {
                             if (cameraInfo == null) {
                                 return;
                             }
-//                            Intent intent = new Intent(CameraListActivity.this, PlayBackListActivity.class);
-//                            intent.putExtra(RemoteListContant.QUERY_DATE_INTENT_KEY, DateTimeUtil.getNow());
-//                            intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
-//                            startActivity(intent);
+                            Intent intent = new Intent(CameraListActivity.this, PlayBackListActivity.class);
+                            intent.putExtra(RemoteListContant.QUERY_DATE_INTENT_KEY, DateTimeUtil.getNow());
+                            intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
+                            startActivity(intent);
                         }
                         break;
                     case R.id.tab_alarmlist_btn:

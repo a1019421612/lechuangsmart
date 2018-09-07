@@ -200,6 +200,9 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".devicelist.APWifiConfigActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".remoteplayback.list.PlayBackListActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="nosensor"/>
     </application>
 
 </manifest>
