@@ -34,4 +34,14 @@
     <item name="dividerPadding">@dimen/device_set_padding</item>
     <item name="android:background">@android:color/white</item>
   </style>
+  <style name="CommonListView" parent="@android:style/Widget.ListView">
+    <item name="android:cacheColorHint">#0000</item>
+    <item name="android:fadingEdgeLength">0dp</item>
+    <item name="android:listSelector">#0000</item>
+    <item name="android:fastScrollEnabled">false</item>
+    <item name="android:dividerHeight">0dp</item>
+    <item name="android:divider">@null</item>
+    <item name="android:headerDividersEnabled">false</item>
+    <item name="android:footerDividersEnabled">false</item>
+  </style>
 </resources>

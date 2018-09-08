@@ -207,6 +207,15 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".devicemgt.ModifyDeviceNameActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".message.EZMessageActivity2"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".message.EZMessageImageActivity2"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".message.remoteplayback.EZRemotePlayBackActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

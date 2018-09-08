@@ -34,14 +34,14 @@ public class DataManager {
         return mDataManager;
     }
 
-//    public LruBitmapPool getBitmapPool(Context context){
-//        if (mBitmapPool == null){
-//            MemorySizeCalculator calculator = new MemorySizeCalculator(context);
-//            int defaultBitmapPoolSize = calculator.getBitmapPoolSize();
-//            mBitmapPool = new LruBitmapPool(defaultBitmapPoolSize);
-//        }
-//        return mBitmapPool;
-//    }
+    public LruBitmapPool getBitmapPool(Context context){
+        if (mBitmapPool == null){
+            MemorySizeCalculator calculator = new MemorySizeCalculator(context);
+            int defaultBitmapPoolSize = calculator.getBitmapPoolSize();
+            mBitmapPool = new LruBitmapPool(defaultBitmapPoolSize);
+        }
+        return mBitmapPool;
+    }
 
     /**
      * 缓存设备验证码信息

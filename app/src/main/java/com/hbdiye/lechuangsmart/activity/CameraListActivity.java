@@ -13,6 +13,7 @@ import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.adapter.CameraAdapter;
 import com.hbdiye.lechuangsmart.devicemgt.EZDeviceSettingActivity;
 import com.hbdiye.lechuangsmart.google.zxing.activity.CaptureActivity;
+import com.hbdiye.lechuangsmart.message.EZMessageActivity2;
 import com.hbdiye.lechuangsmart.remoteplayback.list.PlayBackListActivity;
 import com.hbdiye.lechuangsmart.remoteplayback.list.RemoteListContant;
 import com.hbdiye.lechuangsmart.util.SPUtils;
@@ -174,15 +175,20 @@ public class CameraListActivity extends BaseActivity {
                         break;
                     case R.id.tab_alarmlist_btn:
                         //消息列表
+                        final EZDeviceInfo deviceInfo_msg = mList.get(position);
+                        LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
+                        Intent intent = new Intent(CameraListActivity.this, EZMessageActivity2.class);
+                        intent.putExtra(IntentConsts.EXTRA_DEVICE_ID, deviceInfo_msg.getDeviceSerial());
+                        startActivity(intent);
                         break;
                     case R.id.tab_setdevice_btn:
                         //设置
                         EZDeviceInfo deviceInfo_setting = mList.get(position);
-                        Intent intent = new Intent(CameraListActivity.this, EZDeviceSettingActivity.class);
+                        Intent intent1 = new Intent(CameraListActivity.this, EZDeviceSettingActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putParcelable(IntentConsts.EXTRA_DEVICE_INFO,deviceInfo_setting);
-                        intent.putExtra("Bundle",bundle);
-                        startActivity(intent);
+                        intent1.putExtra("Bundle",bundle);
+                        startActivity(intent1);
                         break;
                 }
             }
