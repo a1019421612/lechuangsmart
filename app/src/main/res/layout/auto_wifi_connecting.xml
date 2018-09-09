@@ -3,17 +3,17 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/wifi_config_bg"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/top_bar_bg" >
+        android:layout_height="44dp"
+        android:background="@drawable/top_bar_bg">
 
-        <Button
+        <ImageView
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:background="@drawable/common_title_back_selector"
@@ -51,13 +51,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="visible" >
+        android:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/imgAnimation"
@@ -70,8 +70,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="40dp"
-                android:layout_marginRight="40dp"
                 android:layout_marginTop="15dp"
+                android:layout_marginRight="40dp"
                 android:gravity="center"
                 android:text="@string/added_camera_success_txt"
                 android:textColor="@color/title_text"
@@ -83,8 +83,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="40dp"
-                android:layout_marginRight="40dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginRight="40dp"
                 android:gravity="center"
                 android:text="@string/add_camera_success_tip"
                 android:textColor="@color/add_title_text_color"
@@ -96,8 +96,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="30dp"
+                android:layout_marginRight="20dp"
                 android:background="@drawable/login_btn_selector"
                 android:text="@string/added_camera_success_txt"
                 android:textColor="@color/white"
@@ -108,8 +108,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="30dp"
+                android:layout_marginRight="20dp"
                 android:background="@drawable/ez_reaty_btn_selector"
                 android:text="@string/retry"
                 android:textColor="@color/white"
@@ -120,8 +120,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="20dp"
+                android:layout_marginRight="20dp"
                 android:background="@drawable/login_btn_selector"
                 android:text="@string/ez_auto_wifi_line_connect"
                 android:textColor="@color/white"
@@ -167,10 +167,10 @@
             android:id="@+id/btnFinish"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
             android:layout_marginLeft="38dp"
-            android:layout_marginRight="38dp"
             android:layout_marginTop="20dp"
+            android:layout_marginRight="38dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/login_btn_selector"
             android:gravity="center_horizontal|center_vertical"
             android:text="@string/complete_txt"
@@ -185,7 +185,7 @@
             android:layout_gravity="bottom"
             android:layout_marginBottom="24dp"
             android:gravity="center"
-            android:visibility="gone" >
+            android:visibility="gone">
 
             <CheckBox
                 android:id="@+id/ckbCloundService"
@@ -222,7 +222,7 @@
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:padding="38dp"
-        android:visibility="gone" >
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/imgLineConnectGuid"
@@ -257,19 +257,19 @@
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:paddingTop="80dp"
-        android:visibility="visible" >
+        android:visibility="visible">
 
         <LinearLayout
             android:id="@+id/llyStatus1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <include
+                layout="@layout/auto_wifi_connecting_status_item"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                layout="@layout/auto_wifi_connecting_status_item" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <LinearLayout
@@ -277,24 +277,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <include
+                layout="@layout/auto_wifi_connecting_status_item"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                layout="@layout/auto_wifi_connecting_status_item" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/llyStatus3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <include
+                layout="@layout/auto_wifi_connecting_status_item"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                layout="@layout/auto_wifi_connecting_status_item" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
 

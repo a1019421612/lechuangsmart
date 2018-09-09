@@ -28,6 +28,7 @@ import com.coder.zzq.smartshow.toast.SmartToast;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.RootActivity;
 import com.hbdiye.lechuangsmart.devicelist.AutoWifiConnectingActivity;
+import com.hbdiye.lechuangsmart.devicelist.AutoWifiPrepareStepOneActivity;
 import com.hbdiye.lechuangsmart.devicelist.DeviceModel;
 import com.hbdiye.lechuangsmart.utils.ActivityUtils;
 import com.hbdiye.lechuangsmart.widget.WaitDialog;
