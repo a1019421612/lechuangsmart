@@ -17,13 +17,22 @@ package com.hbdiye.lechuangsmart.utils;
 
 import android.app.Activity;
 
+import com.hbdiye.lechuangsmart.MyApp;
+import com.hbdiye.lechuangsmart.util.SPUtils;
 import com.videogo.exception.BaseException;
 import com.videogo.openapi.EZGlobalSDK;
 import com.videogo.openapi.EZOpenSDK;
 import com.videogo.openapi.bean.EZAreaInfo;
 import com.videogo.util.LogUtil;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
+
+import okhttp3.Call;
 
 //import com.videogo.login.LoginActivity;
 //import com.videogo.login.LoginAgainActivity;
@@ -50,27 +59,56 @@ public class ActivityUtils {
         goToLoginAgain(activity);
     }
 
-    public static void goToLoginAgain(Activity activity) {
-        if (EZGlobalSDK.class.isInstance(EZOpenSDK.getInstance())) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        List<EZAreaInfo> areaList = EZGlobalSDK.getInstance().getAreaList();
-                        if (areaList != null) {
-                            LogUtil.debugLog("application", "list count: " + areaList.size());
+    public static void goToLoginAgain(final Activity activity) {
+//        if (EZGlobalSDK.class.isInstance(EZOpenSDK.getInstance())) {
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        List<EZAreaInfo> areaList = EZGlobalSDK.getInstance().getAreaList();
+//                        if (areaList != null) {
+//                            LogUtil.debugLog("application", "list count: " + areaList.size());
+//
+//                            EZAreaInfo areaInfo = areaList.get(0);
+//                            EZGlobalSDK.getInstance().openLoginPage(areaInfo.getId());
+//                        }
+//                    } catch (BaseException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }).start();
+//        } else {
+//            EZOpenSDK.getInstance().openLoginPage();
+//        }
+        OkHttpUtils.post()
+                .url("https://open.ys7.com/api/lapp/token/get")
+                .addParams("appKey", MyApp.APPKEY)
+                .addParams("appSecret",MyApp.APPSECRET)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
 
-                            EZAreaInfo areaInfo = areaList.get(0);
-                            EZGlobalSDK.getInstance().openLoginPage(areaInfo.getId());
-                        }
-                    } catch (BaseException e) {
-                        e.printStackTrace();
                     }
-                }
-            }).start();
-        } else {
-            EZOpenSDK.getInstance().openLoginPage();
-        }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        try {
+                            JSONObject jsonObject=new JSONObject(response);
+                            String code = jsonObject.getString("code");
+                            if (code.equals("200")){
+                                JSONObject data = jsonObject.getJSONObject("data");
+                                String accessToken = data.getString("accessToken");
+                                String expireTime = data.getString("expireTime");
+                                EZOpenSDK.getInstance().setAccessToken(accessToken);
+                                SPUtils.put(activity,"accessToken",accessToken);
+                                SPUtils.put(activity,"firstToken", TimeUtils.getNowTimeNoWeek());
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
 

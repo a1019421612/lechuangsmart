@@ -189,33 +189,44 @@
             android:screenOrientation="portrait" />
         <activity android:name=".activity.AutoWifiPrepareStepOneActivity" />
         <activity android:name=".activity.AutoWifiNetConfigActivityActivity" />
-        <activity android:name=".activity.SeriesNumSearchActivity"></activity>
-        <activity android:name=".devicelist.AutoWifiConnectingActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".devicelist.AutoWifiPrepareStepOneActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".devicelist.AutoWifiNetConfigActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".devicelist.AutoWifiResetActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".devicelist.APWifiConfigActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".remoteplayback.list.PlayBackListActivity"
+        <activity android:name=".activity.SeriesNumSearchActivity" />
+        <activity
+            android:name=".devicelist.AutoWifiConnectingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".devicelist.AutoWifiPrepareStepOneActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".devicelist.AutoWifiNetConfigActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".devicelist.AutoWifiResetActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".devicelist.APWifiConfigActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".remoteplayback.list.PlayBackListActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="nosensor"/>
-        <activity android:name=".devicemgt.EZDeviceSettingActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".devicemgt.ModifyDeviceNameActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".message.EZMessageActivity2"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".devicemgt.EZDeviceSettingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".devicemgt.ModifyDeviceNameActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".message.EZMessageActivity2"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".message.EZMessageImageActivity2"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".message.remoteplayback.EZRemotePlayBackActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
+        <activity android:name=".activity.YiLiaoActivity" />
+        <activity android:name=".activity.TiZhiActivity"></activity>
     </application>
 
 </manifest>

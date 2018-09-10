@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.hbdiye.lechuangsmart.MyApp;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.adapter.CameraAdapter;
 import com.hbdiye.lechuangsmart.devicemgt.EZDeviceSettingActivity;
@@ -27,11 +28,17 @@ import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
 import com.videogo.util.DateTimeUtil;
 import com.videogo.util.LogUtil;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import okhttp3.Call;
 
 public class CameraListActivity extends BaseActivity {
 
@@ -52,24 +59,59 @@ public class CameraListActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        EZOpenSDK.getInstance().openLoginPage();
-        handleString();
 
-        cameraListData();
+//        EZOpenSDK.getInstance().openLoginPage();
+        handleString();
 
         String firstToken = (String) SPUtils.get(getApplicationContext(), "firstToken", "");
         if (TextUtils.isEmpty(firstToken)){
-            SPUtils.put(getApplicationContext(),"firstToken", TimeUtils.getNowTimeNoWeek());
+            getToken();
         }else {
             boolean b = TimeUtils.DateCompare(TimeUtils.getNowTimeNoWeek(), firstToken);
+            String accessToken = (String) SPUtils.get(getApplicationContext(), "accessToken", "");
             if (b){
-                Log.e("sss","大于7天");
+                Log.e("sss","大于7天"+accessToken);
+                getToken();
             }else {
-                Log.e("sss","小于7天");
+                Log.e("sss","小于7天"+accessToken);
             }
         }
 
 
+    }
+
+    private void getToken() {
+        OkHttpUtils.post()
+                .url("https://open.ys7.com/api/lapp/token/get")
+                .addParams("appKey", MyApp.APPKEY)
+                .addParams("appSecret",MyApp.APPSECRET)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        Log.e("TOKEN",e.toString());
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        Log.e("TOKEN",response);
+                        try {
+                            JSONObject jsonObject=new JSONObject(response);
+                            String code = jsonObject.getString("code");
+                            if (code.equals("200")){
+                                JSONObject data = jsonObject.getJSONObject("data");
+                                String accessToken = data.getString("accessToken");
+                                String expireTime = data.getString("expireTime");
+                                EZOpenSDK.getInstance().setAccessToken(accessToken);
+                                SPUtils.put(getApplicationContext(),"accessToken",accessToken);
+                                SPUtils.put(getApplicationContext(),"firstToken", TimeUtils.getNowTimeNoWeek());
+                                cameraListData();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
     private void cameraListData() {

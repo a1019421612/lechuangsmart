@@ -30,5 +30,12 @@
         <attr name="dividerColor" format="color" />
         <attr name="itemSelector" format="reference" />
     </declare-styleable>
-
+    <declare-styleable name="CircleProgressBar">
+        <attr name="outCircleColor" format="color"></attr>
+        <attr name="inCircleColor" format="color"></attr>
+        <attr name="progressColor" format="color"></attr>
+        <attr name="barTextColor" format="color"></attr>
+        <attr name="textBold" format="boolean"></attr>
+        <attr name="lineWidth" format="dimension"></attr>
+    </declare-styleable>
 </resources>

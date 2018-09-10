@@ -120,7 +120,7 @@
     <orderEntry type="library" name="Gradle: com.jakewharton:butterknife-8.5.1" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support.constraint:constraint-layout-solver:1.1.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.zxing:core:3.3.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.bumptech.glide:glide-4.7.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.bumptech.glide:glide:3.6.1@jar" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:E.\AndroidProject\lechuangsmart\app\libs\fastjson-1.1.34.android.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:recyclerview-v7-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:E.\AndroidProject\lechuangsmart\app\libs\jackson-core-2.0.2.jar:unspecified@jar" level="project" />
@@ -144,6 +144,7 @@
     <orderEntry type="library" name="Gradle: __local_aars__:E.\AndroidProject\lechuangsmart\app\libs\BaiduLBS_Android.jar:unspecified@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: net.sf.kxml:kxml2:2.3.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:runtime-1.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: __local_aars__:E.\AndroidProject\lechuangsmart\app\libs\jmdns-3.4.1.jar:unspecified@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test:runner-1.0.1" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:transition-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: com.jakewharton:butterknife-annotations:8.5.1@jar" level="project" />
@@ -161,7 +162,6 @@
     <orderEntry type="library" name="Gradle: com.contrarywind:wheelview-4.0.5" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-vector-drawable-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.bumptech.glide:disklrucache:4.7.1@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.code.findbugs:jsr305:2.0.1@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test.espresso:espresso-core-3.0.1" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:E.\AndroidProject\lechuangsmart\app\libs\jackson-databind-2.0.2.jar:unspecified@jar" level="project" />
@@ -173,12 +173,11 @@
     <orderEntry type="library" name="Gradle: com.github.CymChad:BaseRecyclerViewAdapterHelper-2.9.30" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test.espresso:espresso-idling-resource-3.0.1" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:livedata-core-1.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.bumptech.glide:gifdecoder-4.7.1" level="project" />
     <orderEntry type="library" name="Gradle: com.zhouyou:signseekbar-1.0.6" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-integration:1.3@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-library:1.3@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.bumptech.glide:annotations:4.7.1@jar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.core:common:1.1.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:E.\AndroidProject\lechuangsmart\app\libs\jackson-annotations-2.0.2.jar:unspecified@jar" level="project" />
+    <orderEntry type="library" name="Gradle: __local_aars__:E.\AndroidProject\lechuangsmart\app\libs\EZOpenSDK_V4.8.4.20180810.jar:unspecified@jar" level="project" />
   </component>
 </module>

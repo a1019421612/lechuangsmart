@@ -31,7 +31,8 @@ public class MyApp extends Application {
             .synchronizedList(new LinkedList<Activity>());
 
     private static Context context;
-
+    public static String APPKEY="378b43177968438bb78bf72e645f2ddc";
+    public static String APPSECRET="1dab52a43e50c0c53c43bac177c7604d";
     private String mobilephone;
     private String password;
     public WebSocketConnection mConnection;
@@ -51,7 +52,7 @@ public class MyApp extends Application {
         /** * 设置是否支持P2P取流,详见api */
         EZOpenSDK.enableP2P(false);
         /** * APP_KEY请替换成自己申请的 */
-        EZOpenSDK.initLib(this, "378b43177968438bb78bf72e645f2ddc");
+        EZOpenSDK.initLib(this, APPKEY);
 //        initWebSocket();
     }
     private void initWebSocket() {
