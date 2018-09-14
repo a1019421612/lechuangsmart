@@ -20,20 +20,29 @@ import com.hbdiye.lechuangsmart.R;
 public class CircleProgressBar extends View {
     private Context mContext;
     private Paint mPaint;
-    private int mProgress = 0;
-    private static int MAX_PROGRESS = 100;
+    private double mProgress = 0;
+    private static double MAX_PROGRESS = 100;
     /**
      * 弧度
      */
-    private int mAngle;
+    private double mAngle;
     /**
      * 中间的文字
      */
     private String mText;
     /**
-     * 底部的文字
+     * 描述文字
      */
-    private String mText_b="体脂率";
+    private String mDescript;
+
+    public String getmDescript() {
+        return mDescript;
+    }
+
+    public void setmDescript(String mDescript) {
+        this.mDescript = mDescript;
+    }
+
     /**
      * 外圆颜色
      */
@@ -124,7 +133,7 @@ public class CircleProgressBar extends View {
         //画进度是一个弧线
         mPaint.setColor(progressBarColor);
         RectF rectF = new RectF(center - radius, center - radius, center + radius, center + radius);//圆弧范围的外接矩形
-        canvas.drawArc(rectF, -90, mAngle, false, mPaint);
+        canvas.drawArc(rectF, -90, (float) mAngle, false, mPaint);
         canvas.save();  //平移画布之前保存之前画的
 
         //画进度终点的小球,旋转画布的方式实现
@@ -132,7 +141,7 @@ public class CircleProgressBar extends View {
         //将画布坐标原点移动至圆心
         canvas.translate(center, center);
         //旋转和进度相同的角度，因为进度是从-90度开始的所以-90度
-        canvas.rotate(mAngle - 90);
+        canvas.rotate((float) (mAngle - 90));
         //同理从圆心出发直接将原点平移至要画小球的位置
         canvas.translate(radius, 0);
         canvas.drawCircle(0, 0, roundWidth, mPaint);
@@ -140,38 +149,43 @@ public class CircleProgressBar extends View {
         canvas.restore();
 
         //画文字将坐标平移至圆心
-        canvas.translate(center, center);
-        mPaint.setStrokeWidth(0);
-        mPaint.setColor(textColor);
-        if (isBold) {
-            //字体加粗
-            mPaint.setTypeface(Typeface.DEFAULT_BOLD);
-        }
-        if (TextUtils.isEmpty(mText)) {
-            mText = mProgress + "%";
-        }
-        //动态设置文字长为圆半径，计算字体大小
-        float textLength = mText.length();
-        textSize = radius / textLength;
-        mPaint.setTextSize(textSize);
-        //将文字画到中间
-        float textWidth = mPaint.measureText(mText);
-        canvas.drawText(mText, -textWidth / 2, textSize / 2, mPaint);
+//        canvas.translate(center, center);
+//        mPaint.setStrokeWidth(0);
+//        mPaint.setColor(textColor);
+//        if (isBold) {
+//            //字体加粗
+//            mPaint.setTypeface(Typeface.DEFAULT_BOLD);
+//        }
+//        if (TextUtils.isEmpty(mText)) {
+//            mText = mProgress + "%";
+//        }
+//        //动态设置文字长为圆半径，计算字体大小
+//        float textLength = mText.length();
+//        textSize = radius / textLength;
+//        mPaint.setTextSize(60);
+//        //将文字画到中间
+//        float textWidth = mPaint.measureText(mText);
+//        canvas.drawText(mText, -textWidth / 2, (textSize / 2)-20, mPaint);
+////        canvas.drawText(mText, -textWidth / 2, -textSize, mPaint);
 
+
+//        String mText_b=mDescript;
+//        float textLength_b = mText_b.length();
+//        textSize = radius / 3;
+//        mPaint.setTextSize(30);
+//        //将文字画到中间
+//        float textWidth_b = mPaint.measureText(mText_b);
+//        canvas.drawText(mText_b, -textWidth_b / 2, textSize, mPaint);
     }
 
 
-    public int getmProgress() {
+    public double getmProgress() {
         return mProgress;
-    }
-    public String getDescript(){
-        return mText_b;
     }
 
     /**
      * 设置进度
      *
-     * @return
      */
     public void setmProgress(int p) {
         if (p > MAX_PROGRESS) {
@@ -179,7 +193,7 @@ public class CircleProgressBar extends View {
             mAngle = 360;
         } else {
             mProgress = p;
-            mAngle = 360 * p / MAX_PROGRESS;
+            mAngle = 360 * p / (int) MAX_PROGRESS;
         }
     }
 
@@ -201,14 +215,14 @@ public class CircleProgressBar extends View {
      * 设置带动画的进度
      * @param p
      */
-    public void setAnimProgress(int p) {
+    public void setAnimProgress(double p) {
         if (p > MAX_PROGRESS) {
             mProgress = MAX_PROGRESS;
         } else {
             mProgress = p;
         }
         //设置属性动画
-        ValueAnimator valueAnimator = new ValueAnimator().ofInt(0, p);
+        ValueAnimator valueAnimator = new ValueAnimator().ofInt(0, (int) p);
         //动画从快到慢
         valueAnimator.setInterpolator(new DecelerateInterpolator());
         valueAnimator.setDuration(3000);
@@ -217,9 +231,9 @@ public class CircleProgressBar extends View {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 int currentV = (Integer) animation.getAnimatedValue();
-                Log.e("fwc", "current" + currentV);
-                mAngle = 360 * currentV / MAX_PROGRESS;
-                mText = currentV + "%";
+                mAngle = 360 * currentV / (int) MAX_PROGRESS;
+//                Object animatedValue = animation.getAnimatedValue();
+//                mText = currentV + "%";
                 invalidate();
             }
         });

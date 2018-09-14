@@ -385,6 +385,10 @@ public class HomeFragment extends Fragment {
                 if (message.contains("\"pn\":\"IRATP\"")) {
                     websocketSendBroadcase(message, "IRATP");
                 }
+//                ==============医疗BTLTP
+                if (message.contains("\"pn\":\"BTLTP\"")){
+                    websocketSendBroadcase(message, "BTLTP");
+                }
             }
         });
     }

@@ -84,4 +84,5 @@ dependencies {
     compile 'com.zhouyou:signseekbar:1.0.6'
     implementation files('libs/EZOpenSDK_V4.8.4.20180810.jar')
     implementation files('libs/jmdns-3.4.1.jar')
+    compile 'com.github.yiwent:ShiftyTextview:1.1.0'
 }
