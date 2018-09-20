@@ -226,7 +226,8 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" />
         <activity android:name=".activity.YiLiaoActivity" />
-        <activity android:name=".activity.TiZhiActivity"></activity>
+        <activity android:name=".activity.TiZhiActivity" />
+        <activity android:name=".activity.InfraredActivity"></activity>
     </application>
 
 </manifest>

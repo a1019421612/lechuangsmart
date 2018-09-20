@@ -24,6 +24,7 @@ import com.hbdiye.lechuangsmart.activity.AnFangActivity;
 import com.hbdiye.lechuangsmart.activity.ChuangLianActivity;
 import com.hbdiye.lechuangsmart.activity.ChuanganqiActivity;
 import com.hbdiye.lechuangsmart.activity.FangjianActivity;
+import com.hbdiye.lechuangsmart.activity.InfraredActivity;
 import com.hbdiye.lechuangsmart.activity.KaiguanActivity;
 import com.hbdiye.lechuangsmart.activity.LoginActivity;
 import com.hbdiye.lechuangsmart.activity.YaokongqiActivity;
@@ -49,6 +50,8 @@ public class HomeFragment extends Fragment {
     TextView tvDate;
     @BindView(R.id.ll_yiliao)
     LinearLayout llYiliao;
+    @BindView(R.id.ll_hongwai)
+    LinearLayout llHongwai;
     private String TAG = HomeFragment.class.getName();
     @BindView(R.id.ll_anfang)
     LinearLayout llAnfang;
@@ -386,7 +389,7 @@ public class HomeFragment extends Fragment {
                     websocketSendBroadcase(message, "IRATP");
                 }
 //                ==============医疗BTLTP
-                if (message.contains("\"pn\":\"BTLTP\"")){
+                if (message.contains("\"pn\":\"BTLTP\"")) {
                     websocketSendBroadcase(message, "BTLTP");
                 }
             }
@@ -421,7 +424,8 @@ public class HomeFragment extends Fragment {
         mConnection.disconnect();
     }
 
-    @OnClick({R.id.ll_anfang, R.id.ll_zhaoming, R.id.ll_chuanglian, R.id.ll_chuanganqi, R.id.ll_fangjian, R.id.ll_kaiguan, R.id.ll_yaokong, R.id.ll_yiliao})
+    @OnClick({R.id.ll_anfang, R.id.ll_zhaoming, R.id.ll_chuanglian, R.id.ll_chuanganqi, R.id.ll_fangjian,
+            R.id.ll_kaiguan, R.id.ll_yaokong, R.id.ll_yiliao, R.id.ll_hongwai})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.ll_anfang:
@@ -454,7 +458,11 @@ public class HomeFragment extends Fragment {
                 break;
             case R.id.ll_yiliao:
                 //医疗
-                startActivity(new Intent(getActivity(),YiLiaoActivity.class));
+                startActivity(new Intent(getActivity(), YiLiaoActivity.class));
+                break;
+            case R.id.ll_hongwai:
+                //红外
+                startActivity(new Intent(getActivity(), InfraredActivity.class));
                 break;
         }
     }

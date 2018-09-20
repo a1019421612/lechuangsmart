@@ -49,7 +49,7 @@ public class RoomDeviceByIDAdapter extends BaseQuickAdapter<RoomDeviceBean.Devic
                             for (int j = 0; j < deviceAttributes.size(); j++) {
                                 String proAttID = deviceAttributes.get(j).proAttID;
                                 if (proAttID.equals(id)){
-                                    int value = deviceAttributes.get(i).value;
+                                    int value = deviceAttributes.get(j).value;
                                     String wd = String.format("%.1f", (float)value / 100);
                                     helper.setText(R.id.tv_wd,wd+"℃");
                                 }
@@ -59,7 +59,7 @@ public class RoomDeviceByIDAdapter extends BaseQuickAdapter<RoomDeviceBean.Devic
                             for (int j = 0; j < deviceAttributes.size(); j++) {
                                 String proAttID = deviceAttributes.get(j).proAttID;
                                 if (proAttID.equals(id)){
-                                    int value = deviceAttributes.get(i).value;
+                                    int value = deviceAttributes.get(j).value;
 //                                int round = Math.round(value / 100);
                                     String sd = String.format("%.1f", (float)value / 100);
                                     helper.setText(R.id.tv_sd,sd+"%");
@@ -71,7 +71,7 @@ public class RoomDeviceByIDAdapter extends BaseQuickAdapter<RoomDeviceBean.Devic
                             for (int j = 0; j < deviceAttributes.size(); j++) {
                                 String proAttID = deviceAttributes.get(j).proAttID;
                                 if (proAttID.equals(id)){
-                                    int value = deviceAttributes.get(i).value;
+                                    int value = deviceAttributes.get(j).value;
                                     helper.setText(R.id.tv_pm,value+"PPM");
                                 }
                             }
