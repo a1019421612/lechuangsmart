@@ -8,9 +8,10 @@
     android:background="@drawable/shezhibg"
     tools:context=".activity.VersionActivity">
 <TextView
+    android:id="@+id/tv_version"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="V2.0.0"
+    android:text="V---"
     android:textSize="20sp"
     android:textColor="@color/textcolor"
     android:padding="10dp"
