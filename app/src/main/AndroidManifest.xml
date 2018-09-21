@@ -227,7 +227,11 @@
             android:screenOrientation="portrait" />
         <activity android:name=".activity.YiLiaoActivity" />
         <activity android:name=".activity.TiZhiActivity" />
-        <activity android:name=".activity.InfraredActivity"></activity>
+        <activity android:name=".activity.InfraredActivity" />
+        <activity android:name=".activity.TiwenActivity" />
+        <activity android:name=".activity.TizhongActivity" />
+        <activity android:name=".activity.XuetangActivity" />
+        <activity android:name=".activity.XueyaActivity"></activity>
     </application>
 
 </manifest>

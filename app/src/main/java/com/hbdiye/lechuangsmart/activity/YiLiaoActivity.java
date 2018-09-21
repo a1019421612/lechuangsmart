@@ -56,12 +56,16 @@ public class YiLiaoActivity extends BaseActivity {
                 startActivity(new Intent(this,TiZhiActivity.class));
                 break;
             case R.id.ll_yiliao_tiwen:
+                startActivity(new Intent(this,TiwenActivity.class));
                 break;
             case R.id.ll_yiliao_tizhong:
+                startActivity(new Intent(this,TizhongActivity.class));
                 break;
             case R.id.ll_yiliao_xuetang:
+                startActivity(new Intent(this,XuetangActivity.class));
                 break;
             case R.id.ll_yiliao_xueya:
+                startActivity(new Intent(this,XueyaActivity.class));
                 break;
         }
     }

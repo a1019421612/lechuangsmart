@@ -76,13 +76,6 @@ public class TiZhiActivity extends BaseActivity {
         return R.layout.activity_ti_zhi;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO: add setContentView(...) invocation
-        ButterKnife.bind(this);
-    }
-
     class HomeReceiver extends BroadcastReceiver {
 
         @Override
