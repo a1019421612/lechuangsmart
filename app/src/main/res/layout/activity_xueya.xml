@@ -194,4 +194,10 @@
                 android:textColor="#8affffff" />
         </LinearLayout>
     </LinearLayout>
+    <ImageView
+        android:id="@+id/iv_xueya"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/fat_po"
+        />
 </LinearLayout>
