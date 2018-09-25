@@ -225,75 +225,75 @@ public class FamilyNameActivity extends BaseActivity {
         }
     }
     private List<String> mList_a= new ArrayList<>();
-    class FamilyNameWebSocketHandler extends WebSocketHandler {
-        @Override
-        public void onOpen() {
-            Log.e(TAG, "open");
-            mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
-            if (flag) {
-                mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\"" + erCode + "\"} ");
-            }
-        }
-
-        @Override
-        public void onTextMessage(String payload) {
-            Log.e(TAG, "onTextMessage" + payload);
-            if (payload.contains("{\"pn\":\"HRQP\"}")) {
-                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
-            }
-            if (payload.contains("{\"pn\":\"PRTP\"}")) {
-                for (Activity activity : MyApp.mActivitys) {
-                    String packageName = activity.getLocalClassName();
-                    Log.e("LLL",packageName);
-                    mList_a.add(packageName);
-                }
-                if (mList_a.get(mList_a.size()-1).equals("FamilyNameActivity")){
-                    MyApp.finishAllActivity();
-                    Intent intent = new Intent(FamilyNameActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                }
-            }
-            if (payload.contains("\"pn\":\"UITP\"")) {
-                parseData(payload);
-            }
-            if (payload.contains("\"pn\":\"UUITP\"")){
-                try {
-                    JSONObject jsonObject=new JSONObject(payload);
-                    boolean status = jsonObject.getBoolean("status");
-                    if (status){
-                        SmartToast.show("修改成功");
-                        if (sceneDialog!=null){
-                            sceneDialog.dismiss();
-                        }
-                        mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (payload.contains("\"pn\":\"UJFTP\"")) {
-                //扫描加入家庭
-                flag = false;
-                try {
-                    JSONObject jsonObject = new JSONObject(payload);
-                    boolean status = jsonObject.getBoolean("status");
-                    if (status) {
-                        SmartToast.show("成功加入家庭");
-                    } else {
-                        SmartToast.show("加入家庭失败");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-//                SmartToast.showLong(payload);
-            }
-        }
-
-        @Override
-        public void onClose(int code, String reason) {
-            Log.e(TAG, "onClose");
-        }
-    }
+//    class FamilyNameWebSocketHandler extends WebSocketHandler {
+//        @Override
+//        public void onOpen() {
+//            Log.e(TAG, "open");
+//            mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
+//            if (flag) {
+//                mConnection.sendTextMessage("{\"pn\":\"UJFTP\",\"familyID\":\"" + erCode + "\"} ");
+//            }
+//        }
+//
+//        @Override
+//        public void onTextMessage(String payload) {
+//            Log.e(TAG, "onTextMessage" + payload);
+//            if (payload.contains("{\"pn\":\"HRQP\"}")) {
+//                mConnection.sendTextMessage("{\"pn\":\"HRSP\"}");
+//            }
+//            if (payload.contains("{\"pn\":\"PRTP\"}")) {
+//                for (Activity activity : MyApp.mActivitys) {
+//                    String packageName = activity.getLocalClassName();
+//                    Log.e("LLL",packageName);
+//                    mList_a.add(packageName);
+//                }
+//                if (mList_a.get(mList_a.size()-1).equals("FamilyNameActivity")){
+//                    MyApp.finishAllActivity();
+//                    Intent intent = new Intent(FamilyNameActivity.this, LoginActivity.class);
+//                    startActivity(intent);
+//                }
+//            }
+//            if (payload.contains("\"pn\":\"UITP\"")) {
+//                parseData(payload);
+//            }
+//            if (payload.contains("\"pn\":\"UUITP\"")){
+//                try {
+//                    JSONObject jsonObject=new JSONObject(payload);
+//                    boolean status = jsonObject.getBoolean("status");
+//                    if (status){
+//                        SmartToast.show("修改成功");
+//                        if (sceneDialog!=null){
+//                            sceneDialog.dismiss();
+//                        }
+//                        mConnection.sendTextMessage("{\"pn\":\"UITP\"}");
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            if (payload.contains("\"pn\":\"UJFTP\"")) {
+//                //扫描加入家庭
+//                flag = false;
+//                try {
+//                    JSONObject jsonObject = new JSONObject(payload);
+//                    boolean status = jsonObject.getBoolean("status");
+//                    if (status) {
+//                        SmartToast.show("成功加入家庭");
+//                    } else {
+//                        SmartToast.show("加入家庭失败");
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+////                SmartToast.showLong(payload);
+//            }
+//        }
+//
+//        @Override
+//        public void onClose(int code, String reason) {
+//            Log.e(TAG, "onClose");
+//        }
+//    }
 
     private void parseData(String payload) {
 
@@ -304,9 +304,11 @@ public class FamilyNameActivity extends BaseActivity {
             String familyname = familyNameBean.user.family.name;
             String familyID = familyNameBean.user.familyID;
             try {
-                Bitmap qrCode = EncodingHandler.createQRCode(familyID, DensityUtils.dp2px(this, 150));
-                Glide.with(FamilyNameActivity.this).load(qrCode).into(ivQrcode);
-            } catch (WriterException e) {
+//                Bitmap qrCode = EncodingHandler.createQRCode(familyID, DensityUtils.dp2px(this, 150));
+                Bitmap qrCode= EncodingHandler.createQRCode(familyID,DensityUtils.dp2px(this, 150),DensityUtils.dp2px(this, 150),null);
+//                Glide.with(FamilyNameActivity.this).load(qrCode).into(ivQrcode);
+                ivQrcode.setImageBitmap(qrCode);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             tvFamilyName.setText(familyname);

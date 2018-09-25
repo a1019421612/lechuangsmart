@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.coder.zzq.smartshow.toast.SmartToast;
+import com.hbdiye.lechuangsmart.Global.InterfaceManager;
 import com.hbdiye.lechuangsmart.MyWebSocketHandler;
 import com.hbdiye.lechuangsmart.R;
 import com.hbdiye.lechuangsmart.SingleWebSocketConnection;
@@ -31,8 +33,15 @@ import com.hbdiye.lechuangsmart.activity.YaokongqiActivity;
 import com.hbdiye.lechuangsmart.activity.YiLiaoActivity;
 import com.hbdiye.lechuangsmart.activity.ZhaoMingActivity;
 import com.hbdiye.lechuangsmart.util.SPUtils;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Calendar;
+
+import javax.security.auth.login.LoginException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,6 +49,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
+import okhttp3.Call;
 
 import static com.hbdiye.lechuangsmart.MyApp.finishAllActivity;
 
@@ -462,9 +472,43 @@ public class HomeFragment extends Fragment {
                 break;
             case R.id.ll_hongwai:
                 //红外
+                registerInfrared();
                 startActivity(new Intent(getActivity(), InfraredActivity.class));
                 break;
         }
+    }
+
+    private void registerInfrared() {
+        String phone= (String) SPUtils.get(getActivity(),"mobilephone","");
+        OkHttpUtils
+                .post()
+                .url(InterfaceManager.getInstance().getURL(InterfaceManager.HWREGISTER))
+                .addParams("app_id",InterfaceManager.APPID)
+                .addParams("app_type",InterfaceManager.APPKEY)
+                .addParams("phone",phone)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        SmartToast.show("网络连接错误");
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        try {
+                            JSONObject jsonObject=new JSONObject(response);
+                            boolean success = jsonObject.getBoolean("success");
+                            if (success){
+
+                            }else {
+                                String info = jsonObject.getString("info");
+//                                SmartToast.show(info);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
     //    class MyWebSocketHandler extends CWebSocketHandler{

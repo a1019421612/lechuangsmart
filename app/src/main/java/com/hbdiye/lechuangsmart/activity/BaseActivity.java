@@ -28,6 +28,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     ImageView ivBaseBack;
     @BindView(R.id.tv_base_title)
     TextView tvBaseTitle;
+    @BindView(R.id.iv_base_add)
+    ImageView ivBaseAdd;
     private Unbinder unbinder;
     @BindView(R.id.iv_base_right)
     ImageView ivBaseEdit;
@@ -71,6 +73,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onDestroy();
         unbinder.unbind();
     }
+
     @OnClick({R.id.iv_base_back})
     public void onViewClicked(View view) {
         switch (view.getId()) {
@@ -80,6 +83,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         }
     }
+
     /**
      * 判定是否需要隐藏
      */
@@ -106,6 +110,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             manager.hideSoftInputFromWindow(token, InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
+
     /**
      * 获取点击事件
      */
