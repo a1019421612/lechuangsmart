@@ -46,7 +46,7 @@ public class InfraredActivity extends BaseActivity {
     private List<InfraredBean.Remote_list> mList = new ArrayList<>();
     private boolean editStatus = false;//编辑状态标志，默认false
     private SceneDialog sceneDialog;
-    private String uuid="";
+    private String uuid = "";
 
     @Override
     protected void initData() {
@@ -68,7 +68,7 @@ public class InfraredActivity extends BaseActivity {
 
                     @Override
                     public void onResponse(String response, int id) {
-                        if (TextUtils.isEmpty(response)){
+                        if (TextUtils.isEmpty(response)) {
                             return;
                         }
                         InfraredBean infraredBean = new Gson().fromJson(response, InfraredBean.class);
@@ -86,7 +86,7 @@ public class InfraredActivity extends BaseActivity {
 
     @Override
     protected String getTitleName() {
-        return "红外";
+        return "遥控中心";
     }
 
     @Override
@@ -96,7 +96,7 @@ public class InfraredActivity extends BaseActivity {
         ivBaseAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(InfraredActivity.this, ZuWangActivity.class),100);
+                startActivityForResult(new Intent(InfraredActivity.this, ZuWangActivity.class), 100);
             }
         });
         ivBaseEdit.setOnClickListener(new View.OnClickListener() {
@@ -127,7 +127,12 @@ public class InfraredActivity extends BaseActivity {
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                startActivity(new Intent(InfraredActivity.this,RemoteDeviceListActivity.class));
+                String uuid = mList.get(position).uuid;
+                ArrayList<InfraredBean.Remote_list.Ir_list> ir_list = (ArrayList<InfraredBean.Remote_list.Ir_list>) mList.get(position).ir_list;
+                startActivity(new Intent(InfraredActivity.this, RemoteDeviceListActivity.class)
+                        .putExtra("uuid", uuid)
+                        .putExtra("ir_list",ir_list)
+                );
             }
         });
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
@@ -137,15 +142,15 @@ public class InfraredActivity extends BaseActivity {
                 uuid = remote_list.uuid;
                 switch (view.getId()) {
                     case R.id.ll_scene_item_del:
-                        AlertDialog.Builder builder=new AlertDialog.Builder(InfraredActivity.this);
-                        builder.setMessage("确认删除场景？");
+                        AlertDialog.Builder builder = new AlertDialog.Builder(InfraredActivity.this);
+                        builder.setMessage("确认删除遥控中心？");
                         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 delRemote();
                             }
                         });
-                        builder.setNegativeButton("取消",null);
+                        builder.setNegativeButton("取消", null);
                         builder.show();
                         break;
                     case R.id.ll_scene_item_edt:
@@ -175,11 +180,11 @@ public class InfraredActivity extends BaseActivity {
                     @Override
                     public void onResponse(String response, int id) {
                         try {
-                            JSONObject jsonObject=new JSONObject(response);
+                            JSONObject jsonObject = new JSONObject(response);
                             boolean success = jsonObject.getBoolean("success");
                             String info = jsonObject.getString("info");
                             SmartToast.show(info);
-                            if (success){
+                            if (success) {
                                 getInfraredList();
 
                             }
@@ -228,14 +233,14 @@ public class InfraredActivity extends BaseActivity {
                     @Override
                     public void onResponse(String response, int id) {
                         try {
-                            JSONObject jsonObject=new JSONObject(response);
+                            JSONObject jsonObject = new JSONObject(response);
                             boolean success = jsonObject.getBoolean("success");
                             String info = jsonObject.getString("info");
                             SmartToast.show(info);
-                            if (sceneDialog!=null){
+                            if (sceneDialog != null) {
                                 sceneDialog.dismiss();
                             }
-                            if (success){
+                            if (success) {
                                 getInfraredList();
 
                             }
@@ -260,7 +265,7 @@ public class InfraredActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode==100){
+        if (resultCode == 100) {
             getInfraredList();
         }
     }

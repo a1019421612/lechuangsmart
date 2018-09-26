@@ -1,12 +1,15 @@
 package com.hbdiye.lechuangsmart.activity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 
+import com.alibaba.fastjson.JSON;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.coder.zzq.smartshow.toast.SmartToast;
 import com.google.gson.Gson;
@@ -18,8 +21,13 @@ import com.hbdiye.lechuangsmart.adapter.ModeListAdapter;
 import com.hbdiye.lechuangsmart.bean.BrandListBean;
 import com.hbdiye.lechuangsmart.bean.ModeListBean;
 import com.hbdiye.lechuangsmart.bean.RemoteDeviceBean;
+import com.hbdiye.lechuangsmart.util.TipsUtil;
+import com.hbdiye.lechuangsmart.views.SceneDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +56,15 @@ public class DeviceListActivity extends BaseActivity {
 
     private int flag = 0;
     private int device_id;
+    private int brand_id;
+    private String uuid;
+
+    private SceneDialog sceneDialog;
+    private String mode_id;
 
     @Override
     protected void initData() {
+        uuid = getIntent().getStringExtra("uuid");
         getDeviceList();
     }
 
@@ -142,10 +156,122 @@ public class DeviceListActivity extends BaseActivity {
         adapter_brand.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                int brand_id = mList_brand.get(position).id;
+                brand_id = mList_brand.get(position).id;
                 getModeList(device_id + "", brand_id + "");
             }
         });
+        adapter_mode.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                int key_squency = mList_mode.get(position).key_squency;
+                String bn = mList_mode.get(position).bn;
+                mode_id = mList_mode.get(position).id;
+                checkIrDevice(device_id,brand_id, mode_id,uuid);
+            }
+        });
+    }
+
+    private void checkIrDevice(int device_id, int brand_id, String mode_id, String uuid) {
+        OkHttpUtils
+                .post()
+                .url(InterfaceManager.getInstance().getURL(InterfaceManager.CHECKIRDEVICE))
+                .addParams("app_id", InterfaceManager.APPID)
+                .addParams("app_type", InterfaceManager.APPKEY)
+                .addParams("type",device_id+"")
+                .addParams("brand_id",brand_id+"")
+                .addParams("modelid",mode_id+"")
+                .addParams("uuid",uuid)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        SmartToast.show("网络连接错误");
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        try {
+                            JSONObject jsonObject=new JSONObject(response);
+                            boolean success = jsonObject.getBoolean("success");
+                            String info = jsonObject.getString("info");
+                            SmartToast.show(info);
+                            if (success){
+                                AlertDialog.Builder builder=new AlertDialog.Builder(DeviceListActivity.this);
+                                builder.setMessage("设备有响应吗？");
+                                builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        sceneDialog = new SceneDialog(DeviceListActivity.this, R.style.MyDialogStyle, dailogClicer, "设备名称");
+                                        sceneDialog.show();
+                                    }
+                                });
+                                builder.setNegativeButton("否",null);
+                                builder.show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+    }
+    public View.OnClickListener dailogClicer = new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.app_cancle_tv:
+                    sceneDialog.dismiss();
+                    break;
+                case R.id.app_sure_tv:
+                    String sceneName = sceneDialog.getSceneName().trim();
+                    if (TextUtils.isEmpty(sceneName)) {
+                        SmartToast.show("设备名称不能为空");
+                    } else {
+                        addIrDevice(uuid,device_id,mode_id,sceneName);
+                    }
+                    break;
+            }
+        }
+    };
+
+    private void addIrDevice(String uuid, int device_id, String mode_id, String sceneName) {
+        OkHttpUtils
+                .post()
+                .url(InterfaceManager.getInstance().getURL(InterfaceManager.ADDIRDEVICE))
+                .addParams("app_id", InterfaceManager.APPID)
+                .addParams("app_type", InterfaceManager.APPKEY)
+                .addParams("type",device_id+"")
+                .addParams("modelid",mode_id+"")
+                .addParams("uuid",uuid)
+                .addParams("name",sceneName)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        SmartToast.show("网络连接错误");
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        SmartToast.show(response);
+                        try {
+                            JSONObject jsonObject=new JSONObject(response);
+                            boolean success = jsonObject.getBoolean("success");
+                            String info = jsonObject.getString("info");
+                            if (success){
+                                if (sceneDialog!=null){
+                                    sceneDialog.dismiss();
+                                }
+                                SmartToast.show(info);
+                                setResult(101);
+                                finish();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
     private void getModeList(String s, String s1) {

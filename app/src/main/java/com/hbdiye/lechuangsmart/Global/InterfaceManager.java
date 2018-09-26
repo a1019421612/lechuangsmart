@@ -15,6 +15,11 @@ public class InterfaceManager {
     public static final String GETDEVICELIST="GETDEVICELIST";//支持的红外设备列表
     public static final String GETBRANDLIST="GETBRANDLIST";//获取品牌列表
     public static final String GETMODELIST="GETMODELIST";//获取型号列表
+    public static final String CHECKIRDEVICE="CHECKIRDEVICE";//匹配一个指定的红外设备
+    public static final String ADDIRDEVICE="ADDIRDEVICE";//增加红外设备
+    public static final String EDITIRDEVICE="EDITIRDEVICE";//编辑红外设备名称
+    public static final String DELIRDEVICE="DELIRDEVICE";//删除红外设备
+    public static final String SENDCODE="SENDCODE";//控制红外设备
 
     public static final String HOSTURL="";
     public static final String BASEURL="http://www.thingtill.com/Home/ThreeIr/";
@@ -40,6 +45,11 @@ public class InterfaceManager {
             urlManager.put(InterfaceManager.GETDEVICELIST,BASEURL+"get_device_list");
             urlManager.put(InterfaceManager.GETBRANDLIST,BASEURL+"get_brand_list");
             urlManager.put(InterfaceManager.GETMODELIST,BASEURL+"get_mode_list");
+            urlManager.put(InterfaceManager.CHECKIRDEVICE,BASEURL+"check_ir_device");
+            urlManager.put(InterfaceManager.ADDIRDEVICE,BASEURL+"add_ir_device");
+            urlManager.put(InterfaceManager.EDITIRDEVICE,BASEURL+"edit_ir_device");
+            urlManager.put(InterfaceManager.DELIRDEVICE,BASEURL+"del_ir_device");
+            urlManager.put(InterfaceManager.SENDCODE,BASEURL+"send_code");
         }
         return manager;
     }
