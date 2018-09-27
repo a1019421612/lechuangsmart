@@ -16,69 +16,34 @@ import com.zhy.http.okhttp.callback.StringCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
-
 import butterknife.BindView;
 import butterknife.OnClick;
-import de.tavendo.autobahn.WebSocketConnection;
 import okhttp3.Call;
 
-public class IrDianShiActivity extends BaseActivity{
+public class IrJDHActivity extends BaseActivity{
+    @BindView(R.id.tv_jdh_power)
+    TextView tvJdhPower;
+    @BindView(R.id.tv_jdh_menu)
+    TextView tvJdhMenu;
+    @BindView(R.id.tv_jdh_number)
+    TextView tvJdhNumber;
+    @BindView(R.id.tv_jdh_novoice)
+    TextView tvJdhNovoice;
+    @BindView(R.id.tv_jdh_back)
+    TextView tvJdhBack;
+    @BindView(R.id.tv_jdh_channel_up)
+    TextView tvJdhChannelUp;
+    @BindView(R.id.tv_jdh_channel_down)
+    TextView tvJdhChannelDown;
+    @BindView(R.id.tv_jdh_voice_up)
+    TextView tvJdhVoiceUp;
+    @BindView(R.id.tv_jdh_voice_down)
+    TextView tvJdhVoiceDown;
     @BindView(R.id.roundMenuView)
     RoundMenuView roundMenuView;
-    @BindView(R.id.tv_ds_power)
-    TextView tvDsPower;
-    @BindView(R.id.tv_ds_inputsource)
-    TextView tvDsInputsource;
-    @BindView(R.id.tv_ds_number)
-    TextView tvDsNumber;
-    @BindView(R.id.tv_ds_menu)
-    TextView tvDsMenu;
-    @BindView(R.id.tv_ds_novoice)
-    TextView tvDsNovoice;
-    @BindView(R.id.tv_ds_exp)
-    TextView tvDsExp;
-    @BindView(R.id.tv_ds_channel_up)
-    TextView tvDsChannelUp;
-    @BindView(R.id.tv_ds_channel_down)
-    TextView tvDsChannelDown;
-    @BindView(R.id.tv_ds_back)
-    TextView tvDsRefresh;
-    @BindView(R.id.tv_ds_voice_up)
-    TextView tvDsVoiceUp;
-    @BindView(R.id.tv_ds_voice_down)
-    TextView tvDsVoiceDown;
-    @BindView(R.id.tv_ds_home)
-    TextView tvDsHome;
-
+    
     private TVNumDialog dialog;
-    private String rid = "";
 
-    private String mac;
-    private String power;
-    private String ok;
-    private String channel_up;
-    private String channel_down;
-    private String navigate_up;
-    private String navigate_down;
-    private String navigate_left;
-    private String navigate_right;
-    private String volume_up;
-    private String volume_down;
-    private String back;
-    private String homepage;
-    private String menu;
-    private String zero;
-    private String nine;
-    private String eight;
-    private String seven;
-    private String six;
-    private String five;
-    private String four;
-    private String three;
-    private String two;
-    private String one;
-    private String rcode;
     private String uuid;
     private InfraredBean.Remote_list.Ir_list data;
     private String type;
@@ -96,7 +61,7 @@ public class IrDianShiActivity extends BaseActivity{
 
     @Override
     protected String getTitleName() {
-        return "电视";
+        return "机顶盒";
     }
 
     @Override
@@ -109,16 +74,11 @@ public class IrDianShiActivity extends BaseActivity{
         });
         initRoundMenu();
     }
-
-    @Override
-    protected int getLayoutID() {
-        return R.layout.activity_dian_shi;
-    }
     private void initRoundMenu() {
         RoundMenuView.RoundMenu roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = getResources().getColor(R.color.gray_9999);
         roundMenu.strokeColor = getResources().getColor(R.color.gray_9999);
-        roundMenu.icon = ImageUtil.drawable2Bitmap(IrDianShiActivity.this, R.mipmap.right);
+        roundMenu.icon = ImageUtil.drawable2Bitmap(IrJDHActivity.this, R.mipmap.right);
         roundMenu.onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -131,7 +91,7 @@ public class IrDianShiActivity extends BaseActivity{
         roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = getResources().getColor(R.color.gray_9999);
         roundMenu.strokeColor = getResources().getColor(R.color.gray_9999);
-        roundMenu.icon = ImageUtil.drawable2Bitmap(IrDianShiActivity.this, R.mipmap.right);
+        roundMenu.icon = ImageUtil.drawable2Bitmap(IrJDHActivity.this, R.mipmap.right);
         roundMenu.onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -144,7 +104,7 @@ public class IrDianShiActivity extends BaseActivity{
         roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = getResources().getColor(R.color.gray_9999);
         roundMenu.strokeColor = getResources().getColor(R.color.gray_9999);
-        roundMenu.icon = ImageUtil.drawable2Bitmap(IrDianShiActivity.this, R.mipmap.right);
+        roundMenu.icon = ImageUtil.drawable2Bitmap(IrJDHActivity.this, R.mipmap.right);
         roundMenu.onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -157,7 +117,7 @@ public class IrDianShiActivity extends BaseActivity{
         roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = getResources().getColor(R.color.gray_9999);
         roundMenu.strokeColor = getResources().getColor(R.color.gray_9999);
-        roundMenu.icon = ImageUtil.drawable2Bitmap(IrDianShiActivity.this, R.mipmap.right);
+        roundMenu.icon = ImageUtil.drawable2Bitmap(IrJDHActivity.this, R.mipmap.right);
         roundMenu.onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -169,69 +129,102 @@ public class IrDianShiActivity extends BaseActivity{
 
         roundMenuView.setCoreMenu(getResources().getColor(R.color.gray_f2f2),
                 getResources().getColor(R.color.gray_9999), getResources().getColor(R.color.gray_9999)
-                , 1, 0.43, ImageUtil.drawable2Bitmap(IrDianShiActivity.this, R.drawable.ok), new View.OnClickListener() {
+                , 1, 0.43, ImageUtil.drawable2Bitmap(IrJDHActivity.this, R.drawable.ok), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 //                       ok
-                        sendCode("OK");
+                        sendCode("确认");
                     }
                 });
     }
-    @OnClick({R.id.tv_ds_power, R.id.tv_ds_inputsource, R.id.tv_ds_number, R.id.tv_ds_menu, R.id.tv_ds_novoice,
-            R.id.tv_ds_exp, R.id.tv_ds_channel_up, R.id.tv_ds_channel_down, R.id.tv_ds_home, R.id.tv_ds_back, R.id.tv_ds_voice_up, R.id.tv_ds_voice_down})
+    @Override
+    protected int getLayoutID() {
+        return R.layout.activity_jdh;
+    }
+    @OnClick({R.id.tv_jdh_power, R.id.tv_jdh_menu, R.id.tv_jdh_number, R.id.tv_jdh_novoice, R.id.tv_jdh_back, R.id.tv_jdh_channel_up, R.id.tv_jdh_channel_down, R.id.tv_jdh_voice_up, R.id.tv_jdh_voice_down})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.tv_ds_power:
+            case R.id.tv_jdh_power:
                 //开关
                 sendCode("电源");
                 break;
-            case R.id.tv_ds_inputsource:
-                //输入源
-                sendCode("信号源");
+            case R.id.tv_jdh_menu:
+                //菜单
+                sendCode("菜单");
                 break;
-            case R.id.tv_ds_number:
+            case R.id.tv_jdh_number:
                 //数字键盘
                 dialog = new TVNumDialog(this, R.style.MyDialogStyle, NumOnClick);
                 dialog.setCanceledOnTouchOutside(true);
                 dialog.show();
                 break;
-            case R.id.tv_ds_menu:
-                //菜单
-                sendCode("菜单");
-                break;
-            case R.id.tv_ds_novoice:
-                //静音
+            case R.id.tv_jdh_novoice:
                 sendCode("静音");
                 break;
-            case R.id.tv_ds_exp:
-//                扩展键
+            case R.id.tv_jdh_back:
+                sendCode("返回");
                 break;
-            case R.id.tv_ds_channel_up:
+            case R.id.tv_jdh_channel_up:
 //                频道+
                 sendCode("频道+");
                 break;
-            case R.id.tv_ds_channel_down:
-//                频道-
+            case R.id.tv_jdh_channel_down:
+                //                频道-
                 sendCode("频道-");
                 break;
-            case R.id.tv_ds_home:
-                //主页
-                sendCode("首页");
-                break;
-            case R.id.tv_ds_back:
-//                #
-                sendCode("#");
-                break;
-            case R.id.tv_ds_voice_up:
-//                声音+
+            case R.id.tv_jdh_voice_up:
+                //                声音+
                 sendCode("音量+");
                 break;
-            case R.id.tv_ds_voice_down:
-//                声音-
+            case R.id.tv_jdh_voice_down:
+                //                声音-
                 sendCode("音量-");
                 break;
         }
     }
+    public View.OnClickListener NumOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.tv_num_one:
+                    sendCode("1");
+                    break;
+                case R.id.tv_num_two:
+                    sendCode("2");
+                    break;
+                case R.id.tv_num_three:
+                    sendCode("3");
+                    break;
+                case R.id.tv_num_four:
+                    sendCode("4");
+                    break;
+                case R.id.tv_num_five:
+                    sendCode("5");
+                    break;
+                case R.id.tv_num_six:
+                    sendCode("6");
+                    break;
+                case R.id.tv_num_seven:
+                    sendCode("7");
+                    break;
+                case R.id.tv_num_eight:
+                    sendCode("8");
+                    break;
+                case R.id.tv_num_nine:
+                    sendCode("9");
+                    break;
+                case R.id.tv_num_back:
+                    sendCode("回看");
+                    break;
+                case R.id.tv_num_zero:
+                    sendCode("0");
+                    break;
+                case R.id.tv_num_pick:
+                    sendCode("-/--");
+                    break;
+            }
+        }
+    };
 
     private void sendCode(String handle) {
         OkHttpUtils
@@ -265,48 +258,4 @@ public class IrDianShiActivity extends BaseActivity{
                 });
 
     }
-
-    public View.OnClickListener NumOnClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.tv_num_one:
-                    sendCode("1");
-                    break;
-                case R.id.tv_num_two:
-                    sendCode("2");
-                    break;
-                case R.id.tv_num_three:
-                    sendCode("3");
-                    break;
-                case R.id.tv_num_four:
-                    sendCode("4");
-                    break;
-                case R.id.tv_num_five:
-                    sendCode("5");
-                    break;
-                case R.id.tv_num_six:
-                    sendCode("6");
-                    break;
-                case R.id.tv_num_seven:
-                    sendCode("7");
-                    break;
-                case R.id.tv_num_eight:
-                    sendCode("8");
-                    break;
-                case R.id.tv_num_nine:
-                    sendCode("9");
-                    break;
-                case R.id.tv_num_back:
-                    sendCode("返回");
-                    break;
-                case R.id.tv_num_zero:
-                    sendCode("0");
-                    break;
-                case R.id.tv_num_pick:
-                    sendCode("-/--");
-                    break;
-            }
-        }
-    };
 }

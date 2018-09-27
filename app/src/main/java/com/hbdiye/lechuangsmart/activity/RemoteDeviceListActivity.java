@@ -129,36 +129,42 @@ public class RemoteDeviceListActivity extends BaseActivity {
                 String type = mList.get(position).type;
                 switch (type) {
                     case "1":
-                        SmartToast.show("空调");
+                        startActivity(new Intent(RemoteDeviceListActivity.this, IrKongTiaoActivity.class)
+                                .putExtra("data", mList.get(position))
+                                .putExtra("uuid", uuid));
                         break;
                     case "2":
-                        startActivity(new Intent(RemoteDeviceListActivity.this,IrDianShiActivity.class)
-                        .putExtra("data",mList.get(position))
-                        .putExtra("uuid",uuid));
+                        startActivity(new Intent(RemoteDeviceListActivity.this, IrDianShiActivity.class)
+                                .putExtra("data", mList.get(position))
+                                .putExtra("uuid", uuid));
                         break;
                     case "3":
-                        SmartToast.show("机顶盒");
+                        startActivity(new Intent(RemoteDeviceListActivity.this, IrJDHActivity.class)
+                                .putExtra("data", mList.get(position))
+                                .putExtra("uuid", uuid));
                         break;
                     case "4":
-                        SmartToast.show("DVD");
+//                        SmartToast.show("DVD");
                         break;
                     case "5":
-                        SmartToast.show("电风扇");
+                        startActivity(new Intent(RemoteDeviceListActivity.this, IrFSActivity.class)
+                                .putExtra("data", mList.get(position))
+                                .putExtra("uuid", uuid));
                         break;
                     case "6":
-                        SmartToast.show("空气净化器");
+//                        SmartToast.show("空气净化器");
                         break;
                     case "7":
-                        SmartToast.show("IPTV");
+//                        SmartToast.show("IPTV");
                         break;
                     case "8":
-                        SmartToast.show("投影仪");
+//                        SmartToast.show("投影仪");
                         break;
                     case "9":
-                        SmartToast.show("功放");
+//                        SmartToast.show("功放");
                         break;
                     case "10":
-                        SmartToast.show("热水器");
+//                        SmartToast.show("热水器");
                         break;
                 }
             }

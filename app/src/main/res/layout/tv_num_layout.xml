@@ -128,7 +128,7 @@
                 android:layout_height="60dp"
                 android:background="@drawable/shap_num_circle"
                 android:gravity="center"
-                android:text="回看"
+                android:text="#"
                 android:layout_margin="@dimen/dp_10"
                 android:textSize="@dimen/size_20" />
             <TextView

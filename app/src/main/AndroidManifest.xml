@@ -236,6 +236,9 @@
         <activity android:name=".activity.RemoteDeviceListActivity" />
         <activity android:name=".activity.DeviceListActivity"></activity>
         <activity android:name=".activity.IrDianShiActivity"/>
+        <activity android:name=".activity.IrKongTiaoActivity"/>
+        <activity android:name=".activity.IrJDHActivity"/>
+        <activity android:name=".activity.IrFSActivity"/>
     </application>
 
 </manifest>

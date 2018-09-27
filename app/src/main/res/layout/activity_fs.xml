@@ -91,6 +91,7 @@
             android:gravity="center"
             android:padding="@dimen/dp_20"
             android:text="静音"
+            android:visibility="invisible"
             android:textColor="#000" />
     </LinearLayout>
 </LinearLayout>

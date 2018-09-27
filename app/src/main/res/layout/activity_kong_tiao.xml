@@ -73,6 +73,7 @@
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
+            android:visibility="gone"
             android:background="#e8e8e8" />
 
         <TextView
@@ -81,6 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:visibility="gone"
             android:padding="@dimen/dp_30"
             android:text="扫风" />
     </LinearLayout>
@@ -143,7 +145,6 @@
     <com.zhouyou.view.seekbar.SignSeekBar
         android:id="@+id/seek_bar"
         android:layout_width="match_parent"
-        android:visibility="invisible"
         android:layout_height="16dp"
         app:ssb_section_text_position="bottom_sides"
         app:ssb_show_progress_in_float="false"
@@ -156,11 +157,14 @@
         app:ssb_sign_border_color="@color/color_red"
         app:ssb_sign_border_size="1dp"
         app:ssb_sign_color="@color/color_gray"
+        android:paddingLeft="@dimen/dp_10"
+        android:paddingRight="@dimen/dp_10"
         app:ssb_sign_show_border="true"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_20"
+        android:visibility="gone"
         android:orientation="horizontal">
 
         <TextView
