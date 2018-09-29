@@ -38,7 +38,13 @@ public class TiZhiBean implements Serializable  {
                     public String impedance  ;
                     public String bone  ;
                     public Double moisture  ;
+                    public Double temperature;
+                    public Double weight;
                     public String result  ;
+                    public Double bloodsugar;
+                    public int diastolic;
+                    public int systolic;
+                    public int pulse;
                     public String medicId  ;
                     public Double adiposerate  ;
                     public Double muscle  ;

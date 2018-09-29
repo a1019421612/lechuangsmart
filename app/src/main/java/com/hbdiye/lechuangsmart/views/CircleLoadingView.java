@@ -200,7 +200,7 @@ public class CircleLoadingView extends View {
     private void drawTextValue(Canvas canvas) {
         canvas.save();
 
-        String showValue = String.valueOf(progress);
+        String showValue = (float)progress/10+"";
         Rect textBound = new Rect();
         mTextPaint.getTextBounds(showValue, 0, showValue.length(), textBound);    // 获取文字的矩形范围
         float textWidth = textBound.right - textBound.left;  // 获得文字宽

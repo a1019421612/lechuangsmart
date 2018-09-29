@@ -46,6 +46,7 @@ public class DashboardView extends View {
     private String mHeaderText = "BETA"; // 表头
     private int mCreditValue = 650; // 信用分
     private int mSolidCreditValue = mCreditValue; // 信用分(设定后不变)
+    private String weight="0";
     private int mSparkleWidth; // 亮点宽度
     private int mProgressWidth; // 进度圆弧宽度
     private float mLength1; // 刻度顶部相对边缘的长度
@@ -312,7 +313,7 @@ public class DashboardView extends View {
         mPaint.setAlpha(255);
         mPaint.setTextSize(sp2px(30));
         mPaint.setTextAlign(Paint.Align.CENTER);
-        String value = String.valueOf(mSolidCreditValue-350);
+        String value = weight;
         canvas.drawText(value, mCenterX, mCenterY + dp2px(10), mPaint);
 
         /**
@@ -463,7 +464,12 @@ public class DashboardView extends View {
     public int getCreditValue() {
         return mCreditValue;
     }
-
+/**
+ * 设置体重
+ */
+public void setWeightValue(String value){
+    weight=value;
+};
     /**
      * 设置信用值
      *
